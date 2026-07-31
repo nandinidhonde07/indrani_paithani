@@ -9,10 +9,7 @@
     "images": [
       "/assets/products/product_1.jpg",
       "/assets/products/product_1.jpg",
-      "https://picsum.photos/seed/lotusheritage_zoom/600/800",
-      "https://picsum.photos/seed/lotusheritage_back/600/800",
-      "https://picsum.photos/seed/lotusheritage_pallu/600/800",
-      "https://picsum.photos/seed/lotusheritage_border/600/800"
+      "/assets/products/product_1.jpg"
     ],
     "description": "Lotus Heritage Silk Paithani saree is a masterpiece of Yeola handloom weaving. Rich gold borders showcase traditional pink lotus blossoms, draping the wearer in royal luxury.",
     "fabric": "Pure Silk",
@@ -27,6 +24,7 @@
     "rating": 5.0,
     "reviewsCount": 18,
     "featured": true,
+    "bestSeller": true,
     "newArrival": true
   },
   {
@@ -39,10 +37,7 @@
     "images": [
       "/assets/products/lotus_swan_flat.png",
       "/assets/products/lotus_swan_draped.jpg",
-      "https://picsum.photos/seed/lotusswan_zoom/600/800",
-      "https://picsum.photos/seed/lotusswan_back/600/800",
-      "https://picsum.photos/seed/lotusswan_pallu/600/800",
-      "https://picsum.photos/seed/lotusswan_border/600/800"
+      "/assets/products/lotus_swan_flat.png"
     ],
     "description": "Exquisite handwoven Lotus Swan Border Paithani saree featuring a radiant magenta pink body, intricately decorated with silver thread borders showcasing twin swan and pink lotus motifs.",
     "fabric": "Pure Silk",
@@ -69,11 +64,7 @@
     "image": "/assets/products/muniya_2.png",
     "images": [
       "/assets/products/muniya_2.png",
-      "/assets/products/muniya_2.png",
-      "https://picsum.photos/seed/muniya2_zoom/600/800",
-      "https://picsum.photos/seed/muniya2_back/600/800",
-      "https://picsum.photos/seed/muniya2_pallu/600/800",
-      "https://picsum.photos/seed/muniya2_border/600/800"
+      "/assets/products/muniya_2.png"
     ],
     "description": "Exquisite handwoven Muniya Paithani saree in a bright saffron tone with beautiful horizontal stripes. Perfect for festive celebrations.",
     "fabric": "Pure Silk",
@@ -100,11 +91,7 @@
     "image": "/assets/products/purple_parrot.png",
     "images": [
       "/assets/products/purple_parrot.png",
-      "/assets/products/purple_parrot.png",
-      "https://picsum.photos/seed/purple_zoom/600/800",
-      "https://picsum.photos/seed/purple_back/600/800",
-      "https://picsum.photos/seed/purple_pallu/600/800",
-      "https://picsum.photos/seed/purple_border/600/800"
+      "/assets/products/purple_parrot.png"
     ],
     "description": "Luxurious purple handwoven saree featuring delicate parrot and peacock motifs on premium silk. An signature collectible drape.",
     "fabric": "Pure Silk",
@@ -131,11 +118,7 @@
     "image": "/assets/products/paper_tissue.png",
     "images": [
       "/assets/products/paper_tissue.png",
-      "/assets/products/paper_tissue.png",
-      "https://picsum.photos/seed/paper_zoom/600/800",
-      "https://picsum.photos/seed/paper_back/600/800",
-      "https://picsum.photos/seed/paper_pallu/600/800",
-      "https://picsum.photos/seed/paper_border/600/800"
+      "/assets/products/paper_tissue.png"
     ],
     "description": "Modern lightweight pink paper tissue border Paithani saree displaying classic twin swans on the pallu.",
     "fabric": "Silk",
@@ -162,11 +145,7 @@
     "image": "/assets/products/multicolor_tissue.png",
     "images": [
       "/assets/products/multicolor_tissue.png",
-      "/assets/products/multicolor_tissue.png",
-      "https://picsum.photos/seed/multi_zoom/600/800",
-      "https://picsum.photos/seed/multi_back/600/800",
-      "https://picsum.photos/seed/multi_pallu/600/800",
-      "https://picsum.photos/seed/multi_border/600/800"
+      "/assets/products/multicolor_tissue.png"
     ],
     "description": "Multi-colored striped paper tissue border Paithani displaying a rich peacock pallu in traditional gold weave.",
     "fabric": "Silk",
@@ -193,11 +172,7 @@
     "image": "/assets/products/all_over_brockate.png",
     "images": [
       "/assets/products/all_over_brockate.png",
-      "/assets/products/all_over_brockate.png",
-      "https://picsum.photos/seed/brockate_zoom/600/800",
-      "https://picsum.photos/seed/brockate_back/600/800",
-      "https://picsum.photos/seed/brockate_pallu/600/800",
-      "https://picsum.photos/seed/brockate_border/600/800"
+      "/assets/products/all_over_brockate.png"
     ],
     "description": "Masterpiece heritage item featuring an all-over brocade body with beautiful climbing vines and Muniya border.",
     "fabric": "Pure Silk",
@@ -224,11 +199,7 @@
     "image": "/assets/products/silk_duppata.png",
     "images": [
       "/assets/products/silk_duppata.png",
-      "/assets/products/silk_duppata.png",
-      "https://picsum.photos/seed/duppata_zoom/600/800",
-      "https://picsum.photos/seed/duppata_back/600/800",
-      "https://picsum.photos/seed/duppata_pallu/600/800",
-      "https://picsum.photos/seed/duppata_border/600/800"
+      "/assets/products/silk_duppata.png"
     ],
     "description": "Exquisite pure silk dupatta with climbing flower patterns and traditional border work.",
     "fabric": "Silk",
@@ -240,6 +211,292 @@
     "motif": "Floral Vines",
     "collection": "Pure Silk Collection",
     "stock": 8,
+    "rating": 4.9,
+    "reviewsCount": 19,
+    "featured": false,
+    "bestSeller": false,
+    "newArrival": false
+  },
+  {
+    "id": "1",
+    "name": "Royal Peacock Paithani",
+    "category": "Pure Silk Paithani",
+    "price": 28000,
+    "image": "/assets/products/muniya_1.png",
+    "images": [
+      "/assets/products/muniya_1.png",
+      "/assets/products/muniya_1.png"
+    ],
+    "description": "Exquisite pure silk saree with peacock motif and intricate zari work.",
+    "fabric": "Pure Silk",
+    "silkType": "Mulberry Silk",
+    "zari": "Gold",
+    "weight": "1.2kg",
+    "length": "6.5m",
+    "color": "Red-Orange",
+    "motif": "Peacock",
+    "collection": "Pure Silk Collection",
+    "stock": 4,
+    "rating": 4.9,
+    "reviewsCount": 10,
+    "featured": false,
+    "bestSeller": false,
+    "newArrival": false
+  },
+  {
+    "id": "2",
+    "name": "Lotus Silk Paithani",
+    "category": "Pure Silk Paithani",
+    "price": 34500,
+    "image": "/assets/products/lotus_swan_flat.png",
+    "images": [
+      "/assets/products/lotus_swan_flat.png",
+      "/assets/products/lotus_swan_flat.png"
+    ],
+    "description": "Elegant lotus design woven with premium silk and golden zari.",
+    "fabric": "Pure Silk",
+    "silkType": "Mulberry Silk",
+    "zari": "Gold",
+    "weight": "1.3kg",
+    "length": "6.5m",
+    "color": "Pink",
+    "motif": "Lotus",
+    "collection": "Pure Silk Collection",
+    "stock": 3,
+    "rating": 4.8,
+    "reviewsCount": 12,
+    "featured": false,
+    "bestSeller": false,
+    "newArrival": false
+  },
+  {
+    "id": "3",
+    "name": "Traditional Muniya Paithani",
+    "category": "Traditional Collection",
+    "price": 42500,
+    "image": "/assets/products/muniya_2.png",
+    "images": [
+      "/assets/products/muniya_2.png",
+      "/assets/products/muniya_2.png"
+    ],
+    "description": "Classic traditional pattern with rich colour palette.",
+    "fabric": "Silk",
+    "silkType": "Tussar",
+    "zari": "Silver",
+    "weight": "1.1kg",
+    "length": "6.5m",
+    "color": "Saffron Orange",
+    "motif": "Muniya",
+    "collection": "Traditional Collection",
+    "stock": 5,
+    "rating": 4.7,
+    "reviewsCount": 14,
+    "featured": false,
+    "bestSeller": false,
+    "newArrival": false
+  },
+  {
+    "id": "4",
+    "name": "Bridal Red Paithani",
+    "category": "Bridal Paithani",
+    "price": 56000,
+    "image": "/assets/products/product_1.jpg",
+    "images": [
+      "/assets/products/product_1.jpg",
+      "/assets/products/product_1.jpg"
+    ],
+    "description": "Luxurious red bridal saree with intricate gold zari borders.",
+    "fabric": "Pure Silk",
+    "silkType": "Mulberry Silk",
+    "zari": "Gold",
+    "weight": "1.5kg",
+    "length": "6.5m",
+    "color": "Red-Orange",
+    "motif": "Lotus",
+    "collection": "Bridal Collection",
+    "stock": 2,
+    "rating": 5.0,
+    "reviewsCount": 20,
+    "featured": false,
+    "bestSeller": false,
+    "newArrival": false
+  },
+  {
+    "id": "5",
+    "name": "Purple Peacock Paithani",
+    "category": "Luxury Collection",
+    "price": 69500,
+    "image": "/assets/products/purple_parrot.png",
+    "images": [
+      "/assets/products/purple_parrot.png",
+      "/assets/products/purple_parrot.png"
+    ],
+    "description": "Regal purple saree featuring peacock motifs and premium zari.",
+    "fabric": "Pure Silk",
+    "silkType": "Mulberry Silk",
+    "zari": "Gold",
+    "weight": "1.4kg",
+    "length": "6.5m",
+    "color": "Purple",
+    "motif": "Peacock",
+    "collection": "Luxury Collection",
+    "stock": 4,
+    "rating": 4.9,
+    "reviewsCount": 11,
+    "featured": false,
+    "bestSeller": false,
+    "newArrival": false
+  },
+  {
+    "id": "6",
+    "name": "Golden Tissue Paithani",
+    "category": "Luxury Collection",
+    "price": 78000,
+    "image": "/assets/products/all_over_brockate.png",
+    "images": [
+      "/assets/products/all_over_brockate.png",
+      "/assets/products/all_over_brockate.png"
+    ],
+    "description": "Opulent golden tissue weave with traditional motifs.",
+    "fabric": "Silk",
+    "silkType": "Tussar",
+    "zari": "Gold",
+    "weight": "1.3kg",
+    "length": "6.5m",
+    "color": "Cream",
+    "motif": "Floral",
+    "collection": "Luxury Collection",
+    "stock": 3,
+    "rating": 4.8,
+    "reviewsCount": 9,
+    "featured": false,
+    "bestSeller": false,
+    "newArrival": false
+  },
+  {
+    "id": "7",
+    "name": "Royal Green Paithani",
+    "category": "Heritage Collection",
+    "price": 84500,
+    "image": "/assets/products/multicolor_tissue.png",
+    "images": [
+      "/assets/products/multicolor_tissue.png",
+      "/assets/products/multicolor_tissue.png"
+    ],
+    "description": "Deep green heritage saree with intricate zari patterns.",
+    "fabric": "Pure Silk",
+    "silkType": "Mulberry Silk",
+    "zari": "Silver",
+    "weight": "1.2kg",
+    "length": "6.5m",
+    "color": "Multicolor",
+    "motif": "Peacock",
+    "collection": "Heritage Collection",
+    "stock": 2,
+    "rating": 4.9,
+    "reviewsCount": 13,
+    "featured": false,
+    "bestSeller": false,
+    "newArrival": false
+  },
+  {
+    "id": "8",
+    "name": "Wedding Special Paithani",
+    "category": "Wedding Collection",
+    "price": 102000,
+    "image": "/assets/products/product_1.jpg",
+    "images": [
+      "/assets/products/product_1.jpg",
+      "/assets/products/product_1.jpg"
+    ],
+    "description": "Elegant wedding saree with regal embroidery and zari.",
+    "fabric": "Silk",
+    "silkType": "Tussar",
+    "zari": "Gold",
+    "weight": "1.6kg",
+    "length": "6.5m",
+    "color": "Pink-Lavender",
+    "motif": "Lotus",
+    "collection": "Wedding Collection",
+    "stock": 1,
+    "rating": 5.0,
+    "reviewsCount": 16,
+    "featured": false,
+    "bestSeller": false,
+    "newArrival": false
+  },
+  {
+    "id": "9",
+    "name": "Heritage Collection Paithani",
+    "category": "Heritage Collection",
+    "price": 115000,
+    "image": "/assets/products/lotus_swan_flat.png",
+    "images": [
+      "/assets/products/lotus_swan_flat.png",
+      "/assets/products/lotus_swan_flat.png"
+    ],
+    "description": "Timeless heritage design with subtle gold accents.",
+    "fabric": "Pure Silk",
+    "silkType": "Mulberry Silk",
+    "zari": "Gold",
+    "weight": "1.5kg",
+    "length": "6.5m",
+    "color": "Pink",
+    "motif": "Swan",
+    "collection": "Heritage Collection",
+    "stock": 3,
+    "rating": 4.9,
+    "reviewsCount": 8,
+    "featured": false,
+    "bestSeller": false,
+    "newArrival": false
+  },
+  {
+    "id": "10",
+    "name": "Classic Maharani Paithani",
+    "category": "Traditional Collection",
+    "price": 132000,
+    "image": "/assets/products/muniya_1.png",
+    "images": [
+      "/assets/products/muniya_1.png",
+      "/assets/products/muniya_1.png"
+    ],
+    "description": "Classic design inspired by royal Maharani motifs.",
+    "fabric": "Silk",
+    "silkType": "Tussar",
+    "zari": "Silver",
+    "weight": "1.4kg",
+    "length": "6.5m",
+    "color": "Red-Orange",
+    "motif": "Parrot",
+    "collection": "Traditional Collection",
+    "stock": 2,
+    "rating": 5.0,
+    "reviewsCount": 15,
+    "featured": false,
+    "bestSeller": false,
+    "newArrival": false
+  },
+  {
+    "id": "11",
+    "name": "Pure Silk Paithani",
+    "category": "Pure Silk Paithani",
+    "price": 165000,
+    "image": "/assets/products/paper_tissue.png",
+    "images": [
+      "/assets/products/paper_tissue.png",
+      "/assets/products/paper_tissue.png"
+    ],
+    "description": "Pure silk base with intricate zari patterns.",
+    "fabric": "Pure Silk",
+    "silkType": "Mulberry Silk",
+    "zari": "Gold",
+    "weight": "1.5kg",
+    "length": "6.5m",
+    "color": "Pink",
+    "motif": "Lotus",
+    "collection": "Pure Silk Collection",
+    "stock": 4,
     "rating": 4.9,
     "reviewsCount": 19,
     "featured": false,
