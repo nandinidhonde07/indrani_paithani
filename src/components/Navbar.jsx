@@ -88,13 +88,13 @@ const Navbar = ({ isScrolled, isTransparentInit }) => {
 
   // Dynamic navbar styling based on scroll positions
   const navbarBg = (isTransparentInit && !isScrolled)
-    ? 'bg-transparent text-white border-transparent'
-    : 'bg-white text-black shadow-premium border-b border-gold/15';
+    ? 'bg-transparent text-gold border-transparent'
+    : 'bg-white text-gold shadow-premium border-b border-gold/15';
 
-  const brandColor = (isTransparentInit && !isScrolled) ? 'text-gold' : 'text-maroon';
-  const inputBg = (isTransparentInit && !isScrolled) ? 'bg-white/10 text-white placeholder-white/70 border-white/30' : 'bg-cream/40 text-black border-gold/30';
+  const brandColor = 'text-gold';
+  const inputBg = (isTransparentInit && !isScrolled) ? 'bg-white/10 text-gold placeholder-gold/70 border-gold/30' : 'bg-cream/40 text-gold border-gold/30';
   const navLinkStyle = ({ isActive }) =>
-    isActive ? 'text-gold border-b-2 border-gold pb-1 font-bold' : 'hover:text-gold transition pb-1 border-b-2 border-transparent';
+    isActive ? 'text-gold border-b-2 border-gold pb-1 font-bold' : 'text-gold hover:text-gold/80 transition pb-1 border-b-2 border-transparent';
 
   return (
     <>
@@ -121,10 +121,11 @@ const Navbar = ({ isScrolled, isTransparentInit }) => {
               onMouseEnter={() => setShowMegaMenu(true)}
               onMouseLeave={() => setShowMegaMenu(false)}
             >
-              <button className="hover:text-gold flex items-center space-x-1 py-2 font-semibold tracking-wider">
+              <button className="text-gold hover:text-gold/80 flex items-center space-x-1 py-2 font-semibold tracking-wider">
                 <span>Shop</span>
                 <FaChevronDown size={8} />
               </button>
+
 
               {showMegaMenu && (
                 <div className="absolute left-1/2 transform -translate-x-1/2 top-full w-[850px] bg-white text-black border border-gold/25 shadow-2xl rounded-2xl p-8 grid grid-cols-3 gap-8 z-50 animate-fade-in">

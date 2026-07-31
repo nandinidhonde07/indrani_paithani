@@ -81,7 +81,8 @@ const Home = () => {
           className="absolute inset-0 bg-cover bg-center z-0"
           style={{ backgroundImage: `url('/assets/homepage_bg.jpg')` }}
         />
-        <div className="absolute inset-0 bg-maroon/60 z-10"></div>
+        {/* Remove overlay to make background image fully visible */}
+        <div className="absolute inset-0 bg-black/10 z-10"></div>
 
         {/* Shimmer title and centered info */}
         <div className="relative z-20 text-center text-white px-6 max-w-4xl space-y-6">
