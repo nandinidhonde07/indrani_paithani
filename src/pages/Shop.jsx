@@ -268,23 +268,15 @@ const Shop = () => {
                       className="group bg-white rounded-2xl overflow-hidden shadow-premium border border-gold/10 hover:shadow-2xl hover:-translate-y-1.5 transition duration-500 relative flex flex-col justify-between"
                     >
                       {/* Card Image */}
-                      <div className="relative overflow-hidden aspect-[3/4]">
+                      <div className="relative overflow-hidden aspect-[3/4] bg-white">
                         <img
                           src={p.image}
                           alt={p.name}
-                          className={`w-full h-full object-cover transition-transform duration-700 ${
-                            hasSecondary ? 'group-hover:opacity-0' : 'group-hover:scale-105'
-                          }`}
+                          className="w-full h-full object-cover"
                         />
-                        {hasSecondary && (
-                          <img
-                            src={p.images[1]}
-                            alt={p.name}
-                            className="absolute inset-0 w-full h-full object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-700"
-                          />
-                        )}
 
                         {/* Badges */}
+
                         <div className="absolute top-3 left-3 flex flex-col space-y-1">
                           {discount > 0 && (
                             <span className="bg-red-600 text-white text-[8px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
