@@ -88,13 +88,13 @@ const Navbar = ({ isScrolled, isTransparentInit }) => {
 
   // Dynamic navbar styling based on scroll positions
   const navbarBg = (isTransparentInit && !isScrolled)
-    ? 'bg-transparent text-gold border-transparent'
-    : 'bg-white text-gold shadow-premium border-b border-gold/15';
+    ? 'bg-transparent text-black border-transparent'
+    : 'bg-white text-black shadow-premium border-b border-gold/15';
 
-  const brandColor = 'text-gold';
-  const inputBg = (isTransparentInit && !isScrolled) ? 'bg-white/10 text-gold placeholder-gold/70 border-gold/30' : 'bg-cream/40 text-gold border-gold/30';
+  const brandColor = 'text-black';
+  const inputBg = (isTransparentInit && !isScrolled) ? 'bg-white/10 text-black placeholder-black/70 border-gold/30' : 'bg-cream/40 text-black border-gold/30';
   const navLinkStyle = ({ isActive }) =>
-    isActive ? 'text-gold border-b-2 border-gold pb-1 font-bold' : 'text-gold hover:text-gold/80 transition pb-1 border-b-2 border-transparent';
+    isActive ? 'text-black border-b-2 border-black pb-1 font-bold' : 'text-black hover:text-black/70 transition pb-1 border-b-2 border-transparent';
 
   return (
     <>
@@ -121,7 +121,7 @@ const Navbar = ({ isScrolled, isTransparentInit }) => {
               onMouseEnter={() => setShowMegaMenu(true)}
               onMouseLeave={() => setShowMegaMenu(false)}
             >
-              <button className="text-gold hover:text-gold/80 flex items-center space-x-1 py-2 font-semibold tracking-wider">
+              <button className="text-black hover:text-black/70 flex items-center space-x-1 py-2 font-semibold tracking-wider">
                 <span>Shop</span>
                 <FaChevronDown size={8} />
               </button>
@@ -226,12 +226,12 @@ const Navbar = ({ isScrolled, isTransparentInit }) => {
 
           {/* Actions & Dropdowns */}
           <div className="flex items-center space-x-6">
-            <Link to="/buyer-dashboard/wishlist" className="hover:text-gold transition">
+            <Link to="/buyer-dashboard/wishlist" className="hover:text-black/70 transition">
               <FiHeart size={18} />
             </Link>
             
             {/* Shopping bag opens slide-out cart drawer */}
-            <button onClick={() => { syncCart(); setShowCartDrawer(true); }} className="hover:text-gold transition relative">
+            <button onClick={() => { syncCart(); setShowCartDrawer(true); }} className="hover:text-black/70 transition relative">
               <FiShoppingCart size={18} />
               {cart.length > 0 && (
                 <span className="absolute -top-2 -right-2 bg-maroon text-gold border border-gold/30 w-4 h-4 text-[9px] rounded-full flex items-center justify-center font-bold">
@@ -246,7 +246,7 @@ const Navbar = ({ isScrolled, isTransparentInit }) => {
               onMouseEnter={() => setShowAuthDropdown(true)}
               onMouseLeave={() => setShowAuthDropdown(false)}
             >
-              <button className="hover:text-gold transition focus:outline-none py-2">
+              <button className="hover:text-black/70 transition focus:outline-none py-2">
                 <FiUser size={18} />
               </button>
 

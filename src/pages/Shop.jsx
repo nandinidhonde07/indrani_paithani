@@ -124,9 +124,41 @@ const Shop = () => {
   return (
     <div className="bg-cream min-h-screen py-10 px-6 relative">
       <div className="container mx-auto">
-        <h1 className="text-3xl md:text-5xl font-heading text-maroon text-center mb-10 tracking-widest">
+        <h1 className="text-3xl md:text-5xl font-heading text-maroon text-center mb-8 tracking-widest">
           The Luxury Saree Boutique
         </h1>
+
+        {/* Category Filter Tabs at the top */}
+        <div className="flex overflow-x-auto whitespace-nowrap scrollbar-hide pb-6 mb-8 space-x-3 border-b border-gold/20 justify-start md:justify-center px-2">
+          {[
+            "All",
+            "Paithani Sarees",
+            "Bridal Collection",
+            "Heritage Collection",
+            "Luxury Collection",
+            "Dress Materials",
+            "Dupattas",
+            "Blouse Pieces",
+            "Paithani Bags",
+            "Potli Bags",
+            "Wallets",
+            "Shawls",
+            "Stoles",
+            "Gift Boxes"
+          ].map((cat, idx) => (
+            <button
+              key={idx}
+              onClick={() => setSelectedCategory(cat === "All" ? "" : cat)}
+              className={`px-5 py-2 text-xs font-bold uppercase tracking-wider rounded-full transition whitespace-nowrap ${
+                (selectedCategory === cat || (cat === "All" && selectedCategory === ""))
+                  ? 'bg-maroon text-gold shadow-md border border-maroon'
+                  : 'bg-white text-maroon border border-gold/40 hover:bg-cream'
+              }`}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Advanced Filter Sidebar */}
@@ -149,23 +181,7 @@ const Shop = () => {
               />
             </div>
 
-            {/* Collection Category */}
-            <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase mb-2">Collection</label>
-              <select
-                value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
-                className="w-full px-3 py-2 border rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-gold bg-white"
-              >
-                <option value="">All Collections</option>
-                <option value="Pure Silk Paithani">Pure Silk Paithani</option>
-                <option value="Bridal Paithani">Bridal Paithani</option>
-                <option value="Wedding Collection">Wedding Collection</option>
-                <option value="Traditional Collection">Traditional Collection</option>
-                <option value="Heritage Collection">Heritage Collection</option>
-                <option value="Luxury Collection">Luxury Collection</option>
-              </select>
-            </div>
+            {/* Collection Category Filter removed, replaced by top tabs */}
 
             {/* Color Filter */}
             <div>

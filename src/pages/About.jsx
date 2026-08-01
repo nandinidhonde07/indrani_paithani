@@ -77,17 +77,11 @@ const About = () => {
             <h2 className="text-sm tracking-[0.2em] text-maroon/60 uppercase">About The Founder</h2>
             <h3 className="text-3xl md:text-5xl font-heading text-maroon">Niharika Wade</h3>
             <h4 className="text-gold font-body tracking-wide font-medium text-lg">Founder & CEO, Indrani Paithani</h4>
-            <blockquote className="italic text-gray-600 border-l-4 border-gold pl-4 text-base">
-              "Luxury begins with trust."
-            </blockquote>
-            <p className="text-gray-700 font-light leading-relaxed">
-              At Indrani Paithani, we are dedicated to preserving and celebrating the timeless heritage of Paithani craftsmanship, proudly carrying forward a legacy that has been cherished for over 64 years.
+            <p className="text-gray-700 font-light leading-relaxed mt-4">
+              Luxury begins with trust. At Indrani Paithani, we are dedicated to preserving and celebrating the timeless heritage of Paithani craftsmanship, proudly carrying forward a legacy that has been cherished for over 64 years. Every creation reflects authenticity, elegance, and uncompromising quality. Our commitment extends beyond beautiful saree.
             </p>
-            <p className="text-gray-700 font-light leading-relaxed">
-              Every creation reflects authenticity, elegance, and uncompromising quality. Our commitment extends beyond beautiful sarees. We strive to build lasting relationships founded on customer satisfaction, transparency, and unwavering trust.
-            </p>
-            <p className="text-gray-700 font-light leading-relaxed">
-              These values remain at the heart of everything we do, ensuring every patron experiences the true essence of heritage and luxury.
+            <p className="text-gray-700 font-light leading-relaxed mt-4">
+              We strive to build lasting relationships founded on customer satisfaction, transparency, and unwavering trust. These values remain at the heart of everything we do, ensuring that every patron experiences the true essence of heritage and luxury.
             </p>
           </div>
           <div className="relative">

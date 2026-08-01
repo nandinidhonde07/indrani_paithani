@@ -152,10 +152,10 @@ const Home = () => {
         </div>
       </section>
 
-      {/* 2. FEATURED CATEGORIES */}
+      {/* 2. OUR COLLECTION */}
       <section className="py-24 px-6 bg-white border-b border-gold/15">
         <div className="container mx-auto max-w-6xl">
-          <h2 className="text-center text-3xl md:text-5xl font-heading text-maroon mb-16 tracking-widest">Featured Collections</h2>
+          <h2 className="text-center text-3xl md:text-5xl font-heading text-maroon mb-16 tracking-widest">Our Collection</h2>
           <div className="grid grid-cols-2 md:grid-cols-6 gap-8">
             {categories.map((cat, idx) => (
               <Link to={cat.path} key={idx} className="group flex flex-col items-center space-y-4">
@@ -171,85 +171,7 @@ const Home = () => {
         </div>
       </section>
 
-      {/* 3. INTRODUCING OUR FINEST CREATION */}
-      <section className="py-24 px-6 container mx-auto text-center max-w-3xl space-y-6">
-        <h2 className="text-xs tracking-[0.35em] text-gold uppercase font-semibold">Introducing Our Finest Creation</h2>
-        <h3 className="text-4xl md:text-6xl font-heading text-maroon tracking-wider">PAITHANI COLLECTION</h3>
-        <div className="w-24 h-0.5 bg-gold mx-auto my-4"></div>
-        <p className="text-gray-700 leading-relaxed font-light text-base md:text-lg">
-          Discover exquisite Paithani sarees inspired by centuries of Maharashtrian heritage.
-          Handcrafted with intricate artistry, luxurious fabrics, and timeless elegance, every drape is designed to become a treasured heirloom for generations.
-        </p>
-        <p className="text-gold/80 italic text-xs tracking-widest uppercase">
-          "Crafted over months by skilled artisans."
-        </p>
-      </section>
-
-      {/* 4. PAITHANI COLLECTION GRID */}
-      <section className="py-20 px-6 bg-white border-y border-gold/15">
-        <div className="container mx-auto max-w-6xl">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {productsData.slice(0, 3).map(p => (
-              <div key={p.id} className="group bg-cream/10 rounded-2xl overflow-hidden shadow-premium border border-gold/15 hover:shadow-2xl transition duration-500 relative flex flex-col justify-between">
-                <div className="relative overflow-hidden aspect-[3/4]">
-                  <img src={p.image} alt={p.name} className="w-full h-full object-cover transition-transform duration-750 group-hover:scale-105" />
-                  <div className="absolute top-4 left-4 bg-maroon text-gold text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest border border-gold/30">
-                    Handwoven
-                  </div>
-                </div>
-                <div className="p-6 space-y-4">
-                  <h4 className="font-heading text-2xl text-maroon">{p.name}</h4>
-                  <p className="text-xs text-gray-500 font-light truncate">{p.description}</p>
-                  <div className="flex justify-between items-center pt-2">
-                    <span className="font-bold text-lg text-maroon">₹{p.price.toLocaleString('en-IN')}</span>
-                    <Link to={`/product/${p.id}`} className="text-xs text-gold font-bold border-b border-gold hover:text-maroon pb-1 transition uppercase tracking-widest">
-                      View Saree
-                    </Link>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* 5. BEST SELLERS */}
-      <section className="py-24 px-6">
-        <div className="container mx-auto max-w-6xl">
-          <h2 className="text-center text-3xl md:text-4xl font-heading text-maroon mb-16 tracking-widest">Our Best Sellers</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {bestSellers.map(p => (
-              <div key={p.id} className="bg-white rounded-xl overflow-hidden shadow-premium border border-gold/10 p-4 space-y-3">
-                <img src={p.image} alt={p.name} className="w-full aspect-[3/4] object-cover rounded-lg" />
-                <h4 className="font-heading text-maroon font-semibold truncate text-sm">{p.name}</h4>
-                <div className="flex justify-between items-center text-xs">
-                  <span className="font-bold">₹{p.price.toLocaleString('en-IN')}</span>
-                  <Link to={`/product/${p.id}`} className="text-gold hover:underline font-bold uppercase tracking-wider text-[10px]">Buy Now</Link>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* 6. NEW ARRIVALS */}
-      <section className="py-24 px-6 bg-white border-y border-gold/15">
-        <div className="container mx-auto max-w-6xl">
-          <h2 className="text-center text-3xl md:text-4xl font-heading text-maroon mb-16 tracking-widest">New Arrivals</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {newArrivals.map(p => (
-              <div key={p.id} className="bg-cream/20 rounded-xl overflow-hidden border border-gold/10 p-4 space-y-3">
-                <img src={p.image} alt={p.name} className="w-full aspect-[3/4] object-cover rounded-lg" />
-                <h4 className="font-heading text-maroon font-semibold truncate text-sm">{p.name}</h4>
-                <div className="flex justify-between items-center text-xs">
-                  <span className="font-bold">₹{p.price.toLocaleString('en-IN')}</span>
-                  <Link to={`/product/${p.id}`} className="text-gold hover:underline font-bold uppercase tracking-wider text-[10px]">View</Link>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* (Product grids removed to maintain a clean, premium storytelling homepage) */}
 
       {/* 7. LUXURY BANNER */}
       <div className="bg-maroon py-4 overflow-x-auto whitespace-nowrap scrollbar-none border-y border-gold/30">
@@ -314,8 +236,7 @@ const Home = () => {
         </div>
       </section>
 
-      {/* 9. INTERACTIVE VARIANT SECTION */}
-      <FlipkartVariantSection />
+      {/* 9. INTERACTIVE VARIANT SECTION REMOVED */}
 
       {/* 10. FOUNDER SECTION (PREMIUM EDITORIAL FRAME WITH SIGNATURE PLACEHOLDER) */}
       <section className="py-24 bg-cream">
@@ -338,17 +259,13 @@ const Home = () => {
               
               <div className="w-16 h-0.5 bg-gold my-2"></div>
               
-              <blockquote className="italic text-gray-600 border-l-4 border-gold pl-4 text-sm leading-relaxed">
-                "Luxury is not created overnight—it is woven through generations of trust, artistry, and timeless craftsmanship."
-              </blockquote>
-              
-              <p className="text-gray-700 font-light text-sm leading-relaxed">
-                At Indrani Paithani, we are dedicated to preserving and celebrating the timeless heritage of Paithani craftsmanship, proudly carrying forward a legacy that has been cherished for over 64 years. Every creation reflects authenticity, elegance, and uncompromising quality.
+              <p className="text-gray-700 font-light text-sm leading-relaxed mt-4">
+                Luxury begins with trust. At Indrani Paithani, we are dedicated to preserving and celebrating the timeless heritage of Paithani craftsmanship, proudly carrying forward a legacy that has been cherished for over 64 years. Every creation reflects authenticity, elegance, and uncompromising quality. Our commitment extends beyond beautiful saree.
               </p>
               
-              <div className="pt-4 text-gold/70 font-heading text-lg tracking-widest">
-                Niharika Wade
-              </div>
+              <p className="text-gray-700 font-light text-sm leading-relaxed mt-4">
+                We strive to build lasting relationships founded on customer satisfaction, transparency, and unwavering trust. These values remain at the heart of everything we do, ensuring that every patron experiences the true essence of heritage and luxury.
+              </p>
             </div>
           </div>
         </div>
