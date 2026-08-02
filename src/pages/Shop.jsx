@@ -62,7 +62,12 @@ const Shop = () => {
       );
     }
 
-    if (selectedCategory) result = result.filter(p => p.category === selectedCategory);
+    if (selectedCategory) {
+      result = result.filter(p => 
+        p.category.includes(selectedCategory) || 
+        (selectedCategory === 'Bags' && p.category.toLowerCase().includes('bag'))
+      );
+    }
     if (selectedFabric) result = result.filter(p => p.fabric === selectedFabric);
     if (selectedMotif) result = result.filter(p => p.motif === selectedMotif);
     if (selectedColor) result = result.filter(p => p.color === selectedColor);
@@ -128,36 +133,35 @@ const Shop = () => {
           The Luxury Saree Boutique
         </h1>
 
-        {/* Category Filter Tabs at the top */}
-        <div className="flex overflow-x-auto whitespace-nowrap scrollbar-hide pb-6 mb-8 space-x-3 border-b border-gold/20 justify-start md:justify-center px-2">
+        {/* Category Filter Boxes */}
+        <div className="flex flex-wrap justify-center gap-4 mb-12 px-2">
           {[
             "All",
-            "Paithani Sarees",
-            "Bridal Collection",
-            "Heritage Collection",
-            "Luxury Collection",
-            "Dress Materials",
+            "Pure Silk",
+            "Bridal",
+            "Heritage",
+            "Luxury",
+            "Wedding",
             "Dupattas",
-            "Blouse Pieces",
-            "Paithani Bags",
-            "Potli Bags",
-            "Wallets",
+            "Bags",
             "Shawls",
-            "Stoles",
             "Gift Boxes"
-          ].map((cat, idx) => (
-            <button
-              key={idx}
-              onClick={() => setSelectedCategory(cat === "All" ? "" : cat)}
-              className={`px-5 py-2 text-xs font-bold uppercase tracking-wider rounded-full transition whitespace-nowrap ${
-                (selectedCategory === cat || (cat === "All" && selectedCategory === ""))
-                  ? 'bg-maroon text-gold shadow-md border border-maroon'
-                  : 'bg-white text-maroon border border-gold/40 hover:bg-cream'
-              }`}
-            >
-              {cat}
-            </button>
-          ))}
+          ].map((cat, idx) => {
+            const isSelected = selectedCategory === cat || (cat === "All" && selectedCategory === "");
+            return (
+              <button
+                key={idx}
+                onClick={() => setSelectedCategory(cat === "All" ? "" : cat)}
+                className={`flex flex-col items-center justify-center h-14 px-6 min-w-[120px] rounded-xl border transition-all duration-300 font-heading text-sm uppercase tracking-widest cursor-pointer ${
+                  isSelected
+                    ? 'bg-gold/10 border-gold text-black shadow-[0_4px_14px_rgba(212,175,55,0.2)]'
+                    : 'bg-white border-gold/30 text-black hover:border-gold hover:bg-cream hover:-translate-y-1 hover:shadow-md'
+                }`}
+              >
+                {cat}
+              </button>
+            );
+          })}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">

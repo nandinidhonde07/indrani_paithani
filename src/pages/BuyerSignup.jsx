@@ -25,6 +25,7 @@ const BuyerSignup = () => {
     <div className="bg-cream min-h-screen flex items-center justify-center px-6 py-12">
       <div className="bg-white rounded-3xl p-8 md:p-12 shadow-premium max-w-md w-full border border-gold/10 space-y-6">
         <div className="text-center">
+          <img src="/assets/official_logo.jpg" alt="Indrani Paithani Logo" className="h-16 w-auto mx-auto mb-4 object-contain" />
           <h1 className="text-3xl font-heading text-maroon">Create Account</h1>
           <p className="text-sm text-gray-500 font-light mt-2">Join our luxury heritage family</p>
         </div>

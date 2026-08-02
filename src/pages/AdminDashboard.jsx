@@ -1,6 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import productsData from '../data/products.json';
+import HomepageCMS from './admin/HomepageCMS';
+import MediaLibraryCMS from './admin/MediaLibraryCMS';
+import FounderCMS from './admin/FounderCMS';
+import PolicyCMS from './admin/PolicyCMS';
+import ProductCMS from './admin/ProductCMS';
+import ContactCMS from './admin/ContactCMS';
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -134,21 +140,29 @@ const AdminDashboard = () => {
             <p className="text-xs text-cream/70 font-light mt-1 text-center">Luxury Heritage Suite</p>
           </div>
 
-          <nav className="space-y-2">
+          <nav className="space-y-1 overflow-y-auto max-h-[70vh] pr-2 custom-scrollbar">
             {[
-              { id: 'dashboard', label: 'Dashboard Overview' },
-              { id: 'products', label: 'Products & Multi-Upload' },
-              { id: 'orders', label: 'Orders & Shipping' },
-              { id: 'customers', label: 'Customers DB' },
-              { id: 'analytics', label: 'Revenue Analytics' },
-              { id: 'coupons', label: 'Active Coupons' },
-              { id: 'sections', label: 'Homepage Sections' }
+              { id: 'dashboard', label: 'Dashboard' },
+              { id: 'products', label: 'Products' },
+              { id: 'categories', label: 'Categories' },
+              { id: 'orders', label: 'Orders' },
+              { id: 'customers', label: 'Customers' },
+              { id: 'homepage_cms', label: 'Homepage CMS' },
+              { id: 'founder_cms', label: 'Founder CMS' },
+              { id: 'testimonials', label: 'Testimonials' },
+              { id: 'instagram', label: 'Instagram Gallery' },
+              { id: 'contact', label: 'Contact Info' },
+              { id: 'policy', label: 'Policy Pages' },
+              { id: 'media', label: 'Media Library' },
+              { id: 'banners', label: 'Banner Management' },
+              { id: 'analytics', label: 'Analytics' },
+              { id: 'settings', label: 'Settings' }
             ].map(tab => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`w-full text-left py-2 px-4 rounded-lg font-light text-sm transition ${
-                  activeTab === tab.id ? 'bg-gold text-maroon font-semibold' : 'hover:bg-gold/10'
+                className={`w-full text-left py-2 px-3 rounded-lg font-light text-[13px] transition ${
+                  activeTab === tab.id ? 'bg-gold text-maroon font-semibold shadow-sm' : 'hover:bg-gold/10'
                 }`}
               >
                 {tab.label}
@@ -157,7 +171,7 @@ const AdminDashboard = () => {
           </nav>
         </div>
 
-        <button onClick={handleLogout} className="mt-8 bg-black/30 hover:bg-black/50 text-white text-sm py-2 rounded-lg transition">
+        <button onClick={handleLogout} className="mt-6 bg-black/30 hover:bg-black/50 text-white text-sm py-3 rounded-xl transition font-semibold tracking-wider">
           Logout
         </button>
       </aside>
@@ -219,176 +233,7 @@ const AdminDashboard = () => {
           </div>
         )}
 
-        {activeTab === 'products' && (
-          <div className="space-y-8">
-            <h2 className="text-3xl font-heading text-maroon">Product Upload (Multi-Image Support)</h2>
-
-            {/* Form */}
-            <form onSubmit={handleSaveProduct} className="bg-white p-6 rounded-2xl shadow-premium border border-gold/10 grid grid-cols-1 md:grid-cols-3 gap-6">
-              <h3 className="col-span-full text-lg font-heading text-maroon font-semibold border-b pb-2">
-                {editingProduct ? 'Edit Saree Design' : 'Upload New Design'}
-              </h3>
-              <div>
-                <label className="block text-xs text-gray-500 font-semibold uppercase mb-1">Product Name</label>
-                <input
-                  type="text"
-                  required
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-lg focus:outline-none"
-                />
-              </div>
-              <div>
-                <label className="block text-xs text-gray-500 font-semibold uppercase mb-1">Category</label>
-                <select
-                  value={formData.category}
-                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-lg focus:outline-none bg-white font-medium"
-                >
-                  {categories.map((c, idx) => (
-                    <option key={idx} value={c}>{c}</option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="block text-xs text-gray-500 font-semibold uppercase mb-1">Sale Price (₹)</label>
-                <input
-                  type="number"
-                  required
-                  value={formData.price}
-                  onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-lg focus:outline-none"
-                />
-              </div>
-              <div>
-                <label className="block text-xs text-gray-500 font-semibold uppercase mb-1">Original Price (₹)</label>
-                <input
-                  type="number"
-                  value={formData.originalPrice}
-                  onChange={(e) => setFormData({ ...formData, originalPrice: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-lg focus:outline-none"
-                />
-              </div>
-              <div>
-                <label className="block text-xs text-gray-500 font-semibold uppercase mb-1">Stock Level</label>
-                <input
-                  type="number"
-                  required
-                  value={formData.stock}
-                  onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-lg focus:outline-none"
-                />
-              </div>
-              <div>
-                <label className="block text-xs text-gray-500 font-semibold uppercase mb-1">Saree Color</label>
-                <input
-                  type="text"
-                  value={formData.color}
-                  onChange={(e) => setFormData({ ...formData, color: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-lg focus:outline-none"
-                  placeholder="e.g. Purple, Red-Orange"
-                />
-              </div>
-              <div>
-                <label className="block text-xs text-gray-500 font-semibold uppercase mb-1">Motif Border</label>
-                <input
-                  type="text"
-                  value={formData.motif}
-                  onChange={(e) => setFormData({ ...formData, motif: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-lg focus:outline-none"
-                  placeholder="e.g. Peacock, Swan"
-                />
-              </div>
-              <div>
-                <label className="block text-xs text-gray-500 font-semibold uppercase mb-1">Zari details</label>
-                <input
-                  type="text"
-                  value={formData.zari}
-                  onChange={(e) => setFormData({ ...formData, zari: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-lg focus:outline-none"
-                />
-              </div>
-              <div>
-                <label className="block text-xs text-gray-500 font-semibold uppercase mb-1">Saree Length</label>
-                <input
-                  type="text"
-                  value={formData.length}
-                  onChange={(e) => setFormData({ ...formData, length: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-lg focus:outline-none"
-                />
-              </div>
-
-              {/* Multi-Image upload inputs */}
-              <div className="col-span-full border-t pt-4">
-                <h4 className="text-xs text-gray-500 font-semibold uppercase mb-3">Multi-Image Views (Up to 6 perspectives)</h4>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  {['Flat Saree', 'Woman Wearing Saree', 'Zoom View', 'Back Side', 'Pallu Close-up', 'Border Close-up'].map((label, idx) => (
-                    <div key={idx}>
-                      <label className="block text-[10px] text-gray-400 uppercase font-semibold mb-1">{label} URL</label>
-                      <input
-                        type="text"
-                        value={formData.images[idx] || ''}
-                        onChange={(e) => {
-                          const newImages = [...formData.images];
-                          newImages[idx] = e.target.value;
-                          setFormData({ ...formData, images: newImages });
-                        }}
-                        className="w-full px-3 py-1.5 border rounded-lg text-xs focus:outline-none"
-                        placeholder="https://example.com/image.png"
-                      />
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="col-span-full">
-                <label className="block text-xs text-gray-500 font-semibold uppercase mb-1">Description</label>
-                <textarea
-                  rows="3"
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-lg focus:outline-none"
-                ></textarea>
-              </div>
-
-              <div className="col-span-full flex gap-4">
-                <button type="submit" className="bg-maroon hover:bg-gold text-white font-semibold py-2 px-6 rounded-full transition">
-                  {editingProduct ? 'Update Saree' : 'Publish Saree Design'}
-                </button>
-                <button type="button" onClick={resetForm} className="border border-gray-400 py-2 px-6 rounded-full transition">
-                  Reset Form
-                </button>
-              </div>
-            </form>
-
-            {/* List */}
-            <div className="bg-white rounded-2xl p-6 shadow-premium border border-gold/10 overflow-x-auto">
-              <table className="w-full text-left text-sm border-collapse">
-                <thead>
-                  <tr className="border-b border-gray-200 text-gray-500 font-semibold">
-                    <th className="py-2">Name</th>
-                    <th className="py-2">Category</th>
-                    <th className="py-2">Price</th>
-                    <th className="py-2 text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {products.map(p => (
-                    <tr key={p.id} className="border-b border-gray-100 last:border-0 hover:bg-cream/10">
-                      <td className="py-3 font-medium text-maroon">{p.name}</td>
-                      <td className="py-3">{p.category}</td>
-                      <td className="py-3">₹{p.price.toLocaleString('en-IN')}</td>
-                      <td className="py-3 text-right space-x-2">
-                        <button onClick={() => handleEditInit(p)} className="text-gold hover:underline text-xs">Edit</button>
-                        <button onClick={() => handleDelete(p.id)} className="text-red-600 hover:underline text-xs">Delete</button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
+        {activeTab === 'products' && <ProductCMS />}
 
         {activeTab === 'orders' && (
           <div className="space-y-8">
@@ -472,51 +317,12 @@ const AdminDashboard = () => {
           </div>
         )}
 
-        {activeTab === 'coupons' && (
-          <div className="space-y-8">
-            <h2 className="text-3xl font-heading text-maroon">Coupons</h2>
-            <div className="bg-white p-6 rounded-2xl shadow-premium border border-gold/10 grid grid-cols-1 md:grid-cols-3 gap-6">
-              {[
-                { code: 'FESTIVE10', desc: '10% discount on entire cart', active: true },
-                { code: 'ROYAL20', desc: '20% off on Luxury Collection items', active: true },
-                { code: 'WELCOME5000', desc: '₹5,000 flat discount for first purchase', active: false }
-              ].map((c, idx) => (
-                <div key={idx} className={`p-4 border rounded-xl flex flex-col justify-between ${c.active ? 'border-gold bg-cream/10' : 'border-gray-200 bg-gray-50'}`}>
-                  <div>
-                    <span className="font-heading font-semibold text-lg text-maroon block">{c.code}</span>
-                    <p className="text-xs text-gray-500 mt-1">{c.desc}</p>
-                  </div>
-                  <span className={`text-xs font-semibold mt-4 block ${c.active ? 'text-green-600' : 'text-gray-400'}`}>
-                    {c.active ? '● Active' : '○ Inactive'}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
+        {activeTab === 'media' && <MediaLibraryCMS />}
+        {activeTab === 'homepage_cms' && <HomepageCMS />}
+        {activeTab === 'founder_cms' && <FounderCMS />}
+        {activeTab === 'policy' && <PolicyCMS />}
+        {activeTab === 'contact' && <ContactCMS />}
 
-        {activeTab === 'sections' && (
-          <div className="space-y-8">
-            <h2 className="text-3xl font-heading text-maroon">Homepage Sections Management</h2>
-            <div className="bg-white p-6 rounded-2xl shadow-premium border border-gold/10 space-y-4">
-              {[
-                { name: 'Hero Background Video Banner', active: true },
-                { name: 'Featured Categories Circle List', active: true },
-                { name: 'Paithani Collection Saree Cards Grid', active: true },
-                { name: 'Animated Heritage Statistics Section', active: true },
-                { name: 'Flipkart Variant Color swatches Selector', active: true },
-                { name: 'Instagram Masonry Grid Lookbook', active: true }
-              ].map((sec, idx) => (
-                <div key={idx} className="flex justify-between items-center py-2 border-b last:border-0">
-                  <span className="font-medium text-sm text-maroon">{sec.name}</span>
-                  <span className="px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">
-                    Active on Live Page
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
       </main>
     </div>
   );

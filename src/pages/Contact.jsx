@@ -1,7 +1,12 @@
 import React, { useState } from 'react';
 import { FaPhoneAlt, FaEnvelope, FaMapMarkerAlt, FaWhatsapp } from 'react-icons/fa';
+import useAppStore from '../store/useAppStore.js';
 
 const Contact = () => {
+  const { cmsContent, isCMSLoading } = useAppStore();
+  const contactData = cmsContent?.contact;
+  const generalData = cmsContent?.general;
+
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
 
   const handleSubmit = (e) => {
@@ -10,12 +15,14 @@ const Contact = () => {
     setFormData({ name: '', email: '', message: '' });
   };
 
+  if (isCMSLoading || !contactData) return <div className="bg-cream min-h-screen py-16 px-6"><div className="container mx-auto text-center">Loading...</div></div>;
+
   return (
     <div className="bg-cream min-h-screen py-16 px-6">
       <div className="container mx-auto max-w-5xl space-y-12">
         <div className="text-center space-y-2">
           <h1 className="text-3xl md:text-5xl font-heading text-maroon">Contact Us</h1>
-          <p className="text-sm md:text-lg font-light text-gray-600">INDRANI PAITHANI — Where Heritage Meets Luxury</p>
+          <p className="text-sm md:text-lg font-light text-gray-600">{generalData?.storeName?.toUpperCase() || 'INDRANI PAITHANI'} — Where Heritage Meets Luxury</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 bg-white rounded-3xl p-8 md:p-12 shadow-premium border border-gold/10">
@@ -28,21 +35,21 @@ const Contact = () => {
                 <div className="bg-cream p-3 rounded-full text-maroon"><FaPhoneAlt /></div>
                 <div>
                   <h4 className="font-semibold">Phone</h4>
-                  <p>+91 7507755836</p>
+                  <p>{contactData.phone}</p>
                 </div>
               </div>
               <div className="flex items-center space-x-4">
                 <div className="bg-cream p-3 rounded-full text-maroon"><FaEnvelope /></div>
                 <div>
                   <h4 className="font-semibold">Email</h4>
-                  <p>indranipaithani.yeola@gmail.com</p>
+                  <p>{contactData.email}</p>
                 </div>
               </div>
               <div className="flex items-start space-x-4">
                 <div className="bg-cream p-3 rounded-full text-maroon mt-1"><FaMapMarkerAlt /></div>
                 <div>
                   <h4 className="font-semibold">Address</h4>
-                  <p>Yeola, Nashik, Maharashtra, India – 423401</p>
+                  <p>{contactData.address}</p>
                 </div>
               </div>
             </div>
@@ -50,7 +57,7 @@ const Contact = () => {
             {/* Premium CTA buttons */}
             <div className="flex flex-col sm:flex-row gap-4">
               <a
-                href="https://wa.me/917507755836"
+                href={`https://wa.me/${contactData.phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(contactData.whatsappText)}`}
                 target="_blank"
                 rel="noreferrer"
                 className="bg-green-600 hover:bg-green-700 text-white font-semibold flex items-center justify-center space-x-2 py-3 px-6 rounded-full transition shadow-md"
@@ -59,7 +66,7 @@ const Contact = () => {
                 <span>WhatsApp Us</span>
               </a>
               <a
-                href="tel:7507755836"
+                href={`tel:${contactData.phone.replace(/[^0-9]/g, '')}`}
                 className="bg-maroon hover:bg-gold text-white font-semibold flex items-center justify-center space-x-2 py-3 px-6 rounded-full transition shadow-md"
               >
                 <FaPhoneAlt size={16} />

@@ -103,7 +103,7 @@ const Navbar = ({ isScrolled, isTransparentInit }) => {
           
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-3">
-            <img src="/assets/logo.jpg" alt="Indrani Paithani Logo" className="w-9 h-9 rounded-full border border-gold/30 object-cover shadow" />
+            <img src="/assets/official_logo.jpg" alt="Indrani Paithani Logo" className="h-10 md:h-[52px] w-auto object-contain" />
             <span className={`text-xl font-heading font-bold tracking-widest transition duration-300 ${brandColor}`}>
               INDRANI PAITHANI
             </span>

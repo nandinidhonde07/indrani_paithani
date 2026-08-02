@@ -11,9 +11,15 @@ import OwnerLogin from './pages/OwnerLogin.jsx';
 import AdminDashboard from './pages/AdminDashboard.jsx';
 import BuyerDashboard from './pages/BuyerDashboard.jsx';
 import Checkout from './pages/Checkout.jsx';
+import PrivacyPolicy from './pages/PrivacyPolicy.jsx';
+import RefundPolicy from './pages/RefundPolicy.jsx';
+import AccessibilityStatement from './pages/AccessibilityStatement.jsx';
+import ShippingPolicy from './pages/ShippingPolicy.jsx';
+import TermsConditions from './pages/TermsConditions.jsx';
 import Navbar from './components/Navbar.jsx';
 import Footer from './components/Footer.jsx';
 import { FaWhatsapp, FaArrowUp, FaHome, FaShoppingBag, FaHeart, FaShoppingCart, FaUser } from 'react-icons/fa';
+import useAppStore from './store/useAppStore.js';
 
 // Simple auth guard based on localStorage "role" ("buyer" or "owner")
 const ProtectedRoute = ({ children, role }) => {
@@ -28,8 +34,10 @@ const App = () => {
   const [showScroll, setShowScroll] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
+  const initStore = useAppStore(state => state.initStore);
 
   useEffect(() => {
+    initStore();
     const handleScroll = () => {
       // Manage transparency of navbar
       if (window.scrollY > 50) {
@@ -72,6 +80,11 @@ const App = () => {
           <Route path="/buyer-signup" element={<BuyerSignup />} />
           <Route path="/owner-login" element={<OwnerLogin />} />
           <Route path="/checkout" element={<Checkout />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="/refund-policy" element={<RefundPolicy />} />
+          <Route path="/accessibility" element={<AccessibilityStatement />} />
+          <Route path="/shipping-policy" element={<ShippingPolicy />} />
+          <Route path="/terms-conditions" element={<TermsConditions />} />
           <Route
             path="/buyer-dashboard/*"
             element={

@@ -1,0 +1,58 @@
+{
+  "general": {
+    "storeName": "Indrani Paithani",
+    "tagline": "A Royal Legacy, Now Yours.",
+    "logoUrl": "/assets/official_logo.jpg",
+    "faviconUrl": "/favicon.ico",
+    "themeColor": "#800000"
+  },
+  "home": {
+    "sectionOrder": [
+      { "id": "hero", "name": "Hero Section", "enabled": true },
+      { "id": "collections", "name": "Our Collection", "enabled": true },
+      { "id": "banner", "name": "Luxury Banner", "enabled": true },
+      { "id": "quality", "name": "Quality & Heritage", "enabled": true },
+      { "id": "founder", "name": "Founder Section", "enabled": true },
+      { "id": "bridal", "name": "Bridal Collection", "enabled": true },
+      { "id": "testimonials", "name": "Testimonials", "enabled": true },
+      { "id": "lookbook", "name": "Instagram Lookbook", "enabled": true }
+    ],
+    "heroVideo": null,
+    "heroImage": "/assets/homepage_bg.jpg",
+    "heroTitle": "INDRANI PAITHANI",
+    "heroSubtitle": "Woven With Heritage.\\nCrafted For Eternity.",
+    "heroSmallText": "\"Every thread reflects generations of heritage.\"",
+    "founderImage": "/assets/founder_home.jpg",
+    "founderName": "Niharika Wade",
+    "founderTitle": "Founder & CEO, Indrani Paithani",
+    "founderQuote": "Luxury begins with trust.",
+    "founderText1": "Luxury begins with trust. At Indrani Paithani, we are dedicated to preserving and celebrating the timeless heritage of Paithani craftsmanship, proudly carrying forward a legacy that has been cherished for over 64 years. Every creation reflects authenticity, elegance, and uncompromising quality. Our commitment extends beyond beautiful saree.",
+    "founderText2": "We strive to build lasting relationships founded on customer satisfaction, transparency, and unwavering trust. These values remain at the heart of everything we do, ensuring that every patron experiences the true essence of heritage and luxury."
+  },
+  "about": {
+    "heroImage": "https://picsum.photos/seed/royal_about/1920/600",
+    "heroTitle": "OUR STORY",
+    "heroSubtitle": "A Royal Legacy, Now Yours.",
+    "storyText1": "Indrani Paithani is a celebration of heritage, artistry, and timeless luxury.",
+    "storyText2": "Rooted in a weaving legacy that spans three generations, our journey began with a passion to preserve the royal tradition of authentic Paithani craftsmanship. From the skilled hands of our artisans to the elegance of your wardrobe, every saree is a masterpiece woven with dedication, purity, and grace.",
+    "storyText3": "Inspired by Maharashtra's rich cultural heritage and crafted with meticulous attention to detail, each Paithani carries a story of legacy, pride, and timeless beauty. At Indrani Paithani, we do not simply create sarees—we curate heirlooms destined to be cherished for generations.",
+    "missionText": "To preserve the royal art of Paithani weaving and deliver authentic handwoven masterpieces directly from the weaver to customers who appreciate timeless luxury.",
+    "founderImage": "/assets/founder_about.jpg"
+  },
+  "contact": {
+    "email": "support@indranipaithani.com",
+    "phone": "+91-7507755836",
+    "address": "Yeola, Maharashtra, India",
+    "whatsappText": "Hello Indrani Paithani Expert, I'd like to know more about your saree collections."
+  },
+  "footer": {
+    "description": "Authentic handwoven Paithani sarees crafted with pure silk and pure zari. Directly from the weavers of Yeola to your wardrobe.",
+    "privacyPolicy": "We value your privacy. Read our policy here...",
+    "shippingPolicy": "We ship worldwide via DHL and domestically via BlueDart.",
+    "refundPolicy": "7-day return policy for unused products with original tags.",
+    "termsConditions": "Terms of use for indranipaithani.com",
+    "facebookUrl": "#",
+    "instagramUrl": "#",
+    "youtubeUrl": "#"
+  }
+}
