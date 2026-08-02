@@ -8,10 +8,25 @@ const HomepageCMS = () => {
   const homeData = cmsContent?.home;
   
   const [sections, setSections] = useState([]);
+  const [heroForm, setHeroForm] = useState({
+    heroImage: '',
+    heroBadge: '',
+    heroLabel: '',
+    heroTitle: '',
+    heroSubtitle: ''
+  });
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
-    if (homeData?.sectionOrder) {
-      setSections(homeData.sectionOrder);
+    if (homeData) {
+      if (homeData.sectionOrder) setSections(homeData.sectionOrder);
+      setHeroForm({
+        heroImage: homeData.heroImage || '',
+        heroBadge: homeData.heroBadge || '',
+        heroLabel: homeData.heroLabel || '',
+        heroTitle: homeData.heroTitle || '',
+        heroSubtitle: homeData.heroSubtitle || ''
+      });
     }
   }, [homeData]);
 
@@ -32,16 +47,95 @@ const HomepageCMS = () => {
     updateCMSSection('home', { sectionOrder: updated });
   };
 
+  const handleHeroChange = (field, value) => {
+    setHeroForm(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleSaveHero = async (e) => {
+    e.preventDefault();
+    setIsSaving(true);
+    await updateCMSSection('home', { ...homeData, ...heroForm });
+    setIsSaving(false);
+    alert('Hero section updated successfully!');
+  };
+
   if (!homeData) return <div>Loading...</div>;
 
   return (
     <div className="space-y-8 animate-fade-in">
-      <div className="border-b border-gold/20 pb-4">
-        <h2 className="text-3xl font-heading text-maroon">Homepage Layout CMS</h2>
-        <p className="text-sm text-gray-500 font-light mt-1">Drag and drop to reorder sections. Toggle visibility.</p>
+      <div className="border-b border-gold/20 pb-4 flex justify-between items-end">
+        <div>
+          <h2 className="text-3xl font-heading text-maroon">Homepage CMS</h2>
+          <p className="text-sm text-gray-500 font-light mt-1">Manage the hero content and section order.</p>
+        </div>
       </div>
 
+      {/* Hero Content Editor */}
+      <form onSubmit={handleSaveHero} className="bg-white p-6 rounded-2xl shadow-premium border border-gold/10 space-y-6">
+        <div className="flex justify-between items-center border-b pb-4 mb-4">
+          <h3 className="text-xl font-heading text-maroon">Hero Content</h3>
+          <button 
+            type="submit" 
+            disabled={isSaving}
+            className="bg-maroon hover:bg-gold text-white font-semibold py-2 px-6 rounded-full transition shadow-sm text-sm"
+          >
+            {isSaving ? 'Saving...' : 'Save Hero'}
+          </button>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label className="block text-xs font-semibold text-gray-500 uppercase mb-2">Hero Image URL</label>
+            <input
+              type="text"
+              value={heroForm.heroImage}
+              onChange={(e) => handleHeroChange('heroImage', e.target.value)}
+              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-gold outline-none"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-gray-500 uppercase mb-2">Luxury Badge (Left | Right)</label>
+            <input
+              type="text"
+              value={heroForm.heroBadge}
+              onChange={(e) => handleHeroChange('heroBadge', e.target.value)}
+              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-gold outline-none"
+              placeholder="e.g. 64+ Years | Yeola Paithani"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-gray-500 uppercase mb-2">Small Label</label>
+            <input
+              type="text"
+              value={heroForm.heroLabel}
+              onChange={(e) => handleHeroChange('heroLabel', e.target.value)}
+              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-gold outline-none"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-gray-500 uppercase mb-2">Main Heading</label>
+            <textarea
+              rows="2"
+              value={heroForm.heroTitle}
+              onChange={(e) => handleHeroChange('heroTitle', e.target.value)}
+              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-gold outline-none font-heading"
+            ></textarea>
+          </div>
+          <div className="md:col-span-2">
+            <label className="block text-xs font-semibold text-gray-500 uppercase mb-2">Description Subtitle</label>
+            <textarea
+              rows="3"
+              value={heroForm.heroSubtitle}
+              onChange={(e) => handleHeroChange('heroSubtitle', e.target.value)}
+              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-gold outline-none"
+            ></textarea>
+          </div>
+        </div>
+      </form>
+
+      {/* Drag & Drop Reorder */}
       <div className="bg-white p-6 rounded-2xl shadow-premium border border-gold/10">
+        <h3 className="text-xl font-heading text-maroon mb-6 border-b pb-4">Section Reordering</h3>
         <DragDropContext onDragEnd={handleDragEnd}>
           <Droppable droppableId="homepage-sections">
             {(provided) => (

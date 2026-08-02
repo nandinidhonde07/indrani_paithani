@@ -92,16 +92,18 @@ const Home = () => {
       <div className="relative z-20 w-full container mx-auto px-6 max-w-7xl h-full flex flex-col justify-center items-start pt-16">
         
         {/* Premium Details Badge */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1.2 }}
-          className="flex items-center space-x-4 mb-8"
-        >
-          <span className="text-[10px] text-white/80 uppercase tracking-widest font-semibold">64+ Years of Heritage</span>
-          <div className="w-8 h-px bg-[#C8A45A]"></div>
-          <span className="text-[10px] text-[#C8A45A] uppercase tracking-widest font-semibold">Authentic Yeola Paithani</span>
-        </motion.div>
+        {homeData.heroBadge && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1.2 }}
+            className="flex items-center space-x-4 mb-8"
+          >
+            <span className="text-[10px] text-white/80 uppercase tracking-widest font-semibold">{homeData.heroBadge.split('|')[0]}</span>
+            <div className="w-8 h-px bg-[#C8A45A]"></div>
+            <span className="text-[10px] text-[#C8A45A] uppercase tracking-widest font-semibold">{homeData.heroBadge.split('|')[1]}</span>
+          </motion.div>
+        )}
 
         {/* Small Label */}
         <motion.h4
@@ -110,7 +112,7 @@ const Home = () => {
           transition={{ duration: 1.2, delay: 0.2 }}
           className="text-[#C8A45A] uppercase tracking-[6px] text-[14px] font-body mb-4 font-medium"
         >
-          Authentic Handwoven Paithani
+          {homeData.heroLabel || 'Authentic Handwoven Paithani'}
         </motion.h4>
 
         {/* Main Heading */}
@@ -118,9 +120,9 @@ const Home = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 1.5, delay: 0.4 }}
-          className="text-white font-heading font-bold text-[56px] md:text-[72px] lg:text-[84px] leading-[1.05] mb-8"
+          className="text-white font-heading font-bold text-[56px] md:text-[72px] lg:text-[84px] leading-[1.05] mb-8 whitespace-pre-line"
         >
-          Woven With Heritage.<br/>Crafted For Eternity.
+          {homeData.heroTitle}
         </motion.h1>
         
         {/* Description */}
@@ -128,10 +130,9 @@ const Home = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1.2, delay: 0.6 }}
-          className="text-white/90 font-body text-[18px] md:text-[22px] max-w-[620px] leading-relaxed mb-10 font-light"
+          className="text-white/90 font-body text-[18px] md:text-[22px] max-w-[620px] leading-relaxed mb-10 font-light whitespace-pre-line"
         >
-          Experience the timeless artistry of authentic Paithani sarees handcrafted by skilled artisans in Yeola.<br/><br/>
-          Each masterpiece is woven with tradition, luxury, and elegance for generations to cherish.
+          {homeData.heroSubtitle}
         </motion.p>
         
         {/* CTA Buttons */}
