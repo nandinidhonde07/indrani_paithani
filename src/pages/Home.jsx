@@ -93,7 +93,7 @@ const Home = () => {
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1.2 }}
-          className="h-24 md:h-32 w-auto mx-auto mb-2 object-contain drop-shadow-[0_0_15px_rgba(212,175,55,0.4)]"
+          className="h-24 md:h-32 w-24 md:w-32 mx-auto mb-2 object-cover rounded-full shadow-lg border-2 border-gold/40 drop-shadow-[0_0_15px_rgba(212,175,55,0.4)]"
         />
         <motion.h1
           initial={{ opacity: 0, y: 30 }}
