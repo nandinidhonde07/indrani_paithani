@@ -86,31 +86,30 @@ const Navbar = ({ isScrolled, isTransparentInit }) => {
     { name: "Gift Boxes", path: "/shop?category=Gift%20Boxes", icon: <FaGift className="text-gold" /> }
   ];
 
-  // Dynamic navbar styling based on scroll positions
-  const navbarBg = (isTransparentInit && !isScrolled)
-    ? 'bg-transparent text-black border-transparent'
-    : 'bg-white text-black shadow-premium border-b border-gold/15';
-
-  const brandColor = 'text-black';
-  const inputBg = (isTransparentInit && !isScrolled) ? 'bg-white/10 text-black placeholder-black/70 border-gold/30' : 'bg-cream/40 text-black border-gold/30';
+  // Static solid white luxury navbar
+  const navbarBg = 'bg-white text-[#111111] shadow-sm border-b border-[#E5E5E5] h-[80px] flex items-center';
+  const brandColor = 'text-[#111111]';
+  const inputBg = 'bg-[#F9F9F9] text-[#111111] border-[#E5E5E5] placeholder-[#999999]';
   const navLinkStyle = ({ isActive }) =>
-    isActive ? 'text-black border-b-2 border-black pb-1 font-bold' : 'text-black hover:text-black/70 transition pb-1 border-b-2 border-transparent';
+    isActive ? 'text-[#111111] border-b-2 border-[#111111] pb-1 font-bold' : 'text-[#666666] hover:text-[#111111] transition pb-1 border-b-2 border-transparent';
 
   return (
     <>
       <header className={`sticky top-0 z-50 transition-all duration-300 ${navbarBg}`}>
-        <nav className="container mx-auto flex items-center justify-between py-4 px-6 relative">
+        <nav className="container mx-auto flex items-center justify-between px-6 relative w-full">
           
-          {/* Logo */}
-          <Link to="/" className="flex items-center space-x-3">
-            <img src="/assets/official_logo.jpg" alt="Indrani Paithani Logo" className="h-10 md:h-[52px] w-auto object-contain rounded-full shadow-sm border border-gold/20" />
-            <span className={`text-xl font-heading font-bold tracking-widest transition duration-300 ${brandColor}`}>
-              INDRANI PAITHANI
-            </span>
-          </Link>
+          {/* Logo (Left) */}
+          <div className="w-1/4 flex items-center">
+            <Link to="/" className="flex items-center space-x-3">
+              <img src="/assets/official_logo.jpg" alt="Indrani Paithani Logo" className="h-12 w-12 object-cover rounded-full shadow-sm border border-[#E5E5E5]" />
+              <span className={`text-lg lg:text-xl font-heading font-bold tracking-widest transition duration-300 ${brandColor} hidden sm:block`}>
+                INDRANI PAITHANI
+              </span>
+            </Link>
+          </div>
 
-          {/* Navigation Items */}
-          <ul className="hidden md:flex items-center space-x-8 text-xs font-semibold tracking-widest uppercase">
+          {/* Navigation Items (Center) */}
+          <ul className="hidden lg:flex items-center justify-center space-x-8 text-[11px] font-semibold tracking-widest uppercase w-2/4">
             <li>
               <NavLink to="/" className={navLinkStyle}>Home</NavLink>
             </li>
@@ -186,80 +185,84 @@ const Navbar = ({ isScrolled, isTransparentInit }) => {
             </li>
           </ul>
 
-          {/* Search Bar */}
-          <div ref={searchRef} className="relative hidden lg:block w-64">
-            <form onSubmit={handleSearchSubmit}>
-              <input
-                type="text"
-                placeholder="Search color, motif..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className={`w-full px-4 py-2 border rounded-full text-[11px] focus:outline-none focus:ring-2 focus:ring-gold transition ${inputBg}`}
-              />
-              <button type="submit" className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                🔍
-              </button>
-            </form>
-
-            {suggestions.length > 0 && (
-              <div className="absolute z-50 w-full bg-white border border-gold/20 rounded-2xl mt-2 shadow-2xl p-2 max-h-60 overflow-y-auto">
-                {suggestions.map(p => (
-                  <div
-                    key={p.id}
-                    onClick={() => {
-                      navigate(`/product/${p.id}`);
-                      setSuggestions([]);
-                      setSearch('');
-                    }}
-                    className="flex items-center space-x-3 p-2 hover:bg-cream/40 rounded-xl cursor-pointer transition text-black"
-                  >
-                    <img src={p.image} alt={p.name} className="w-8 h-10 object-cover rounded" />
-                    <div>
-                      <h5 className="text-xs font-semibold text-maroon">{p.name}</h5>
-                      <span className="text-[10px] text-gray-500">{p.category}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Actions & Dropdowns */}
-          <div className="flex items-center space-x-6">
-            <Link to="/buyer-dashboard/wishlist" className="hover:text-black/70 transition">
-              <FiHeart size={18} />
-            </Link>
+          {/* Search & Actions (Right) */}
+          <div className="w-full lg:w-1/4 flex items-center justify-end space-x-6">
             
-            {/* Shopping bag opens slide-out cart drawer */}
-            <button onClick={() => { syncCart(); setShowCartDrawer(true); }} className="hover:text-black/70 transition relative">
-              <FiShoppingCart size={18} />
-              {cart.length > 0 && (
-                <span className="absolute -top-2 -right-2 bg-maroon text-gold border border-gold/30 w-4 h-4 text-[9px] rounded-full flex items-center justify-center font-bold">
-                  {cart.length}
-                </span>
-              )}
-            </button>
+            {/* Search Bar */}
+            <div ref={searchRef} className="relative hidden xl:block w-56">
+              <form onSubmit={handleSearchSubmit}>
+                <input
+                  type="text"
+                  placeholder="Search..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className={`w-full px-4 py-2 border rounded-full text-[11px] focus:outline-none focus:ring-1 focus:ring-[#111111] transition ${inputBg}`}
+                />
+                <button type="submit" className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#666666]">
+                  🔍
+                </button>
+              </form>
 
-            {/* User portal */}
-            <div
-              className="relative"
-              onMouseEnter={() => setShowAuthDropdown(true)}
-              onMouseLeave={() => setShowAuthDropdown(false)}
-            >
-              <button className="hover:text-black/70 transition focus:outline-none py-2">
-                <FiUser size={18} />
-              </button>
-
-              {showAuthDropdown && (
-                <div className="absolute right-0 top-full w-48 bg-white border border-gold/20 shadow-xl rounded-xl p-2 z-50 text-black">
-                  <Link to="/buyer-login" className="block px-4 py-2 hover:bg-cream/40 rounded-lg text-xs font-semibold">
-                    Buyer Portal
-                  </Link>
-                  <Link to="/owner-login" className="block px-4 py-2 hover:bg-cream/40 rounded-lg text-xs font-semibold">
-                    Owner console
-                  </Link>
+              {suggestions.length > 0 && (
+                <div className="absolute z-50 w-full bg-white border border-[#E5E5E5] rounded-2xl mt-2 shadow-2xl p-2 max-h-60 overflow-y-auto">
+                  {suggestions.map(p => (
+                    <div
+                      key={p.id}
+                      onClick={() => {
+                        navigate(`/product/${p.id}`);
+                        setSuggestions([]);
+                        setSearch('');
+                      }}
+                      className="flex items-center space-x-3 p-2 hover:bg-[#F9F9F9] rounded-xl cursor-pointer transition text-[#111111]"
+                    >
+                      <img src={p.image} alt={p.name} className="w-8 h-10 object-cover rounded" />
+                      <div>
+                        <h5 className="text-xs font-semibold text-[#111111]">{p.name}</h5>
+                        <span className="text-[10px] text-[#666666]">{p.category}</span>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               )}
+            </div>
+
+            {/* Icons */}
+            <div className="flex items-center space-x-5 text-[#111111]">
+              <Link to="/buyer-dashboard/wishlist" className="hover:text-[#666666] transition">
+                <FiHeart size={18} />
+              </Link>
+              
+              {/* Shopping bag opens slide-out cart drawer */}
+              <button onClick={() => { syncCart(); setShowCartDrawer(true); }} className="hover:text-[#666666] transition relative">
+                <FiShoppingCart size={18} />
+                {cart.length > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-[#111111] text-white w-4 h-4 text-[9px] rounded-full flex items-center justify-center font-bold">
+                    {cart.length}
+                  </span>
+                )}
+              </button>
+
+              {/* User portal */}
+              <div
+                className="relative"
+                onMouseEnter={() => setShowAuthDropdown(true)}
+                onMouseLeave={() => setShowAuthDropdown(false)}
+              >
+                <button className="hover:text-[#666666] transition focus:outline-none py-2">
+                  <FiUser size={18} />
+                </button>
+
+                {showAuthDropdown && (
+                  <div className="absolute right-0 top-full w-48 bg-white border border-[#E5E5E5] shadow-xl rounded-xl p-2 z-50 text-[#111111]">
+                    <Link to="/buyer-login" className="block px-4 py-2 hover:bg-[#F9F9F9] rounded-lg text-xs font-semibold">
+                      Buyer Portal
+                    </Link>
+                    <Link to="/owner-login" className="block px-4 py-2 hover:bg-[#F9F9F9] rounded-lg text-xs font-semibold">
+                      Owner Console
+                    </Link>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </nav>

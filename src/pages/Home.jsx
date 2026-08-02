@@ -74,81 +74,98 @@ const Home = () => {
   if (isCMSLoading || !homeData) return <div className="min-h-screen bg-cream flex items-center justify-center">Loading...</div>;
 
   const renderHero = () => (
-    <section key="hero" className="relative h-screen flex items-center justify-center overflow-hidden">
+    <section key="hero" className="relative h-screen flex items-center overflow-hidden">
       <motion.div
-        initial={{ scale: 1.15 }}
+        initial={{ scale: 1.05 }}
         animate={{ scale: 1.0 }}
-        transition={{ duration: 6, ease: 'easeOut' }}
+        transition={{ duration: 8, ease: 'easeOut' }}
         className="absolute inset-0 bg-cover bg-center z-0"
         style={{ 
           backgroundImage: `url('${homeData.heroImage}')`,
-          filter: 'brightness(0.85)'
         }}
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/60 z-10"></div>
-      <div className="relative z-20 text-center text-white px-6 max-w-5xl space-y-8 flex flex-col items-center">
-        <motion.img
-          src="/assets/official_logo.jpg"
-          alt="Indrani Paithani Logo"
-          initial={{ opacity: 0, y: -20 }}
+      <div 
+        className="absolute inset-0 z-10" 
+        style={{ background: 'linear-gradient(90deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 50%, rgba(0,0,0,0.1) 100%)' }}
+      ></div>
+      
+      <div className="relative z-20 w-full container mx-auto px-6 max-w-7xl h-full flex flex-col justify-center items-start pt-16">
+        
+        {/* Premium Details Badge */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1.2 }}
-          className="h-24 md:h-32 w-24 md:w-32 mx-auto mb-2 object-cover rounded-full shadow-lg border-2 border-gold/40 drop-shadow-[0_0_15px_rgba(212,175,55,0.4)]"
-        />
-        <motion.h1
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1.5 }}
-          className="text-6xl md:text-9xl font-heading tracking-[0.28em] mb-4 relative overflow-hidden font-medium text-[#D4AF37]"
-          style={{ textShadow: '0 0 30px rgba(212,175,55,0.4), 0 4px 8px rgba(0,0,0,0.8)' }}
+          className="flex items-center space-x-4 mb-8"
         >
-          <span className="bg-gradient-to-r from-[#D4AF37] via-[#F3E5AB] to-[#D4AF37] bg-clip-text text-transparent bg-[length:200%_auto] animate-shimmer">
-            {homeData.heroTitle}
-          </span>
+          <span className="text-[10px] text-white/80 uppercase tracking-widest font-semibold">64+ Years of Heritage</span>
+          <div className="w-8 h-px bg-[#C8A45A]"></div>
+          <span className="text-[10px] text-[#C8A45A] uppercase tracking-widest font-semibold">Authentic Yeola Paithani</span>
+        </motion.div>
+
+        {/* Small Label */}
+        <motion.h4
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1.2, delay: 0.2 }}
+          className="text-[#C8A45A] uppercase tracking-[6px] text-[14px] font-body mb-4 font-medium"
+        >
+          Authentic Handwoven Paithani
+        </motion.h4>
+
+        {/* Main Heading */}
+        <motion.h1
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1.5, delay: 0.4 }}
+          className="text-white font-heading font-bold text-[56px] md:text-[72px] lg:text-[84px] leading-[1.05] mb-8"
+        >
+          Woven With Heritage.<br/>Crafted For Eternity.
         </motion.h1>
         
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.6, duration: 1.2 }}
-          className="font-heading text-xl md:text-3xl font-semibold tracking-[0.2em] text-[#F3E5AB] whitespace-pre-line drop-shadow-md leading-loose"
-        >
-          {homeData.heroSubtitle}
-        </motion.div>
-        
+        {/* Description */}
         <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.0, duration: 1.2 }}
-          className="text-sm md:text-base tracking-[0.35em] uppercase text-white/95 font-light drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1.2, delay: 0.6 }}
+          className="text-white/90 font-body text-[18px] md:text-[22px] max-w-[620px] leading-relaxed mb-10 font-light"
         >
-          {homeData.heroSmallText}
+          Experience the timeless artistry of authentic Paithani sarees handcrafted by skilled artisans in Yeola.<br/><br/>
+          Each masterpiece is woven with tradition, luxury, and elegance for generations to cherish.
         </motion.p>
         
+        {/* CTA Buttons */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 1.4, duration: 0.5 }}
-          className="flex justify-center space-x-6 pt-6"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1.2, delay: 0.8 }}
+          className="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-6"
         >
           <Link
             to="/shop"
-            className="bg-[#D4AF37] text-maroon font-bold px-10 py-4 rounded-full hover:bg-white hover:text-maroon transition-all duration-500 shadow-[0_4px_15px_rgba(212,175,55,0.4)] hover:shadow-[0_6px_25px_rgba(255,255,255,0.6)] hover:-translate-y-1 text-sm uppercase tracking-widest"
+            className="w-full sm:w-auto text-center bg-[#C8A45A] text-[#111111] font-semibold px-10 py-4 rounded-full hover:bg-[#111111] hover:text-[#C8A45A] transition-all duration-300 text-sm uppercase tracking-widest"
           >
             Explore Collection
           </Link>
           <Link
-            to="/shop"
-            className="border-2 border-white text-white font-bold px-10 py-4 rounded-full hover:bg-white hover:text-maroon transition-all duration-500 shadow-lg hover:shadow-[0_6px_25px_rgba(255,255,255,0.6)] hover:-translate-y-1 text-sm uppercase tracking-widest"
+            to="/about"
+            className="w-full sm:w-auto text-center border border-white text-white font-semibold px-10 py-4 rounded-full hover:bg-white hover:text-[#111111] transition-all duration-300 text-sm uppercase tracking-widest"
           >
-            Shop Now
+            Our Story
           </Link>
         </motion.div>
       </div>
-      <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 z-20 flex flex-col items-center space-y-2 text-gold/80 text-xs tracking-[0.2em] uppercase font-semibold">
-        <span>Scroll Down</span>
-        <FiChevronDown className="animate-bounce" size={20} />
-      </div>
+
+      {/* Scroll Indicator */}
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 2, duration: 1 }}
+        className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20 flex flex-col items-center space-y-2 text-white/70 text-xs tracking-widest uppercase font-light"
+      >
+        <span>Scroll</span>
+        <FiChevronDown className="animate-bounce text-white" size={16} />
+      </motion.div>
     </section>
   );
 
