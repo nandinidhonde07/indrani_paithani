@@ -86,12 +86,24 @@ const Navbar = ({ isScrolled, isTransparentInit }) => {
     { name: "Gift Boxes", path: "/shop?category=Gift%20Boxes", icon: <FaGift className="text-gold" /> }
   ];
 
-  // Static solid white luxury navbar
-  const navbarBg = 'bg-white text-[#111111] shadow-sm border-b border-[#E5E5E5] h-[80px] flex items-center';
+  // Dynamic navbar styling
+  const isTransparent = isTransparentInit && !isScrolled;
+  
+  const navbarBg = isTransparent 
+    ? 'bg-transparent text-[#111111] border-transparent h-[80px] flex items-center' 
+    : 'bg-white text-[#111111] shadow-sm border-b border-[#E5E5E5] h-[80px] flex items-center';
+  
   const brandColor = 'text-[#111111]';
-  const inputBg = 'bg-[#F9F9F9] text-[#111111] border-[#E5E5E5] placeholder-[#999999]';
-  const navLinkStyle = ({ isActive }) =>
-    isActive ? 'text-[#111111] border-b-2 border-[#111111] pb-1 font-bold' : 'text-[#666666] hover:text-[#111111] transition pb-1 border-b-2 border-transparent';
+  
+  const inputBg = isTransparent 
+    ? 'bg-[#111111]/5 text-[#111111] border-[#111111]/20 placeholder-[#111111]/60' 
+    : 'bg-[#F9F9F9] text-[#111111] border-[#E5E5E5] placeholder-[#999999]';
+    
+  const navLinkStyle = ({ isActive }) => {
+    return isActive ? 'text-[#111111] border-b-2 border-[#111111] pb-1 font-bold' : 'text-[#666666] hover:text-[#111111] transition pb-1 border-b-2 border-transparent';
+  };
+  
+  const iconClass = `transition focus:outline-none py-2 text-[#111111] hover:text-[#666666]`;
 
   return (
     <>
@@ -198,7 +210,7 @@ const Navbar = ({ isScrolled, isTransparentInit }) => {
                   onChange={(e) => setSearch(e.target.value)}
                   className={`w-full px-4 py-2 border rounded-full text-[11px] focus:outline-none focus:ring-1 focus:ring-[#111111] transition ${inputBg}`}
                 />
-                <button type="submit" className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#666666]">
+                <button type="submit" className={`absolute right-3 top-1/2 transform -translate-y-1/2 ${isTransparent ? 'text-[#111111]/70' : 'text-[#666666]'}`}>
                   🔍
                 </button>
               </form>
@@ -227,13 +239,13 @@ const Navbar = ({ isScrolled, isTransparentInit }) => {
             </div>
 
             {/* Icons */}
-            <div className="flex items-center space-x-5 text-[#111111]">
-              <Link to="/buyer-dashboard/wishlist" className="hover:text-[#666666] transition">
+            <div className="flex items-center space-x-5">
+              <Link to="/buyer-dashboard/wishlist" className={iconClass}>
                 <FiHeart size={18} />
               </Link>
               
               {/* Shopping bag opens slide-out cart drawer */}
-              <button onClick={() => { syncCart(); setShowCartDrawer(true); }} className="hover:text-[#666666] transition relative">
+              <button onClick={() => { syncCart(); setShowCartDrawer(true); }} className={`${iconClass} relative`}>
                 <FiShoppingCart size={18} />
                 {cart.length > 0 && (
                   <span className="absolute -top-2 -right-2 bg-[#111111] text-white w-4 h-4 text-[9px] rounded-full flex items-center justify-center font-bold">
@@ -248,7 +260,7 @@ const Navbar = ({ isScrolled, isTransparentInit }) => {
                 onMouseEnter={() => setShowAuthDropdown(true)}
                 onMouseLeave={() => setShowAuthDropdown(false)}
               >
-                <button className="hover:text-[#666666] transition focus:outline-none py-2">
+                <button className={iconClass}>
                   <FiUser size={18} />
                 </button>
 

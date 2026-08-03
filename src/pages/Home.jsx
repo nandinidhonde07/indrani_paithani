@@ -74,45 +74,33 @@ const Home = () => {
   if (isCMSLoading || !homeData) return <div className="min-h-screen bg-cream flex items-center justify-center">Loading...</div>;
 
   const renderHero = () => (
-    <section key="hero" className="relative h-screen flex items-center overflow-hidden">
-      <motion.div
-        initial={{ scale: 1.05 }}
-        animate={{ scale: 1.0 }}
-        transition={{ duration: 8, ease: 'easeOut' }}
-        className="absolute inset-0 bg-cover bg-center z-0"
-        style={{ 
-          backgroundImage: `url('${homeData.heroImage}')`,
-        }}
-      />
-      <div 
-        className="absolute inset-0 z-10" 
-        style={{ background: 'linear-gradient(90deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 50%, rgba(0,0,0,0.1) 100%)' }}
-      ></div>
+    <section key="hero" className="relative h-screen w-full bg-[#FAF7F2] flex items-center pt-20 pb-12 px-8 lg:px-16 overflow-hidden">
       
-      <div className="relative z-20 w-full container mx-auto px-6 max-w-7xl h-full flex flex-col justify-center items-start pt-16">
+      {/* LEFT CONTENT (40%) */}
+      <div className="w-full lg:w-[45%] h-full flex flex-col justify-center pr-0 lg:pr-16 z-20 relative">
         
-        {/* Premium Details Badge */}
-        {homeData.heroBadge && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1.2 }}
-            className="flex items-center space-x-4 mb-8"
-          >
-            <span className="text-[10px] text-white/80 uppercase tracking-widest font-semibold">{homeData.heroBadge.split('|')[0]}</span>
-            <div className="w-8 h-px bg-[#C8A45A]"></div>
-            <span className="text-[10px] text-[#C8A45A] uppercase tracking-widest font-semibold">{homeData.heroBadge.split('|')[1]}</span>
-          </motion.div>
-        )}
+        {/* Luxury Detail Badge */}
+        <motion.div
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1.2 }}
+          className="flex items-center space-x-3 mb-10 text-[9px] uppercase tracking-[0.3em] font-semibold text-[#888888]"
+        >
+          <span>Since 1961</span>
+          <span className="w-1 h-1 rounded-full bg-[#C8A45A]"></span>
+          <span>Authentic Handloom</span>
+          <span className="w-1 h-1 rounded-full bg-[#C8A45A]"></span>
+          <span>Direct From Weaver</span>
+        </motion.div>
 
         {/* Small Label */}
         <motion.h4
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1.2, delay: 0.2 }}
-          className="text-[#C8A45A] uppercase tracking-[6px] text-[14px] font-body mb-4 font-medium"
+          className="text-[#C8A45A] uppercase tracking-[0.4em] text-[11px] font-body mb-6 font-semibold"
         >
-          {homeData.heroLabel || 'Authentic Handwoven Paithani'}
+          AUTHENTIC YEOLA PAITHANI
         </motion.h4>
 
         {/* Main Heading */}
@@ -120,52 +108,74 @@ const Home = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 1.5, delay: 0.4 }}
-          className="text-white font-heading font-bold text-[56px] md:text-[72px] lg:text-[84px] leading-[1.05] mb-8 whitespace-pre-line"
+          className="text-[#111111] font-heading text-[52px] lg:text-[72px] leading-[1.05] mb-8"
         >
-          {homeData.heroTitle}
+          Woven with <span className="font-bold">Heritage.</span><br/>
+          Crafted for <span className="font-bold">Eternity.</span>
         </motion.h1>
         
-        {/* Description */}
+        {/* Description Subtitle */}
         <motion.p
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1.2, delay: 0.6 }}
-          className="text-white/90 font-body text-[18px] md:text-[22px] max-w-[620px] leading-relaxed mb-10 font-light whitespace-pre-line"
+          className="text-[#444444] font-body text-[16px] lg:text-[18px] max-w-[500px] leading-relaxed mb-12 font-light"
         >
-          {homeData.heroSubtitle}
+          Timeless handwoven masterpieces crafted by skilled artisans in Yeola.
         </motion.p>
         
         {/* CTA Buttons */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1.2, delay: 0.8 }}
-          className="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-6"
+          className="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-5"
         >
           <Link
             to="/shop"
-            className="w-full sm:w-auto text-center bg-[#C8A45A] text-[#111111] font-semibold px-10 py-4 rounded-full hover:bg-[#111111] hover:text-[#C8A45A] transition-all duration-300 text-sm uppercase tracking-widest"
+            className="w-full sm:w-auto text-center bg-[#C8A45A] text-white font-semibold px-9 py-4 rounded-full hover:bg-[#111111] hover:text-[#C8A45A] transition-all duration-500 text-[11px] uppercase tracking-[0.2em]"
           >
             Explore Collection
           </Link>
           <Link
             to="/about"
-            className="w-full sm:w-auto text-center border border-white text-white font-semibold px-10 py-4 rounded-full hover:bg-white hover:text-[#111111] transition-all duration-300 text-sm uppercase tracking-widest"
+            className="w-full sm:w-auto text-center border border-[#C8A45A] text-[#111111] font-semibold px-9 py-4 rounded-full hover:bg-[#C8A45A] hover:text-[#111111] transition-all duration-500 text-[11px] uppercase tracking-[0.2em]"
           >
             Our Story
           </Link>
         </motion.div>
       </div>
 
+      {/* RIGHT IMAGE (60%) */}
+      <motion.div 
+        initial={{ opacity: 0, x: 50 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 1.5, ease: 'easeOut' }}
+        className="hidden lg:block w-[55%] h-full relative rounded-tl-[120px] rounded-br-[120px] overflow-hidden shadow-2xl"
+      >
+        <motion.div
+          initial={{ scale: 1.05 }}
+          animate={{ scale: 1.0 }}
+          transition={{ duration: 10, ease: 'easeOut' }}
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ 
+            backgroundImage: `url('${homeData.heroImage}')`,
+            filter: 'brightness(1.05) contrast(1.05)'
+          }}
+        />
+        {/* Subtle dark overlay on image only */}
+        <div className="absolute inset-0 bg-black/10 mix-blend-multiply"></div>
+      </motion.div>
+
       {/* Scroll Indicator */}
       <motion.div 
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 2, duration: 1 }}
-        className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20 flex flex-col items-center space-y-2 text-white/70 text-xs tracking-widest uppercase font-light"
+        className="absolute bottom-6 left-[22.5%] transform -translate-x-1/2 z-20 flex flex-col items-center space-y-2 text-[#888888] text-[9px] tracking-widest uppercase font-medium"
       >
         <span>Scroll</span>
-        <FiChevronDown className="animate-bounce text-white" size={16} />
+        <FiChevronDown className="animate-bounce text-[#111111]" size={14} />
       </motion.div>
     </section>
   );
