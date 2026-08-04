@@ -88,7 +88,7 @@ const Navbar = ({ isScrolled, isTransparentInit }) => {
   ];
 
   // Always use a fully transparent background with an extremely subtle, modern outline
-  const navbarBg = 'bg-transparent text-[#111111] border-b border-[#111111]/10 h-[80px] flex items-center';
+  const navbarBg = 'bg-transparent text-[#111111] border-b border-[#111111]/30 h-[80px] flex items-center';
   const brandColor = 'text-[#111111]';
   const inputBg = 'bg-[#111111]/5 text-[#111111] border-[#111111]/20 placeholder-[#111111]/60';
     
