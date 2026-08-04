@@ -87,8 +87,8 @@ const Navbar = ({ isScrolled, isTransparentInit }) => {
     { name: "Gift Boxes", path: "/shop?category=Gift%20Boxes", icon: <FaGift className="text-gold" /> }
   ];
 
-  // Always use glassmorphism to integrate seamlessly with the full-screen hero
-  const navbarBg = 'bg-white/10 backdrop-blur-[16px] text-[#111111] border-b border-[#111111]/10 h-[80px] flex items-center';
+  // Always use a fully transparent background as requested
+  const navbarBg = 'bg-transparent text-[#111111] h-[80px] flex items-center';
   const brandColor = 'text-[#111111]';
   const inputBg = 'bg-[#111111]/5 text-[#111111] border-[#111111]/20 placeholder-[#111111]/60';
     
