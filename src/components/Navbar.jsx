@@ -87,8 +87,12 @@ const Navbar = ({ isScrolled, isTransparentInit }) => {
     { name: "Gift Boxes", path: "/shop?category=Gift%20Boxes", icon: <FaGift className="text-gold" /> }
   ];
 
-  // Use a bottom-up dark gradient to create a blended, soft outline effect
-  const navbarBg = 'bg-gradient-to-t from-[#111111]/50 to-transparent text-[#111111] h-[80px] flex items-center';
+  // Dynamic navbar styling based on scroll position
+  const isTransparent = isTransparentInit && !isScrolled;
+
+  const navbarBg = isTransparent 
+    ? 'bg-transparent text-[#111111] h-[80px] flex items-center'
+    : 'bg-white/95 backdrop-blur-[16px] shadow-sm border-b border-[#111111]/10 text-[#111111] h-[80px] flex items-center';
   const brandColor = 'text-[#111111]';
   const inputBg = 'bg-[#111111]/5 text-[#111111] border-[#111111]/20 placeholder-[#111111]/60';
     
