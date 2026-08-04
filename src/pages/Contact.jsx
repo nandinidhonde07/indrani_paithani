@@ -15,10 +15,10 @@ const Contact = () => {
     setFormData({ name: '', email: '', message: '' });
   };
 
-  if (isCMSLoading || !contactData) return <div className="bg-cream min-h-screen py-16 px-6"><div className="container mx-auto text-center">Loading...</div></div>;
+  if (isCMSLoading || !contactData) return <div className="bg-cream min-h-screen pt-32 pb-16 px-6"><div className="container mx-auto text-center">Loading...</div></div>;
 
   return (
-    <div className="bg-cream min-h-screen py-16 px-6">
+    <div className="bg-cream min-h-screen pt-32 pb-16 px-6">
       <div className="container mx-auto max-w-5xl space-y-12">
         <div className="text-center space-y-2">
           <h1 className="text-3xl md:text-5xl font-heading text-maroon">Contact Us</h1>
