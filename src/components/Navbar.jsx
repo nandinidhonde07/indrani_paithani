@@ -139,7 +139,7 @@ const Navbar = ({ isScrolled, isTransparentInit }) => {
 
 
               {showMegaMenu && (
-                <div className="absolute left-1/2 transform -translate-x-1/2 top-full w-[850px] bg-white text-black border border-gold/25 shadow-2xl rounded-2xl p-8 grid grid-cols-3 gap-8 z-50 animate-fade-in">
+                <div className="absolute left-1/2 transform -translate-x-1/2 top-full w-[600px] bg-white text-black border border-gold/25 shadow-2xl rounded-2xl p-8 grid grid-cols-2 gap-8 z-50 animate-fade-in">
                   
                   {/* Category lists */}
                   <div className="space-y-4">
@@ -168,22 +168,6 @@ const Navbar = ({ isScrolled, isTransparentInit }) => {
                         </li>
                       ))}
                     </ul>
-                  </div>
-
-                  {/* Featured Collection image */}
-                  <div className="relative rounded-xl overflow-hidden aspect-[4/3] bg-cream shadow-md">
-                    <img
-                      src="/assets/founder_home.jpg"
-                      alt="Featured Drape Collection"
-                      className="w-full h-full object-cover"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-maroon/90 to-transparent flex flex-col justify-end p-4">
-                      <span className="text-[10px] text-gold uppercase tracking-wider font-semibold">Bridal Showcase</span>
-                      <h5 className="text-white text-sm font-heading font-bold">Maharani Paithani Collection</h5>
-                      <Link to="/shop?category=Bridal%20Paithani" className="text-gold underline text-[9px] mt-1 hover:text-white font-medium">
-                        View Heritage Gallery
-                      </Link>
-                    </div>
                   </div>
                 </div>
               )}
