@@ -83,7 +83,7 @@ const Home = () => {
           {words.map((word, i) => {
             const isGold = word.toLowerCase().includes('heritage') || word.toLowerCase().includes('eternity');
             if (isGold) {
-              return <span key={i} className="block text-[#C8A45A] font-bold mt-1">{word}</span>;
+              return <span key={i} className="block text-[#C9A14A] font-bold mt-1">{word}</span>;
             }
             return <span key={i} className="text-white">{word} </span>;
           })}
@@ -107,22 +107,22 @@ const Home = () => {
       {/* Dark gradient overlay for text readability */}
       <div 
         className="absolute inset-0 z-10"
-        style={{ background: 'linear-gradient(90deg, rgba(15,15,15,.85) 0%, rgba(15,15,15,.65) 35%, rgba(15,15,15,.25) 60%, transparent 100%)' }}
+        style={{ background: 'linear-gradient(90deg, rgba(12,12,12,.88) 0%, rgba(18,18,18,.70) 30%, rgba(25,25,25,.35) 55%, transparent 100%)' }}
       />
 
       {/* LEFT CONTENT */}
-      <div className="absolute top-[22%] left-[6%] w-full lg:w-[60%] z-20 flex flex-col justify-start">
+      <div className="absolute top-[22%] left-[7%] w-full max-w-[620px] z-20 flex flex-col justify-start">
         
         {/* Small Label */}
         <motion.h4
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1.2, delay: 0.2 }}
-          className="flex items-center text-[#C8A45A] uppercase tracking-[0.3em] text-[10px] font-body mb-8 font-semibold"
+          className="flex items-center text-[#C9A14A] uppercase tracking-[0.3em] text-[10px] font-body mb-8 font-semibold"
         >
-          <span className="w-6 h-px bg-[#C8A45A] mr-4"></span>
+          <span className="w-6 h-px bg-[#C9A14A] mr-4"></span>
           {homeData.heroLabel || 'AUTHENTIC YEOLA PAITHANI'}
-          <span className="w-6 h-px bg-[#C8A45A] ml-4 hidden sm:block"></span>
+          <span className="w-6 h-px bg-[#C9A14A] ml-4 hidden sm:block"></span>
         </motion.h4>
 
         {/* Main Heading */}
@@ -130,7 +130,7 @@ const Home = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 1.5, delay: 0.4 }}
-          className="font-heading text-[72px] lg:text-[100px] leading-[0.95] mb-12 drop-shadow-md"
+          className="font-heading text-[72px] lg:text-[110px] leading-[0.9] tracking-tight mb-12 drop-shadow-md"
         >
           {renderTitleParts(homeData.heroTitle)}
         </motion.h1>
@@ -144,13 +144,13 @@ const Home = () => {
         >
           <Link
             to="/shop"
-            className="w-full sm:w-auto text-center bg-[#C8A45A] text-white font-semibold px-10 py-5 rounded-full hover:bg-[#D5B05A] transition-all duration-300 text-[12px] uppercase tracking-[0.2em]"
+            className="w-full sm:w-auto text-center bg-[#C9A14A] text-white font-semibold px-10 py-5 rounded-full hover:bg-[#D4AD56] transition-all duration-300 text-[12px] uppercase tracking-[0.2em]"
           >
             Explore Collection
           </Link>
           <Link
             to="/about"
-            className="w-full sm:w-auto flex justify-center items-center space-x-2 border border-[#C8A45A] text-white font-semibold px-10 py-5 rounded-full hover:bg-[#C8A45A] hover:text-white transition-all duration-300 text-[12px] uppercase tracking-[0.2em]"
+            className="w-full sm:w-auto flex justify-center items-center space-x-2 border border-[#C9A14A] text-[#C9A14A] font-semibold px-10 py-5 rounded-full hover:bg-[#C9A14A] hover:text-white transition-all duration-300 text-[12px] uppercase tracking-[0.2em]"
           >
             <span>Our Story</span>
           </Link>

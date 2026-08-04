@@ -90,7 +90,7 @@ const Navbar = ({ isScrolled, isTransparentInit }) => {
   const isTransparent = isTransparentInit && !isScrolled;
   
   const navbarBg = isTransparent 
-    ? 'bg-black/10 backdrop-blur-[12px] text-white border-b border-white/10 h-[80px] flex items-center' 
+    ? 'bg-black/10 backdrop-blur-[16px] text-white border-b border-white/10 h-[80px] flex items-center' 
     : 'bg-[#111111] text-white shadow-sm border-b border-[#222222] h-[80px] flex items-center';
   
   const brandColor = 'text-white';
@@ -100,10 +100,10 @@ const Navbar = ({ isScrolled, isTransparentInit }) => {
     : 'bg-white/10 text-white border-white/20 placeholder-white/50';
     
   const navLinkStyle = ({ isActive }) => {
-    return isActive ? 'text-white border-b-2 border-[#C8A45A] pb-1 font-bold' : 'text-white/80 hover:text-white transition pb-1 border-b-2 border-transparent';
+    return isActive ? 'text-white border-b-2 border-[#C9A14A] pb-1 font-bold' : 'text-white/80 hover:text-white transition pb-1 border-b-2 border-transparent';
   };
   
-  const iconClass = `transition focus:outline-none py-2 text-white hover:text-[#C8A45A]`;
+  const iconClass = `transition focus:outline-none py-2 text-white hover:text-[#C9A14A]`;
 
   return (
     <>
@@ -210,7 +210,7 @@ const Navbar = ({ isScrolled, isTransparentInit }) => {
                   onChange={(e) => setSearch(e.target.value)}
                   className={`w-full px-4 py-2 border rounded-full text-[11px] focus:outline-none focus:ring-1 focus:ring-[#111111] transition ${inputBg}`}
                 />
-                <button type="submit" className={`absolute right-3 top-1/2 transform -translate-y-1/2 text-white/70 hover:text-[#C8A45A]`}>
+                <button type="submit" className={`absolute right-3 top-1/2 transform -translate-y-1/2 ${isTransparent ? 'text-[#C9A14A]' : 'text-white/70 hover:text-[#C9A14A]'}`}>
                   🔍
                 </button>
               </form>
