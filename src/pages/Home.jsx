@@ -104,14 +104,14 @@ const Home = () => {
         style={{ backgroundImage: `url('${homeData.heroImage}')` }}
       />
       
-      {/* Dark gradient overlay for text readability - solid on left */}
+      {/* Dark gradient overlay for text readability */}
       <div 
         className="absolute inset-0 z-10"
-        style={{ background: 'linear-gradient(90deg, rgba(17,17,17,1) 0%, rgba(17,17,17,1) 35%, rgba(17,17,17,0.8) 55%, rgba(17,17,17,0.2) 75%, rgba(17,17,17,0) 100%)' }}
+        style={{ background: 'linear-gradient(90deg, rgba(15,15,15,.85) 0%, rgba(15,15,15,.65) 35%, rgba(15,15,15,.25) 60%, transparent 100%)' }}
       />
 
       {/* LEFT CONTENT */}
-      <div className="w-full lg:w-[45%] h-full flex flex-col justify-center pr-0 lg:pr-16 z-20 relative">
+      <div className="absolute top-[22%] left-[6%] w-full lg:w-[60%] z-20 flex flex-col justify-start">
         
         {/* Small Label */}
         <motion.h4
@@ -130,7 +130,7 @@ const Home = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 1.5, delay: 0.4 }}
-          className="font-heading text-[56px] lg:text-[80px] leading-[1.05] mb-10"
+          className="font-heading text-[72px] lg:text-[100px] leading-[0.95] mb-12 drop-shadow-md"
         >
           {renderTitleParts(homeData.heroTitle)}
         </motion.h1>
@@ -140,34 +140,23 @@ const Home = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1.2, delay: 0.6 }}
-          className="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-5"
+          className="flex flex-col sm:flex-row items-start space-y-4 sm:space-y-0 sm:space-x-6"
         >
           <Link
             to="/shop"
-            className="w-full sm:w-auto text-center bg-[#C8A45A] text-white font-semibold px-9 py-4 rounded-full hover:bg-white hover:text-[#111111] transition-all duration-500 text-[11px] uppercase tracking-[0.2em]"
+            className="w-full sm:w-auto text-center bg-[#C8A45A] text-white font-semibold px-10 py-5 rounded-full hover:bg-[#D5B05A] transition-all duration-300 text-[12px] uppercase tracking-[0.2em]"
           >
             Explore Collection
           </Link>
           <Link
             to="/about"
-            className="w-full sm:w-auto flex justify-center items-center space-x-2 border border-[#C8A45A] text-white font-semibold px-9 py-4 rounded-full hover:bg-[#C8A45A] hover:text-white transition-all duration-500 text-[11px] uppercase tracking-[0.2em]"
+            className="w-full sm:w-auto flex justify-center items-center space-x-2 border border-[#C8A45A] text-white font-semibold px-10 py-5 rounded-full hover:bg-[#C8A45A] hover:text-white transition-all duration-300 text-[12px] uppercase tracking-[0.2em]"
           >
             <span>Our Story</span>
-            <span>&rarr;</span>
           </Link>
         </motion.div>
       </div>
 
-      {/* Scroll Indicator */}
-      <motion.div 
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 2, duration: 1 }}
-        className="absolute bottom-6 left-[22.5%] transform -translate-x-1/2 z-20 flex flex-col items-center space-y-2 text-[#C8A45A] text-[9px] tracking-widest uppercase font-medium"
-      >
-        <span>Scroll</span>
-        <FiChevronDown className="animate-bounce text-white" size={14} />
-      </motion.div>
     </section>
   );
 

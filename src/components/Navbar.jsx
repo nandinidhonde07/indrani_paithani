@@ -90,17 +90,17 @@ const Navbar = ({ isScrolled, isTransparentInit }) => {
   const isTransparent = isTransparentInit && !isScrolled;
   
   const navbarBg = isTransparent 
-    ? 'bg-transparent text-white border-transparent h-[80px] flex items-center' 
+    ? 'bg-black/10 backdrop-blur-[12px] text-white border-b border-white/10 h-[80px] flex items-center' 
     : 'bg-[#111111] text-white shadow-sm border-b border-[#222222] h-[80px] flex items-center';
   
   const brandColor = 'text-white';
   
   const inputBg = isTransparent 
-    ? 'bg-white/10 text-white border-[#C8A45A]/50 placeholder-white/70' 
+    ? 'bg-transparent text-white border-white/30 placeholder-white/70' 
     : 'bg-white/10 text-white border-white/20 placeholder-white/50';
     
   const navLinkStyle = ({ isActive }) => {
-    return isActive ? 'text-white border-b-2 border-white pb-1 font-bold' : 'text-white/80 hover:text-white transition pb-1 border-b-2 border-transparent';
+    return isActive ? 'text-white border-b-2 border-[#C8A45A] pb-1 font-bold' : 'text-white/80 hover:text-white transition pb-1 border-b-2 border-transparent';
   };
   
   const iconClass = `transition focus:outline-none py-2 text-white hover:text-[#C8A45A]`;
