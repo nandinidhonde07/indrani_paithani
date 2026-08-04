@@ -73,73 +73,61 @@ const Home = () => {
 
   if (isCMSLoading || !homeData) return <div className="min-h-screen bg-cream flex items-center justify-center">Loading...</div>;
 
-  const renderTitleParts = (text) => {
-    if (!text) return null;
-    const lines = text.split('\n');
-    return lines.map((line, idx) => {
-      const words = line.split(' ');
-      return (
-        <React.Fragment key={idx}>
-          {words.map((word, i) => {
-            const isGold = word.toLowerCase().includes('heritage') || word.toLowerCase().includes('eternity');
-            if (isGold) {
-              return <span key={i} className="block text-[#C9A14A] font-bold mt-1">{word}</span>;
-            }
-            return <span key={i} className="text-white">{word} </span>;
-          })}
-        </React.Fragment>
-      );
-    });
-  };
-
   const renderHero = () => (
-    <section key="hero" className="relative h-screen w-full flex items-center pt-20 pb-12 px-8 lg:px-24 overflow-hidden">
+    <section key="hero" className="relative h-screen w-full flex items-center overflow-hidden bg-[#0E0E0E]">
       
-      {/* Full-bleed background image */}
+      {/* Cinematic Full-Bleed Image with Ken Burns Zoom */}
       <motion.div
-        initial={{ scale: 1.05 }}
-        animate={{ scale: 1.0 }}
-        transition={{ duration: 10, ease: 'easeOut' }}
-        className="absolute inset-0 z-0 bg-cover bg-center"
-        style={{ backgroundImage: `url('${homeData.heroImage}')` }}
+        initial={{ scale: 1 }}
+        animate={{ scale: 1.15 }}
+        transition={{ duration: 25, ease: 'linear', repeat: Infinity, repeatType: 'reverse' }}
+        className="absolute inset-0 z-0 bg-cover"
+        style={{ 
+          backgroundImage: `url('${homeData.heroImage}')`,
+          backgroundPosition: 'center right',
+          backgroundRepeat: 'no-repeat'
+        }}
       />
       
-      {/* Dark gradient overlay for text readability */}
+      {/* Dark Luxury Gradient Overlay - Left side heavily darkened */}
       <div 
         className="absolute inset-0 z-10"
-        style={{ background: 'linear-gradient(90deg, rgba(12,12,12,.88) 0%, rgba(18,18,18,.70) 30%, rgba(25,25,25,.35) 55%, transparent 100%)' }}
+        style={{ background: 'linear-gradient(90deg, rgba(14,14,14,0.95) 0%, rgba(14,14,14,0.75) 35%, rgba(14,14,14,0.3) 55%, transparent 100%)' }}
       />
 
-      {/* LEFT CONTENT */}
-      <div className="absolute top-[22%] left-[7%] w-full max-w-[620px] z-20 flex flex-col justify-start">
+      {/* Hero Content positioned Left 7% and Vertically Centered */}
+      <div className="absolute top-1/2 -translate-y-1/2 left-[7%] w-full max-w-[620px] z-20 flex flex-col justify-start">
         
         {/* Small Label */}
         <motion.h4
-          initial={{ opacity: 0, y: 15 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1.2, delay: 0.2 }}
-          className="flex items-center text-[#C9A14A] uppercase tracking-[0.3em] text-[10px] font-body mb-8 font-semibold"
+          className="text-[#C9A14A] uppercase tracking-[0.3em] text-[10px] font-body mb-8 font-semibold flex items-center"
         >
           <span className="w-6 h-px bg-[#C9A14A] mr-4"></span>
-          {homeData.heroLabel || 'AUTHENTIC YEOLA PAITHANI'}
+          AUTHENTIC YEOLA PAITHANI
           <span className="w-6 h-px bg-[#C9A14A] ml-4 hidden sm:block"></span>
         </motion.h4>
 
-        {/* Main Heading */}
+        {/* Main Typography */}
         <motion.h1
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1.5, delay: 0.4 }}
-          className="font-heading text-[72px] lg:text-[110px] leading-[0.9] tracking-tight mb-12 drop-shadow-md"
+          className="font-heading text-[72px] lg:text-[110px] leading-[0.9] text-white drop-shadow-md mb-12"
         >
-          {renderTitleParts(homeData.heroTitle)}
+          Woven with <br/>
+          <span className="text-[#C9A14A]">Heritage.</span><br/>
+          Crafted for <br/>
+          <span className="text-[#C9A14A]">Eternity.</span>
         </motion.h1>
         
         {/* CTA Buttons */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1.2, delay: 0.6 }}
+          transition={{ duration: 1.2, delay: 0.8 }}
           className="flex flex-col sm:flex-row items-start space-y-4 sm:space-y-0 sm:space-x-6"
         >
           <Link
@@ -156,7 +144,6 @@ const Home = () => {
           </Link>
         </motion.div>
       </div>
-
     </section>
   );
 
