@@ -88,15 +88,15 @@ const Navbar = ({ isScrolled, isTransparentInit }) => {
   ];
 
   // Always use glassmorphism to integrate seamlessly with the full-screen hero
-  const navbarBg = 'bg-black/10 backdrop-blur-[16px] text-white border-b border-white/10 h-[80px] flex items-center';
-  const brandColor = 'text-white';
-  const inputBg = 'bg-transparent text-white border-white/30 placeholder-white/70';
+  const navbarBg = 'bg-white/10 backdrop-blur-[16px] text-[#111111] border-b border-[#111111]/10 h-[80px] flex items-center';
+  const brandColor = 'text-[#111111]';
+  const inputBg = 'bg-[#111111]/5 text-[#111111] border-[#111111]/20 placeholder-[#111111]/60';
     
   const navLinkStyle = ({ isActive }) => {
-    return isActive ? 'text-white border-b-2 border-[#C9A14A] pb-1 font-bold' : 'text-white/80 hover:text-white transition pb-1 border-b-2 border-transparent';
+    return isActive ? 'text-[#111111] border-b-2 border-[#C9A14A] pb-1 font-bold' : 'text-[#111111]/80 hover:text-[#111111] transition pb-1 border-b-2 border-transparent';
   };
   
-  const iconClass = `transition focus:outline-none py-2 text-white hover:text-[#C9A14A]`;
+  const iconClass = `transition focus:outline-none py-2 text-[#111111] hover:text-[#C9A14A]`;
 
   return (
     <>
@@ -208,7 +208,7 @@ const Navbar = ({ isScrolled, isTransparentInit }) => {
                   onChange={(e) => setSearch(e.target.value)}
                   className={`w-full px-4 py-2 border rounded-full text-[11px] focus:outline-none focus:ring-1 focus:ring-[#111111] transition ${inputBg}`}
                 />
-                <button type="submit" className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#C9A14A]">
+                <button type="submit" className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#111111]/70 hover:text-[#C9A14A]">
                   🔍
                 </button>
               </form>
