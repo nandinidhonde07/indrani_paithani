@@ -130,10 +130,12 @@ const Navbar = ({ isScrolled, isTransparentInit }) => {
               onMouseEnter={() => setShowMegaMenu(true)}
               onMouseLeave={() => setShowMegaMenu(false)}
             >
-              <button className="text-black hover:text-black/70 flex items-center space-x-1 py-2 font-semibold tracking-wider">
-                <span>Shop</span>
-                <FaChevronDown size={8} />
-              </button>
+              <NavLink to="/shop" className={navLinkStyle}>
+                <span className="flex items-center space-x-1">
+                  <span>Shop</span>
+                  <FaChevronDown size={8} />
+                </span>
+              </NavLink>
 
 
               {showMegaMenu && (
@@ -258,9 +260,9 @@ const Navbar = ({ isScrolled, isTransparentInit }) => {
                 onMouseEnter={() => setShowAuthDropdown(true)}
                 onMouseLeave={() => setShowAuthDropdown(false)}
               >
-                <button className={iconClass}>
+                <Link to="/buyer-login" className={iconClass}>
                   <FiUser size={18} />
-                </button>
+                </Link>
 
                 {showAuthDropdown && (
                   <div className="absolute right-0 top-full w-48 bg-white border border-[#E5E5E5] shadow-xl rounded-xl p-2 z-50 text-[#111111]">
