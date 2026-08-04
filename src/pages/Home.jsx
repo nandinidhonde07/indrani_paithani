@@ -89,14 +89,14 @@ const Home = () => {
         }}
       />
       
-      {/* Dark Luxury Gradient Overlay - Left side heavily darkened */}
+      {/* Dark Luxury Gradient Overlay - Softer to show more image */}
       <div 
         className="absolute inset-0 z-10"
-        style={{ background: 'linear-gradient(90deg, rgba(14,14,14,0.95) 0%, rgba(14,14,14,0.75) 35%, rgba(14,14,14,0.3) 55%, transparent 100%)' }}
+        style={{ background: 'linear-gradient(90deg, rgba(14,14,14,0.8) 0%, rgba(14,14,14,0.5) 35%, rgba(14,14,14,0.1) 55%, transparent 100%)' }}
       />
 
       {/* Hero Content positioned Left 7% and Vertically Centered */}
-      <div className="absolute top-1/2 -translate-y-1/2 left-[7%] w-full max-w-[620px] z-20 flex flex-col justify-start">
+      <div className="absolute top-1/2 -translate-y-1/2 left-[7%] w-full max-w-[500px] z-20 flex flex-col justify-start">
         
         {/* Small Label */}
         <motion.h4
@@ -115,12 +115,12 @@ const Home = () => {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1.5, delay: 0.4 }}
-          className="font-heading text-[72px] lg:text-[110px] leading-[0.9] text-white drop-shadow-md mb-12"
+          className="font-heading text-[52px] lg:text-[64px] leading-[1.0] font-normal text-white drop-shadow-md mb-10"
         >
           Woven with <br/>
-          <span className="text-[#C9A14A]">Heritage.</span><br/>
+          <span className="text-[#C9A14A] font-normal">Heritage.</span><br/>
           Crafted for <br/>
-          <span className="text-[#C9A14A]">Eternity.</span>
+          <span className="text-[#C9A14A] font-normal">Eternity.</span>
         </motion.h1>
         
         {/* CTA Buttons */}
