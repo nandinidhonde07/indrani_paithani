@@ -104,10 +104,10 @@ const Home = () => {
         style={{ backgroundImage: `url('${homeData.heroImage}')` }}
       />
       
-      {/* Dark gradient overlay for text readability */}
+      {/* Dark gradient overlay for text readability - solid on left */}
       <div 
         className="absolute inset-0 z-10"
-        style={{ background: 'linear-gradient(90deg, rgba(17,17,17,0.95) 0%, rgba(17,17,17,0.8) 30%, rgba(17,17,17,0.2) 70%, rgba(17,17,17,0) 100%)' }}
+        style={{ background: 'linear-gradient(90deg, rgba(17,17,17,1) 0%, rgba(17,17,17,1) 35%, rgba(17,17,17,0.8) 55%, rgba(17,17,17,0.2) 75%, rgba(17,17,17,0) 100%)' }}
       />
 
       {/* LEFT CONTENT */}
@@ -118,9 +118,11 @@ const Home = () => {
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1.2, delay: 0.2 }}
-          className="text-[#C8A45A] uppercase tracking-[0.3em] text-[10px] font-body mb-8 font-semibold"
+          className="flex items-center text-[#C8A45A] uppercase tracking-[0.3em] text-[10px] font-body mb-8 font-semibold"
         >
+          <span className="w-6 h-px bg-[#C8A45A] mr-4"></span>
           {homeData.heroLabel || 'AUTHENTIC YEOLA PAITHANI'}
+          <span className="w-6 h-px bg-[#C8A45A] ml-4 hidden sm:block"></span>
         </motion.h4>
 
         {/* Main Heading */}
@@ -148,9 +150,10 @@ const Home = () => {
           </Link>
           <Link
             to="/about"
-            className="w-full sm:w-auto text-center border border-[#C8A45A] text-white font-semibold px-9 py-4 rounded-full hover:bg-[#C8A45A] hover:text-white transition-all duration-500 text-[11px] uppercase tracking-[0.2em]"
+            className="w-full sm:w-auto flex justify-center items-center space-x-2 border border-[#C8A45A] text-white font-semibold px-9 py-4 rounded-full hover:bg-[#C8A45A] hover:text-white transition-all duration-500 text-[11px] uppercase tracking-[0.2em]"
           >
-            Our Story
+            <span>Our Story</span>
+            <span>&rarr;</span>
           </Link>
         </motion.div>
       </div>
