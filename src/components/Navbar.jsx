@@ -90,20 +90,20 @@ const Navbar = ({ isScrolled, isTransparentInit }) => {
   const isTransparent = isTransparentInit && !isScrolled;
   
   const navbarBg = isTransparent 
-    ? 'bg-transparent text-[#111111] border-transparent h-[80px] flex items-center' 
-    : 'bg-white text-[#111111] shadow-sm border-b border-[#E5E5E5] h-[80px] flex items-center';
+    ? 'bg-transparent text-white border-transparent h-[80px] flex items-center' 
+    : 'bg-[#111111] text-white shadow-sm border-b border-[#222222] h-[80px] flex items-center';
   
-  const brandColor = 'text-[#111111]';
+  const brandColor = 'text-white';
   
   const inputBg = isTransparent 
-    ? 'bg-[#111111]/5 text-[#111111] border-[#111111]/20 placeholder-[#111111]/60' 
-    : 'bg-[#F9F9F9] text-[#111111] border-[#E5E5E5] placeholder-[#999999]';
+    ? 'bg-white/10 text-white border-[#C8A45A]/50 placeholder-white/70' 
+    : 'bg-white/10 text-white border-white/20 placeholder-white/50';
     
   const navLinkStyle = ({ isActive }) => {
-    return isActive ? 'text-[#111111] border-b-2 border-[#111111] pb-1 font-bold' : 'text-[#666666] hover:text-[#111111] transition pb-1 border-b-2 border-transparent';
+    return isActive ? 'text-white border-b-2 border-white pb-1 font-bold' : 'text-white/80 hover:text-white transition pb-1 border-b-2 border-transparent';
   };
   
-  const iconClass = `transition focus:outline-none py-2 text-[#111111] hover:text-[#666666]`;
+  const iconClass = `transition focus:outline-none py-2 text-white hover:text-[#C8A45A]`;
 
   return (
     <>
@@ -210,7 +210,7 @@ const Navbar = ({ isScrolled, isTransparentInit }) => {
                   onChange={(e) => setSearch(e.target.value)}
                   className={`w-full px-4 py-2 border rounded-full text-[11px] focus:outline-none focus:ring-1 focus:ring-[#111111] transition ${inputBg}`}
                 />
-                <button type="submit" className={`absolute right-3 top-1/2 transform -translate-y-1/2 ${isTransparent ? 'text-[#111111]/70' : 'text-[#666666]'}`}>
+                <button type="submit" className={`absolute right-3 top-1/2 transform -translate-y-1/2 text-white/70 hover:text-[#C8A45A]`}>
                   🔍
                 </button>
               </form>
