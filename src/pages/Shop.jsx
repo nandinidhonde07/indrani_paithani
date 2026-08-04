@@ -127,7 +127,7 @@ const Shop = () => {
   };
 
   return (
-    <div className="bg-cream min-h-screen py-10 px-6 relative">
+    <div className="bg-cream min-h-screen pt-32 pb-10 px-6 relative">
       <div className="container mx-auto">
         <h1 className="text-3xl md:text-5xl font-heading text-maroon text-center mb-8 tracking-widest">
           The Luxury Saree Boutique

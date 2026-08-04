@@ -94,7 +94,7 @@ const ProductDetail = () => {
   };
 
   return (
-    <div className="bg-cream min-h-screen py-12 px-6 relative">
+    <div className="bg-cream min-h-screen pt-32 pb-12 px-6 relative">
       <div className="container mx-auto max-w-6xl bg-white rounded-3xl p-6 md:p-12 shadow-premium border border-gold/10">
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12">

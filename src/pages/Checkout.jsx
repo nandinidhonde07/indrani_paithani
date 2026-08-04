@@ -49,7 +49,7 @@ const Checkout = () => {
   };
 
   return (
-    <div className="bg-cream min-h-screen py-16 px-6">
+    <div className="bg-cream min-h-screen pt-32 pb-16 px-6">
       <div className="container mx-auto max-w-4xl bg-white rounded-3xl p-8 md:p-12 shadow-premium border border-gold/10">
         
         {/* Progress Bar */}
