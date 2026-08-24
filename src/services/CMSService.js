@@ -26,6 +26,11 @@ class CMSService {
            merged.home.heroLabel = defaultSiteContent.home.heroLabel;
         }
 
+        // Force update the hero image to bypass browser/CDN cache
+        if (merged.home && (merged.home.heroImage === '/assets/homepage_bg.jpg' || !merged.home.heroImage)) {
+           merged.home.heroImage = '/assets/homepage_bg_v2.jpg';
+        }
+
         resolve(merged);
       } else {
         localStorage.setItem(this.CMS_KEY, JSON.stringify(defaultSiteContent));

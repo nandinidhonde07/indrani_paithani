@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { FaPhoneAlt, FaEnvelope, FaMapMarkerAlt, FaWhatsapp } from 'react-icons/fa';
 import useAppStore from '../store/useAppStore.js';
+import ContactService from '../services/ContactService.js';
 
 const Contact = () => {
   const { cmsContent, isCMSLoading } = useAppStore();
@@ -9,8 +10,12 @@ const Contact = () => {
 
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!formData.name || !formData.email || !formData.message) return;
+    
+    await ContactService.submitInquiry(formData);
+    
     alert('Thank you! Your message has been received. We will connect with you soon.');
     setFormData({ name: '', email: '', message: '' });
   };

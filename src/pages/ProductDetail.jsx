@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import productsData from '../data/products.json';
 import { FiHeart, FiShare2, FiShoppingCart, FiTruck, FiRotateCcw, FiStar, FiChevronDown, FiChevronUp, FiMaximize } from 'react-icons/fi';
+import useCartStore from '../store/useCartStore.js';
+import ReviewService from '../services/ReviewService.js';
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -18,6 +20,12 @@ const ProductDetail = () => {
   // FAQ Accordion states
   const [faqOpen, setFaqOpen] = useState([false, false, false]);
 
+  // Reviews states
+  const [reviews, setReviews] = useState([]);
+  const [newReview, setNewReview] = useState({ rating: 5, comment: '' });
+  const [reviewSubmitted, setReviewSubmitted] = useState(false);
+  const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+
   useEffect(() => {
     const stored = localStorage.getItem('products');
     const catalog = stored ? JSON.parse(stored) : productsData;
@@ -27,12 +35,34 @@ const ProductDetail = () => {
       setActiveImageIndex(0);
       const filtered = catalog.filter(p => p.category === found.category && p.id !== found.id).slice(0, 4);
       setRelated(filtered);
+      
+      ReviewService.getApprovedReviewsForProduct(id).then(res => setReviews(res));
     } else {
       navigate('/shop');
     }
   }, [id, navigate]);
 
   if (!product) return <div className="text-center py-20 bg-cream">Loading Saree...</div>;
+
+  const submitReview = async (e) => {
+    e.preventDefault();
+    if (!currentUser) {
+      alert("Please login to submit a review.");
+      return;
+    }
+    if (!newReview.comment.trim()) return;
+
+    await ReviewService.submitReview({
+      productId: product.id,
+      userId: currentUser.email,
+      userName: currentUser.name || currentUser.email.split('@')[0],
+      rating: newReview.rating,
+      comment: newReview.comment
+    });
+    
+    setReviewSubmitted(true);
+    setNewReview({ rating: 5, comment: '' });
+  };
 
   const imagesList = product.images && product.images.length > 0 ? product.images : [product.image];
   const galleryLabels = ['Flat Saree', 'Woman Wearing Saree', 'Zoom View', 'Back Side', 'Pallu Close-up', 'Border Close-up'];
@@ -54,27 +84,17 @@ const ProductDetail = () => {
     setZoomStyle({ display: 'none' });
   };
 
+  const addToCartAction = useCartStore(state => state.addToCart);
+  const addToWishlistAction = useCartStore(state => state.toggleWishlist);
+
   const addToCart = () => {
-    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-    const existing = cart.find(item => item.id === product.id);
-    if (existing) {
-      existing.quantity += 1;
-    } else {
-      cart.push({ ...product, quantity: 1 });
-    }
-    localStorage.setItem('cart', JSON.stringify(cart));
+    addToCartAction(product, 1);
     alert(`${product.name} added to cart!`);
   };
 
   const addToWishlist = () => {
-    const wishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
-    if (!wishlist.find(item => item.id === product.id)) {
-      wishlist.push(product);
-      localStorage.setItem('wishlist', JSON.stringify(wishlist));
-      alert(`${product.name} added to wishlist!`);
-    } else {
-      alert(`${product.name} is already in wishlist!`);
-    }
+    addToWishlistAction(product);
+    alert(`${product.name} wishlist updated!`);
   };
 
   const buyNow = () => {
@@ -243,6 +263,75 @@ const ProductDetail = () => {
               )}
             </div>
           ))}
+        </div>
+
+        {/* REVIEWS SECTION */}
+        <div className="mt-20 border-t border-gold/20 pt-12 max-w-4xl mx-auto space-y-8">
+          <h3 className="font-heading text-2xl text-maroon text-center mb-8">Patron Reviews</h3>
+          
+          {reviews.length > 0 ? (
+            <div className="space-y-6">
+              {reviews.map(rev => (
+                <div key={rev.id} className="bg-cream/10 p-6 rounded-2xl border border-gold/10 shadow-sm">
+                  <div className="flex justify-between items-center mb-2">
+                    <h4 className="font-bold text-maroon">{rev.userName}</h4>
+                    <span className="text-xs text-gray-400">{new Date(rev.date).toLocaleDateString()}</span>
+                  </div>
+                  <div className="text-gold mb-2 text-sm">
+                    {'★'.repeat(rev.rating)}{'☆'.repeat(5 - rev.rating)}
+                  </div>
+                  <p className="text-sm text-gray-700 italic">"{rev.comment}"</p>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center text-gray-500 py-6 border border-dashed border-gray-300 rounded-2xl">
+              No reviews yet. Be the first to review this masterpiece!
+            </div>
+          )}
+
+          {/* Submit Review */}
+          <div className="bg-white p-8 border border-gold/10 rounded-2xl shadow-premium mt-8">
+            <h4 className="font-heading text-lg text-maroon mb-4">Write a Review</h4>
+            {reviewSubmitted ? (
+              <div className="bg-green-50 text-green-700 p-4 rounded-xl text-sm border border-green-200">
+                Thank you! Your review has been submitted and is pending moderation.
+              </div>
+            ) : (
+              <form onSubmit={submitReview} className="space-y-4">
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 uppercase mb-2">Rating</label>
+                  <select 
+                    value={newReview.rating} 
+                    onChange={e => setNewReview({ ...newReview, rating: parseInt(e.target.value) })}
+                    className="w-full sm:w-32 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gold bg-white"
+                  >
+                    {[5,4,3,2,1].map(num => <option key={num} value={num}>{num} Stars</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 uppercase mb-2">Your Experience</label>
+                  <textarea 
+                    rows="3" 
+                    required
+                    value={newReview.comment}
+                    onChange={e => setNewReview({ ...newReview, comment: e.target.value })}
+                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gold"
+                    placeholder="Tell us what you loved about this saree..."
+                  ></textarea>
+                </div>
+                {currentUser ? (
+                  <button type="submit" className="bg-gold hover:bg-maroon text-maroon hover:text-white font-semibold py-2 px-6 rounded-full transition shadow text-sm">
+                    Submit Review
+                  </button>
+                ) : (
+                  <div className="text-sm text-maroon font-semibold">
+                    <Link to="/buyer-login" className="underline">Log in</Link> to write a review.
+                  </div>
+                )}
+              </form>
+            )}
+          </div>
         </div>
 
         {/* RELATED PRODUCTS */}

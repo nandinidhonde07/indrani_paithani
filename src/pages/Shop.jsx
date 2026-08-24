@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useSearchParams, Link, useNavigate } from 'react-router-dom';
 import productsData from '../data/products.json';
 import { FiHeart, FiEye, FiShoppingCart, FiStar, FiX } from 'react-icons/fi';
+import useCartStore from '../store/useCartStore.js';
 
 const Shop = () => {
   const [searchParams] = useSearchParams();
@@ -86,28 +87,8 @@ const Shop = () => {
     setFilteredProducts(result);
   }, [searchQuery, selectedCategory, selectedFabric, selectedMotif, selectedColor, maxPrice, sortBy, products]);
 
-  const addToCart = (product) => {
-    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-    const existing = cart.find(item => item.id === product.id);
-    if (existing) {
-      existing.quantity += 1;
-    } else {
-      cart.push({ ...product, quantity: 1 });
-    }
-    localStorage.setItem('cart', JSON.stringify(cart));
-    alert(`${product.name} added to cart!`);
-  };
-
-  const addToWishlist = (product) => {
-    const wishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
-    if (!wishlist.find(item => item.id === product.id)) {
-      wishlist.push(product);
-      localStorage.setItem('wishlist', JSON.stringify(wishlist));
-      alert(`${product.name} added to wishlist!`);
-    } else {
-      alert(`${product.name} is already in wishlist!`);
-    }
-  };
+  const addToCart = useCartStore(state => state.addToCart);
+  const addToWishlist = useCartStore(state => state.toggleWishlist);
 
   const buyNow = (product) => {
     addToCart(product);

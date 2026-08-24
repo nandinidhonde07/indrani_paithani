@@ -7,6 +7,9 @@ import FounderCMS from './admin/FounderCMS';
 import PolicyCMS from './admin/PolicyCMS';
 import ProductCMS from './admin/ProductCMS';
 import ContactCMS from './admin/ContactCMS';
+import OrderManagementCMS from './admin/OrderManagementCMS';
+import InquiriesCMS from './admin/InquiriesCMS';
+import ReviewModerationCMS from './admin/ReviewModerationCMS';
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -152,6 +155,8 @@ const AdminDashboard = () => {
               { id: 'testimonials', label: 'Testimonials' },
               { id: 'instagram', label: 'Instagram Gallery' },
               { id: 'contact', label: 'Contact Info' },
+              { id: 'inquiries', label: 'Inquiries' },
+              { id: 'reviews', label: 'Review Moderation' },
               { id: 'policy', label: 'Policy Pages' },
               { id: 'media', label: 'Media Library' },
               { id: 'banners', label: 'Banner Management' },
@@ -235,46 +240,7 @@ const AdminDashboard = () => {
 
         {activeTab === 'products' && <ProductCMS />}
 
-        {activeTab === 'orders' && (
-          <div className="space-y-8">
-            <h2 className="text-3xl font-heading text-maroon">Orders & Dispatch</h2>
-            <div className="bg-white rounded-2xl p-6 shadow-premium border border-gold/10 overflow-x-auto">
-              <table className="w-full text-left text-sm border-collapse">
-                <thead>
-                  <tr className="border-b border-gray-200 text-gray-500">
-                    <th className="py-2">Order ID</th>
-                    <th className="py-2">Date</th>
-                    <th className="py-2">Customer</th>
-                    <th className="py-2">Status</th>
-                    <th className="py-2">Total Price</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {[
-                    { id: 'ORD1024', date: '2026-07-28', customer: 'Priya Deshmukh', status: 'Delivered', total: 28000 },
-                    { id: 'ORD1025', date: '2026-07-29', customer: 'Aditi Kulkarni', status: 'In Transit', total: 42500 },
-                    { id: 'ORD1026', date: '2026-07-30', customer: 'Sneha Patil', status: 'Processing', total: 115000 }
-                  ].map(ord => (
-                    <tr key={ord.id} className="border-b border-gray-100 last:border-0">
-                      <td className="py-3 font-semibold">{ord.id}</td>
-                      <td className="py-3">{ord.date}</td>
-                      <td className="py-3">{ord.customer}</td>
-                      <td className="py-3">
-                        <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                          ord.status === 'Delivered' ? 'bg-green-100 text-green-700' :
-                          ord.status === 'In Transit' ? 'bg-blue-100 text-blue-700' : 'bg-yellow-100 text-yellow-700'
-                        }`}>
-                          {ord.status}
-                        </span>
-                      </td>
-                      <td className="py-3 font-medium">₹{ord.total.toLocaleString('en-IN')}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
+        {activeTab === 'orders' && <OrderManagementCMS />}
 
         {activeTab === 'customers' && (
           <div className="space-y-8">
@@ -322,6 +288,8 @@ const AdminDashboard = () => {
         {activeTab === 'founder_cms' && <FounderCMS />}
         {activeTab === 'policy' && <PolicyCMS />}
         {activeTab === 'contact' && <ContactCMS />}
+        {activeTab === 'inquiries' && <InquiriesCMS />}
+        {activeTab === 'reviews' && <ReviewModerationCMS />}
 
       </main>
     </div>

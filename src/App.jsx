@@ -20,6 +20,7 @@ import Navbar from './components/Navbar.jsx';
 import Footer from './components/Footer.jsx';
 import { FaWhatsapp, FaArrowUp, FaHome, FaShoppingBag, FaHeart, FaShoppingCart, FaUser } from 'react-icons/fa';
 import useAppStore from './store/useAppStore.js';
+import useCartStore from './store/useCartStore.js';
 
 // Simple auth guard based on localStorage "role" ("buyer" or "owner")
 const ProtectedRoute = ({ children, role }) => {
@@ -35,9 +36,11 @@ const App = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
   const initStore = useAppStore(state => state.initStore);
+  const initCartStore = useCartStore(state => state.initStore);
 
   useEffect(() => {
     initStore();
+    initCartStore();
     const handleScroll = () => {
       // Manage transparency of navbar
       if (window.scrollY > 50) {

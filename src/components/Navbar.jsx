@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { FiHeart, FiShoppingCart, FiUser, FiX, FiPlus, FiMinus } from 'react-icons/fi';
 import { FaUserShield, FaChevronDown, FaStore, FaGem, FaGift, FaHeartbeat } from 'react-icons/fa';
 import productsData from '../data/products.json';
+import useCartStore from '../store/useCartStore.js';
 
 const Navbar = ({ isScrolled, isTransparentInit }) => {
   const [search, setSearch] = useState('');
@@ -11,21 +12,15 @@ const Navbar = ({ isScrolled, isTransparentInit }) => {
   const [showMegaMenu, setShowMegaMenu] = useState(false);
   const [showAuthDropdown, setShowAuthDropdown] = useState(false);
   const [showCartDrawer, setShowCartDrawer] = useState(false);
-  const [cart, setCart] = useState([]);
+  
+  const cart = useCartStore(state => state.cart);
+  const updateQuantity = useCartStore(state => state.updateQuantity);
+  const removeFromCart = useCartStore(state => state.removeFromCart);
+
   const navigate = useNavigate();
   const searchRef = useRef(null);
 
-  // Sync mini cart drawer data
-  const syncCart = () => {
-    setCart(JSON.parse(localStorage.getItem('cart') || '[]'));
-  };
-
-  useEffect(() => {
-    syncCart();
-    // Setup simple listener for local storage changes
-    window.addEventListener('storage', syncCart);
-    return () => window.removeEventListener('storage', syncCart);
-  }, [showCartDrawer]);
+  // Cart sync is handled by zustand store automatically!
 
   useEffect(() => {
     if (search.trim().length > 1) {
@@ -57,18 +52,7 @@ const Navbar = ({ isScrolled, isTransparentInit }) => {
     }
   };
 
-  const updateQuantity = (id, q) => {
-    if (q < 1) return;
-    const updated = cart.map(item => item.id === id ? { ...item, quantity: q } : item);
-    localStorage.setItem('cart', JSON.stringify(updated));
-    setCart(updated);
-  };
-
-  const removeFromCart = (id) => {
-    const updated = cart.filter(item => item.id !== id);
-    localStorage.setItem('cart', JSON.stringify(updated));
-    setCart(updated);
-  };
+  // Removed local updateQuantity and removeFromCart, using zustand directly
 
   const calculateTotal = () => {
     return cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
@@ -91,16 +75,20 @@ const Navbar = ({ isScrolled, isTransparentInit }) => {
   const isTransparent = isTransparentInit && !isScrolled;
 
   const navbarBg = isTransparent 
-    ? 'bg-transparent text-[#111111] h-[80px] flex items-center'
+    ? 'bg-transparent text-white h-[80px] flex items-center'
     : 'bg-white/95 backdrop-blur-[16px] shadow-sm border-b border-[#111111]/10 text-[#111111] h-[80px] flex items-center';
-  const brandColor = 'text-[#111111]';
-  const inputBg = 'bg-[#111111]/5 text-[#111111] border-[#111111]/20 placeholder-[#111111]/60';
+  const brandColor = isTransparent ? 'text-white' : 'text-[#111111]';
+  const inputBg = isTransparent 
+    ? 'bg-white/20 text-white border-white/30 placeholder-white/70'
+    : 'bg-[#111111]/5 text-[#111111] border-[#111111]/20 placeholder-[#111111]/60';
     
   const navLinkStyle = ({ isActive }) => {
-    return isActive ? 'text-[#111111] border-b-2 border-[#C9A14A] pb-1 font-bold' : 'text-[#111111]/80 hover:text-[#111111] transition pb-1 border-b-2 border-transparent';
+    return isActive 
+      ? `border-b-2 border-[#C9A14A] pb-1 font-bold ${isTransparent ? 'text-white' : 'text-[#111111]'}`
+      : `${isTransparent ? 'text-white/80 hover:text-white' : 'text-[#111111]/80 hover:text-[#111111]'} transition pb-1 border-b-2 border-transparent`;
   };
   
-  const iconClass = `transition focus:outline-none py-2 text-[#111111] hover:text-[#C9A14A]`;
+  const iconClass = `transition focus:outline-none py-2 ${isTransparent ? 'text-white hover:text-[#C9A14A]' : 'text-[#111111] hover:text-[#C9A14A]'}`;
 
   return (
     <>
@@ -233,10 +221,10 @@ const Navbar = ({ isScrolled, isTransparentInit }) => {
               </Link>
               
               {/* Shopping bag opens slide-out cart drawer */}
-              <button onClick={() => { syncCart(); setShowCartDrawer(true); }} className={`${iconClass} relative`}>
+              <button onClick={() => setShowCartDrawer(true)} className={`${iconClass} relative`}>
                 <FiShoppingCart size={18} />
                 {cart.length > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-[#111111] text-white w-4 h-4 text-[9px] rounded-full flex items-center justify-center font-bold">
+                  <span className={`absolute -top-2 -right-2 w-4 h-4 text-[9px] rounded-full flex items-center justify-center font-bold ${isTransparent ? 'bg-white text-black' : 'bg-[#111111] text-white'}`}>
                     {cart.length}
                   </span>
                 )}
