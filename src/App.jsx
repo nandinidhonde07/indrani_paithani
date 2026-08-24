@@ -22,12 +22,29 @@ import { FaWhatsapp, FaArrowUp, FaHome, FaShoppingBag, FaHeart, FaShoppingCart, 
 import useAppStore from './store/useAppStore.js';
 import useCartStore from './store/useCartStore.js';
 
-// Simple auth guard based on localStorage "role" ("buyer" or "owner")
+import useAuthStore from './store/useAuthStore.js';
+
+// Simple auth guard
 const ProtectedRoute = ({ children, role }) => {
+  const { isAuthenticated, loading } = useAuthStore();
   const storedRole = localStorage.getItem('role');
-  if (storedRole !== role) {
-    return <Navigate to={role === 'owner' ? '/owner-login' : '/buyer-login'} replace />;
+
+  if (loading && role === 'buyer') {
+    return <div className="min-h-screen flex items-center justify-center bg-cream font-heading text-maroon text-2xl">Loading...</div>;
   }
+
+  if (role === 'owner') {
+    if (storedRole !== 'owner') {
+      return <Navigate to="/owner-login" replace />;
+    }
+    return children;
+  }
+
+  // Buyer Route
+  if (!isAuthenticated && storedRole !== 'buyer') {
+    return <Navigate to="/buyer-login" replace />;
+  }
+  
   return children;
 };
 
@@ -37,10 +54,13 @@ const App = () => {
   const location = useLocation();
   const initStore = useAppStore(state => state.initStore);
   const initCartStore = useCartStore(state => state.initStore);
+  const initAuth = useAuthStore(state => state.initAuth);
 
   useEffect(() => {
     initStore();
     initCartStore();
+    initAuth();
+    
     const handleScroll = () => {
       // Manage transparency of navbar
       if (window.scrollY > 50) {

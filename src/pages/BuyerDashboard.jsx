@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import OrderService from '../services/OrderService.js';
 import UserService from '../services/UserService.js';
 import useCartStore from '../store/useCartStore.js';
+import useAuthStore from '../store/useAuthStore.js';
 import { generateInvoice } from '../utils/InvoiceGenerator.js';
 
 const TIMELINE_STAGES = [
@@ -34,16 +35,18 @@ const BuyerDashboard = () => {
   const [notifications, setNotifications] = useState([]);
   const [showNotifications, setShowNotifications] = useState(false);
 
+  const { user: authUser, isAuthenticated } = useAuthStore();
+
   useEffect(() => {
-    UserService.getCurrentUser().then(user => {
-      if (user) {
-        setUserProfile(user);
-        setAddress(user.address || 'Yeola, Nashik, Maharashtra - 423401');
-      } else {
-        setUserProfile({ name: 'Guest Valued Buyer', email: 'guest@example.com' });
-      }
-    });
-  }, []);
+    // If the authUser from Zustand changes, update the local userProfile 
+    // and fetch the latest address from UserService
+    if (authUser) {
+      setUserProfile(authUser);
+      setAddress(authUser.address || 'Yeola, Nashik, Maharashtra - 423401');
+    } else {
+      setUserProfile({ name: 'Guest Valued Buyer', email: 'guest@example.com' });
+    }
+  }, [authUser]);
 
   // Load Orders
   useEffect(() => {
@@ -73,10 +76,10 @@ const BuyerDashboard = () => {
     }
   }, [activeTab, userProfile]);
 
-  const handleLogout = () => {
-    localStorage.removeItem('role');
-    localStorage.removeItem('currentUser');
-    navigate('/buyer-login');
+  // Removed handleLogout from here, we will rely on Navbar for logout or add it here
+  const handleLogout = async () => {
+    await import('../services/AuthService.js').then(m => m.default.logout());
+    navigate('/');
   };
 
   const saveAddress = async (e) => {
@@ -124,9 +127,16 @@ const BuyerDashboard = () => {
       {/* Sidebar Navigation */}
       <aside className="w-full md:w-64 bg-maroon text-white p-6 flex flex-col justify-between">
         <div className="space-y-6">
-          <div className="border-b border-gold/30 pb-4">
-            <h2 className="text-xl font-heading text-gold tracking-widest">MY LUXURY</h2>
-            <p className="text-xs text-cream/70 font-light mt-1">{userProfile?.name}</p>
+          <div className="border-b border-gold/30 pb-4 text-center">
+            {userProfile?.photo ? (
+              <img src={userProfile.photo} alt={userProfile.name} className="w-16 h-16 mx-auto rounded-full object-cover border-2 border-gold shadow-sm mb-3" />
+            ) : (
+              <div className="w-16 h-16 mx-auto rounded-full bg-cream/10 border-2 border-gold flex items-center justify-center text-2xl font-bold mb-3 shadow-sm">
+                {userProfile?.name?.charAt(0) || 'G'}
+              </div>
+            )}
+            <h2 className="text-xl font-heading text-gold tracking-widest leading-tight">{userProfile?.name}</h2>
+            <p className="text-[10px] text-cream/70 font-light mt-1 truncate">{userProfile?.email}</p>
           </div>
 
           <nav className="space-y-2">
@@ -354,14 +364,31 @@ const BuyerDashboard = () => {
         {activeTab === 'profile' && (
           <div className="space-y-8">
             <h2 className="text-3xl font-heading text-maroon">Profile Details</h2>
-            <div className="bg-white p-8 rounded-2xl shadow-premium border border-gold/10 max-w-md space-y-4">
-              <div>
-                <span className="block text-xs font-semibold text-gray-400 uppercase">Registered Name</span>
-                <p className="text-lg font-medium text-maroon mt-1">{userProfile?.name}</p>
+            <div className="bg-white p-8 rounded-2xl shadow-premium border border-gold/10 max-w-md space-y-6">
+              
+              <div className="flex items-center space-x-6 pb-6 border-b border-gray-100">
+                {userProfile?.photo ? (
+                  <img src={userProfile.photo} alt={userProfile.name} className="w-20 h-20 rounded-full object-cover border border-gold shadow-sm" />
+                ) : (
+                  <div className="w-20 h-20 rounded-full bg-cream border border-gold flex items-center justify-center text-3xl font-bold text-maroon shadow-sm">
+                    {userProfile?.name?.charAt(0) || 'G'}
+                  </div>
+                )}
+                <div>
+                  <h3 className="text-xl font-heading text-maroon">{userProfile?.name}</h3>
+                  <span className="text-xs font-semibold text-gray-400 uppercase">Verified Buyer</span>
+                </div>
               </div>
-              <div>
-                <span className="block text-xs font-semibold text-gray-400 uppercase">Email Address</span>
-                <p className="text-lg font-medium text-maroon mt-1">{userProfile?.email}</p>
+
+              <div className="space-y-4">
+                <div>
+                  <span className="block text-xs font-semibold text-gray-400 uppercase">Registered Name</span>
+                  <p className="text-lg font-medium text-maroon mt-1">{userProfile?.name}</p>
+                </div>
+                <div>
+                  <span className="block text-xs font-semibold text-gray-400 uppercase">Email Address</span>
+                  <p className="text-lg font-medium text-maroon mt-1">{userProfile?.email}</p>
+                </div>
               </div>
               <div className="pt-4 border-t border-gray-100 text-xs text-gray-400">
                 Contact customer support at +91 7507755836 to request email modifications.
