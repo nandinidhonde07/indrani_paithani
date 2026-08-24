@@ -4,6 +4,11 @@ import UserService from './UserService.js';
 
 class AuthService {
   static initAuthListener(callback) {
+    if (!auth) {
+      callback(null);
+      return () => {};
+    }
+
     // Ensures persistence across refreshes
     setPersistence(auth, browserLocalPersistence).catch(console.error);
 
@@ -45,6 +50,7 @@ class AuthService {
   }
 
   static async loginWithGoogle() {
+    if (!auth) return { success: false, message: 'Firebase is not configured. Please setup environment variables.' };
     try {
       const result = await signInWithPopup(auth, googleProvider);
       return { success: true, user: result.user };
@@ -61,6 +67,7 @@ class AuthService {
   }
 
   static async loginWithEmail(email, password) {
+    if (!auth) return { success: false, message: 'Firebase is not configured. Please setup environment variables.' };
     try {
       const result = await signInWithEmailAndPassword(auth, email, password);
       return { success: true, user: result.user };
@@ -74,6 +81,7 @@ class AuthService {
   }
 
   static async signupWithEmail(email, password, name) {
+    if (!auth) return { success: false, message: 'Firebase is not configured. Please setup environment variables.' };
     try {
       const result = await createUserWithEmailAndPassword(auth, email, password);
       // Update Firebase profile with the provided name
@@ -92,6 +100,7 @@ class AuthService {
   }
 
   static async logout() {
+    if (!auth) return { success: true };
     try {
       await signOut(auth);
       return { success: true };

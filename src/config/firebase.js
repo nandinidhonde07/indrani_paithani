@@ -10,8 +10,22 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_FIREBASE_APP_ID
 };
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const googleProvider = new GoogleAuthProvider();
+let app;
+let auth = null;
+let googleProvider = null;
+
+// Only initialize Firebase if we have an API key. 
+// Otherwise, the entire React app will crash with a blank white screen on production.
+if (firebaseConfig.apiKey) {
+  try {
+    app = initializeApp(firebaseConfig);
+    auth = getAuth(app);
+    googleProvider = new GoogleAuthProvider();
+  } catch (error) {
+    console.error("Firebase initialization error", error);
+  }
+} else {
+  console.warn("Firebase is not initialized. Please add VITE_FIREBASE environment variables.");
+}
 
 export { auth, googleProvider };
