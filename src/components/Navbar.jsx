@@ -232,20 +232,20 @@ const Navbar = ({ isScrolled, isTransparentInit }) => {
 
               {/* User portal */}
               <div
-                className="relative"
+                className="relative flex items-center h-full"
                 onMouseEnter={() => setShowAuthDropdown(true)}
                 onMouseLeave={() => setShowAuthDropdown(false)}
               >
-                <Link to="/buyer-login" className={iconClass}>
+                <button onClick={() => setShowAuthDropdown(!showAuthDropdown)} className={iconClass}>
                   <FiUser size={18} />
-                </Link>
+                </button>
 
                 {showAuthDropdown && (
-                  <div className="absolute right-0 top-full w-48 bg-white border border-[#E5E5E5] shadow-xl rounded-xl p-2 z-50 text-[#111111]">
-                    <Link to="/buyer-login" className="block px-4 py-2 hover:bg-[#F9F9F9] rounded-lg text-xs font-semibold">
+                  <div className="absolute right-0 top-full mt-2 w-48 bg-white border border-[#E5E5E5] shadow-xl rounded-xl p-2 z-50 text-[#111111] before:absolute before:-top-4 before:left-0 before:w-full before:h-4">
+                    <Link to="/buyer-login" onClick={() => setShowAuthDropdown(false)} className="block px-4 py-2 hover:bg-[#F9F9F9] rounded-lg text-xs font-semibold">
                       Buyer Portal
                     </Link>
-                    <Link to="/owner-login" className="block px-4 py-2 hover:bg-[#F9F9F9] rounded-lg text-xs font-semibold">
+                    <Link to="/owner-login" onClick={() => setShowAuthDropdown(false)} className="block px-4 py-2 hover:bg-[#F9F9F9] rounded-lg text-xs font-semibold">
                       Owner Console
                     </Link>
                   </div>
