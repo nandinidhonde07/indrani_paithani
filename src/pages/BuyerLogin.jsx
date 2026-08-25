@@ -1,14 +1,10 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import AuthService from '../services/AuthService.js';
-import { FcGoogle } from 'react-icons/fc';
 
 const BuyerLogin = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
-
-  const [error, setError] = useState('');
 
   const handleLogin = (e) => {
     e.preventDefault();
@@ -17,21 +13,10 @@ const BuyerLogin = () => {
 
     if (user || (email === 'buyer@indranipaithani.com' && password === 'buyer123')) {
       localStorage.setItem('role', 'buyer');
-      localStorage.setItem('user', JSON.stringify(user || { email, name: 'Guest Valued Buyer', role: 'buyer' }));
-      localStorage.setItem('currentUser', JSON.stringify(user || { email, name: 'Guest Valued Buyer', role: 'buyer' }));
+      localStorage.setItem('currentUser', JSON.stringify(user || { email, name: 'Guest Valued Buyer' }));
       navigate('/buyer-dashboard');
     } else {
-      setError('Invalid login credentials. Sign up if you have not created an account.');
-    }
-  };
-
-  const handleGoogleLogin = async () => {
-    setError('');
-    const result = await AuthService.loginWithGoogle();
-    if (result.success) {
-      navigate('/buyer-dashboard');
-    } else {
-      setError(result.error);
+      alert('Invalid login credentials. Sign up if you have not created an account.');
     }
   };
 
@@ -45,11 +30,6 @@ const BuyerLogin = () => {
         </div>
 
         <form onSubmit={handleLogin} className="space-y-4">
-          {error && (
-            <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm border border-red-200">
-              {error}
-            </div>
-          )}
           <div>
             <label className="block text-xs font-semibold text-gray-500 uppercase mb-2">Email Address</label>
             <input
@@ -79,20 +59,6 @@ const BuyerLogin = () => {
             Sign In
           </button>
         </form>
-
-        <div className="relative flex items-center justify-center my-6">
-          <div className="border-t border-gray-200 w-full"></div>
-          <span className="bg-white px-4 text-xs text-gray-400 uppercase tracking-widest absolute">Or</span>
-        </div>
-
-        <button
-          onClick={handleGoogleLogin}
-          type="button"
-          className="w-full bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-semibold py-3 rounded-full transition shadow-sm flex items-center justify-center space-x-3"
-        >
-          <FcGoogle size={24} />
-          <span>Continue with Google</span>
-        </button>
 
         <div className="text-center text-xs text-gray-500 pt-4">
           Don't have a luxury account?{' '}

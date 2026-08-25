@@ -124,21 +124,9 @@ const BuyerDashboard = () => {
       {/* Sidebar Navigation */}
       <aside className="w-full md:w-64 bg-maroon text-white p-6 flex flex-col justify-between">
         <div className="space-y-6">
-          <div className="border-b border-gold/30 pb-4 text-center md:text-left">
+          <div className="border-b border-gold/30 pb-4">
             <h2 className="text-xl font-heading text-gold tracking-widest">MY LUXURY</h2>
-            <div className="flex items-center space-x-3 mt-4">
-              {userProfile?.photoURL ? (
-                <img src={userProfile.photoURL} alt={userProfile.name} className="w-10 h-10 rounded-full border-2 border-gold" />
-              ) : (
-                <div className="w-10 h-10 rounded-full bg-gold/20 flex items-center justify-center border-2 border-gold text-gold font-bold">
-                  {userProfile?.name?.charAt(0) || 'U'}
-                </div>
-              )}
-              <div>
-                <p className="text-sm text-cream font-medium">{userProfile?.name}</p>
-                <p className="text-xs text-cream/70 font-light truncate max-w-[150px]">{userProfile?.email}</p>
-              </div>
-            </div>
+            <p className="text-xs text-cream/70 font-light mt-1">{userProfile?.name}</p>
           </div>
 
           <nav className="space-y-2">
