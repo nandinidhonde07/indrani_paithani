@@ -5,8 +5,6 @@ import { FiHeart, FiShoppingCart, FiUser, FiX, FiPlus, FiMinus } from 'react-ico
 import { FaUserShield, FaChevronDown, FaStore, FaGem, FaGift, FaHeartbeat } from 'react-icons/fa';
 import productsData from '../data/products.json';
 import useCartStore from '../store/useCartStore.js';
-import useAuthStore from '../store/useAuthStore.js';
-import AuthService from '../services/AuthService.js';
 
 const Navbar = ({ isScrolled, isTransparentInit }) => {
   const [search, setSearch] = useState('');
@@ -18,8 +16,6 @@ const Navbar = ({ isScrolled, isTransparentInit }) => {
   const cart = useCartStore(state => state.cart);
   const updateQuantity = useCartStore(state => state.updateQuantity);
   const removeFromCart = useCartStore(state => state.removeFromCart);
-
-  const { user, isAuthenticated } = useAuthStore();
 
   const navigate = useNavigate();
   const searchRef = useRef(null);
@@ -240,44 +236,18 @@ const Navbar = ({ isScrolled, isTransparentInit }) => {
                 onMouseEnter={() => setShowAuthDropdown(true)}
                 onMouseLeave={() => setShowAuthDropdown(false)}
               >
-                <Link to={isAuthenticated ? "/buyer-dashboard" : "/buyer-login"} className={`${iconClass} flex items-center`}>
-                  {isAuthenticated && user?.photo ? (
-                    <img src={user.photo} alt={user.name} className="w-6 h-6 rounded-full object-cover border border-[#C9A14A]" />
-                  ) : (
-                    <FiUser size={18} />
-                  )}
+                <Link to="/buyer-login" className={iconClass}>
+                  <FiUser size={18} />
                 </Link>
 
                 {showAuthDropdown && (
                   <div className="absolute right-0 top-full w-48 bg-white border border-[#E5E5E5] shadow-xl rounded-xl p-2 z-50 text-[#111111]">
-                    {isAuthenticated ? (
-                      <>
-                        <div className="px-4 py-2 text-xs text-gray-500 border-b border-gray-100 mb-1 truncate">
-                          Signed in as <br/> <strong className="text-black">{user?.name}</strong>
-                        </div>
-                        <Link to="/buyer-dashboard" className="block px-4 py-2 hover:bg-[#F9F9F9] rounded-lg text-xs font-semibold">
-                          Buyer Dashboard
-                        </Link>
-                        <button 
-                          onClick={async () => {
-                            await AuthService.logout();
-                            navigate('/');
-                          }} 
-                          className="w-full text-left px-4 py-2 hover:bg-red-50 text-red-600 rounded-lg text-xs font-semibold"
-                        >
-                          Sign Out
-                        </button>
-                      </>
-                    ) : (
-                      <>
-                        <Link to="/buyer-login" className="block px-4 py-2 hover:bg-[#F9F9F9] rounded-lg text-xs font-semibold">
-                          Buyer Portal
-                        </Link>
-                        <Link to="/owner-login" className="block px-4 py-2 hover:bg-[#F9F9F9] rounded-lg text-xs font-semibold">
-                          Owner Console
-                        </Link>
-                      </>
-                    )}
+                    <Link to="/buyer-login" className="block px-4 py-2 hover:bg-[#F9F9F9] rounded-lg text-xs font-semibold">
+                      Buyer Portal
+                    </Link>
+                    <Link to="/owner-login" className="block px-4 py-2 hover:bg-[#F9F9F9] rounded-lg text-xs font-semibold">
+                      Owner Console
+                    </Link>
                   </div>
                 )}
               </div>
