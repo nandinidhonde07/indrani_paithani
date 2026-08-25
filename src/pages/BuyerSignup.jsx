@@ -1,17 +1,20 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import AuthService from '../services/AuthService.js';
+import { FcGoogle } from 'react-icons/fc';
 
 const BuyerSignup = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
   const navigate = useNavigate();
 
   const handleSignup = (e) => {
     e.preventDefault();
     const users = JSON.parse(localStorage.getItem('buyer_users') || '[]');
     if (users.find(u => u.email === email)) {
-      alert('Email already registered. Try logging in.');
+      setError('Email already registered. Try logging in.');
       return;
     }
 
@@ -19,6 +22,16 @@ const BuyerSignup = () => {
     localStorage.setItem('buyer_users', JSON.stringify(users));
     alert('Registration successful! Please login to your account.');
     navigate('/buyer-login');
+  };
+
+  const handleGoogleLogin = async () => {
+    setError('');
+    const result = await AuthService.loginWithGoogle();
+    if (result.success) {
+      navigate('/buyer-dashboard');
+    } else {
+      setError(result.error);
+    }
   };
 
   return (
@@ -31,6 +44,11 @@ const BuyerSignup = () => {
         </div>
 
         <form onSubmit={handleSignup} className="space-y-4">
+          {error && (
+            <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm border border-red-200">
+              {error}
+            </div>
+          )}
           <div>
             <label className="block text-xs font-semibold text-gray-500 uppercase mb-2">Full Name</label>
             <input
@@ -71,6 +89,20 @@ const BuyerSignup = () => {
             Register Account
           </button>
         </form>
+
+        <div className="relative flex items-center justify-center my-6">
+          <div className="border-t border-gray-200 w-full"></div>
+          <span className="bg-white px-4 text-xs text-gray-400 uppercase tracking-widest absolute">Or</span>
+        </div>
+
+        <button
+          onClick={handleGoogleLogin}
+          type="button"
+          className="w-full bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-semibold py-3 rounded-full transition shadow-sm flex items-center justify-center space-x-3"
+        >
+          <FcGoogle size={24} />
+          <span>Continue with Google</span>
+        </button>
 
         <div className="text-center text-xs text-gray-500 pt-4">
           Already have an account?{' '}

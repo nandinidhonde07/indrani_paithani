@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import OrderService from '../services/OrderService.js';
+import AuthService from '../services/AuthService.js';
 import useCartStore from '../store/useCartStore.js';
+import { FcGoogle } from 'react-icons/fc';
 
 const Checkout = () => {
   const navigate = useNavigate();
   
   // Grab user if logged in
-  const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{"email":"guest@example.com"}');
+  const [currentUser, setCurrentUser] = useState(() => JSON.parse(localStorage.getItem('currentUser') || '{"email":"guest@example.com"}'));
   
   // Step 0: Auth Check, 1: Cart, 2: Address, 3: Payment, 4: Summary, 5: Confirmation
   const [step, setStep] = useState(currentUser.email === 'guest@example.com' ? 0 : 1); 
@@ -24,6 +26,18 @@ const Checkout = () => {
   const [paymentMethod, setPaymentMethod] = useState('razorpay');
   const [isProcessing, setIsProcessing] = useState(false);
   const [placedOrder, setPlacedOrder] = useState(null);
+  const [authError, setAuthError] = useState('');
+
+  const handleGoogleLogin = async () => {
+    setAuthError('');
+    const result = await AuthService.loginWithGoogle();
+    if (result.success) {
+      setCurrentUser(result.user);
+      setStep(1); // Proceed to cart review
+    } else {
+      setAuthError(result.error);
+    }
+  };
 
   // cart is handled by useCartStore
 
@@ -168,14 +182,31 @@ const Checkout = () => {
 
         {/* Dynamic Steps */}
         {step === 0 && (
-          <div className="space-y-8 text-center py-10">
+          <div className="space-y-8 text-center py-10 max-w-md mx-auto">
             <h2 className="text-3xl font-heading text-maroon mb-4">Welcome to Checkout</h2>
             <p className="text-gray-600 mb-8">Log in for a faster checkout and to track your royal orders, or continue as a guest.</p>
-            <div className="flex flex-col sm:flex-row gap-6 justify-center">
-              <Link to="/buyer-login" className="bg-maroon hover:bg-gold text-white font-semibold py-4 px-10 rounded-full transition shadow-md w-full sm:w-auto">
-                Secure Login
+            
+            {authError && (
+              <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm border border-red-200 mb-6">
+                {authError}
+              </div>
+            )}
+
+            <div className="flex flex-col gap-4">
+              <button
+                onClick={handleGoogleLogin}
+                type="button"
+                className="w-full bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-semibold py-4 rounded-full transition shadow-sm flex items-center justify-center space-x-3"
+              >
+                <FcGoogle size={24} />
+                <span>Continue with Google</span>
+              </button>
+              
+              <Link to="/buyer-login" className="bg-maroon hover:bg-gold text-white font-semibold py-4 rounded-full transition shadow-md w-full">
+                Login with Email
               </Link>
-              <button onClick={() => setStep(1)} className="border-2 border-maroon text-maroon hover:bg-cream font-semibold py-4 px-10 rounded-full transition w-full sm:w-auto">
+              
+              <button onClick={() => setStep(1)} className="border-2 border-maroon text-maroon hover:bg-cream font-semibold py-4 rounded-full transition w-full">
                 Continue as Guest
               </button>
             </div>

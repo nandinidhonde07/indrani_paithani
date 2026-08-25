@@ -237,17 +237,53 @@ const Navbar = ({ isScrolled, isTransparentInit }) => {
                 onMouseLeave={() => setShowAuthDropdown(false)}
               >
                 <button onClick={() => setShowAuthDropdown(!showAuthDropdown)} className={iconClass}>
-                  <FiUser size={18} />
+                  {(() => {
+                    const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+                    if (currentUser?.photoURL) {
+                      return <img src={currentUser.photoURL} alt={currentUser.name} className="w-5 h-5 rounded-full border border-current" />;
+                    }
+                    return <FiUser size={18} />;
+                  })()}
                 </button>
 
                 {showAuthDropdown && (
                   <div className="absolute right-0 top-full mt-2 w-48 bg-white border border-[#E5E5E5] shadow-xl rounded-xl p-2 z-50 text-[#111111] before:absolute before:-top-4 before:left-0 before:w-full before:h-4">
-                    <Link to="/buyer-login" onClick={() => setShowAuthDropdown(false)} className="block px-4 py-2 hover:bg-[#F9F9F9] rounded-lg text-xs font-semibold">
-                      Buyer Portal
-                    </Link>
-                    <Link to="/owner-login" onClick={() => setShowAuthDropdown(false)} className="block px-4 py-2 hover:bg-[#F9F9F9] rounded-lg text-xs font-semibold">
-                      Owner Console
-                    </Link>
+                    {(() => {
+                      const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+                      if (currentUser) {
+                        return (
+                          <>
+                            <div className="px-4 py-2 border-b border-gray-100 mb-1">
+                              <p className="text-xs font-bold truncate">{currentUser.name}</p>
+                              <p className="text-[10px] text-gray-500 truncate">{currentUser.email}</p>
+                            </div>
+                            <Link to="/buyer-dashboard" onClick={() => setShowAuthDropdown(false)} className="block px-4 py-2 hover:bg-[#F9F9F9] rounded-lg text-xs font-semibold">
+                              My Dashboard
+                            </Link>
+                            <button 
+                              onClick={() => {
+                                import('../services/AuthService.js').then(m => m.default.logout());
+                                setShowAuthDropdown(false);
+                                navigate('/');
+                              }} 
+                              className="w-full text-left block px-4 py-2 hover:bg-red-50 text-red-600 rounded-lg text-xs font-semibold"
+                            >
+                              Logout
+                            </button>
+                          </>
+                        );
+                      }
+                      return (
+                        <>
+                          <Link to="/buyer-login" onClick={() => setShowAuthDropdown(false)} className="block px-4 py-2 hover:bg-[#F9F9F9] rounded-lg text-xs font-semibold">
+                            Buyer Login
+                          </Link>
+                          <Link to="/owner-login" onClick={() => setShowAuthDropdown(false)} className="block px-4 py-2 hover:bg-[#F9F9F9] rounded-lg text-xs font-semibold border-t mt-1 pt-2">
+                            Owner Console
+                          </Link>
+                        </>
+                      );
+                    })()}
                   </div>
                 )}
               </div>

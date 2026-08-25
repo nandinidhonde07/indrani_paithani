@@ -1,4 +1,6 @@
 import ActivityLogger from './ActivityLogger';
+import { signInWithPopup } from 'firebase/auth';
+import { auth, googleProvider } from '../config/firebase.js';
 
 class AuthService {
   static ROLES = {
@@ -30,7 +32,9 @@ class AuthService {
       if (role) {
         localStorage.setItem('role', role);
         localStorage.setItem('user', JSON.stringify(user));
-        if (role !== this.ROLES.BUYER) {
+        if (role === this.ROLES.BUYER) {
+          localStorage.setItem('currentUser', JSON.stringify(user));
+        } else {
            ActivityLogger.log('Admin Login', `${user.name} logged in.`, user.name);
         }
         resolve({ success: true, user });
@@ -38,6 +42,40 @@ class AuthService {
         resolve({ success: false, error: 'Invalid credentials' });
       }
     });
+  }
+
+  static async loginWithGoogle() {
+    try {
+      if (!auth || !googleProvider) {
+        throw new Error("Firebase configuration is missing.");
+      }
+      
+      const result = await signInWithPopup(auth, googleProvider);
+      const fbUser = result.user;
+      
+      const userProfile = {
+        name: fbUser.displayName || 'Google User',
+        email: fbUser.email,
+        photoURL: fbUser.photoURL,
+        role: this.ROLES.BUYER,
+        uid: fbUser.uid
+      };
+
+      localStorage.setItem('role', this.ROLES.BUYER);
+      localStorage.setItem('user', JSON.stringify(userProfile));
+      localStorage.setItem('currentUser', JSON.stringify(userProfile)); 
+      
+      return { success: true, user: userProfile };
+    } catch (error) {
+      console.error("Google Sign-In Error:", error);
+      let errorMsg = error.message;
+      if (error.code === 'auth/popup-closed-by-user') {
+        errorMsg = 'Sign-in popup was closed before completing.';
+      } else if (error.message.includes('configuration is missing')) {
+         errorMsg = 'Firebase configuration is missing. Please check GOOGLE_AUTH_SETUP.md';
+      }
+      return { success: false, error: errorMsg };
+    }
   }
 
   static logout() {
@@ -50,6 +88,7 @@ class AuthService {
     }
     localStorage.removeItem('role');
     localStorage.removeItem('user');
+    localStorage.removeItem('currentUser');
   }
 
   static getCurrentUser() {
