@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { FiHeart, FiShoppingCart, FiUser, FiX, FiPlus, FiMinus } from 'react-icons/fi';
+import { FiHeart, FiShoppingCart, FiUser, FiX, FiPlus, FiMinus, FiMenu } from 'react-icons/fi';
 import { FaUserShield, FaChevronDown, FaStore, FaGem, FaGift, FaHeartbeat } from 'react-icons/fa';
 import productsData from '../data/products.json';
 import useCartStore from '../store/useCartStore.js';
@@ -12,6 +12,7 @@ const Navbar = ({ isScrolled, isTransparentInit }) => {
   const [showMegaMenu, setShowMegaMenu] = useState(false);
   const [showAuthDropdown, setShowAuthDropdown] = useState(false);
   const [showCartDrawer, setShowCartDrawer] = useState(false);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
   
   const cart = useCartStore(state => state.cart);
   const updateQuantity = useCartStore(state => state.updateQuantity);
@@ -101,10 +102,10 @@ const Navbar = ({ isScrolled, isTransparentInit }) => {
         <nav className="container mx-auto flex items-center justify-between px-6 relative w-full">
           
           {/* Logo (Left) */}
-          <div className="w-1/4 flex items-center">
+          <div className="w-1/3 lg:w-1/4 flex items-center">
             <Link to="/" className="flex items-center space-x-3">
-              <img src="/assets/official_logo.jpg" alt="Indrani Paithani Logo" className="h-12 w-12 object-cover rounded-full shadow-sm border border-[#E5E5E5]" />
-              <span className={`text-lg lg:text-xl font-heading font-bold tracking-widest transition duration-300 ${brandColor} hidden sm:block`}>
+              <img src="/assets/official_logo.jpg" alt="Indrani Paithani Logo" className="h-10 w-10 md:h-12 md:w-12 object-cover rounded-full shadow-sm border border-[#E5E5E5]" />
+              <span className={`text-sm lg:text-xl font-heading font-bold tracking-widest transition duration-300 ${brandColor} hidden sm:block`}>
                 INDRANI PAITHANI
               </span>
             </Link>
@@ -174,7 +175,7 @@ const Navbar = ({ isScrolled, isTransparentInit }) => {
           </ul>
 
           {/* Search & Actions (Right) */}
-          <div className="w-full lg:w-1/4 flex items-center justify-end space-x-6">
+          <div className="w-2/3 lg:w-1/4 flex items-center justify-end space-x-4 md:space-x-6">
             
             {/* Search Bar */}
             <div ref={searchRef} className="relative hidden xl:block w-56">
@@ -251,6 +252,14 @@ const Navbar = ({ isScrolled, isTransparentInit }) => {
                   </div>
                 )}
               </div>
+              
+              {/* Hamburger Menu (Mobile Only) */}
+              <button 
+                onClick={() => setShowMobileMenu(true)} 
+                className={`lg:hidden ${iconClass}`}
+              >
+                <FiMenu size={20} />
+              </button>
             </div>
           </div>
         </nav>
@@ -315,6 +324,65 @@ const Navbar = ({ isScrolled, isTransparentInit }) => {
                 </button>
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* MOBILE MENU DRAWER */}
+      {showMobileMenu && (
+        <div className="fixed inset-0 z-50 bg-black/60 flex justify-start lg:hidden">
+          <div className="w-3/4 max-w-sm bg-white h-full flex flex-col shadow-2xl relative text-black animate-slide-right">
+            
+            <div className="p-6 border-b border-gold/20 flex justify-between items-center bg-cream/10">
+              <h3 className="font-heading text-xl text-maroon font-bold tracking-widest">MENU</h3>
+              <button onClick={() => setShowMobileMenu(false)} className="text-gray-500 hover:text-maroon">
+                <FiX size={24} />
+              </button>
+            </div>
+
+            <div className="flex-grow overflow-y-auto p-6 space-y-6">
+              {/* Mobile Search */}
+              <form onSubmit={(e) => { handleSearchSubmit(e); setShowMobileMenu(false); }} className="relative mb-8">
+                <input
+                  type="text"
+                  placeholder="Search products..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-full text-sm focus:outline-none focus:ring-1 focus:ring-gold"
+                />
+                <button type="submit" className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400">
+                  🔍
+                </button>
+              </form>
+
+              <div className="flex flex-col space-y-6 text-sm font-semibold tracking-widest uppercase">
+                <Link to="/" onClick={() => setShowMobileMenu(false)} className="border-b border-gray-100 pb-2">Home</Link>
+                <Link to="/shop" onClick={() => setShowMobileMenu(false)} className="border-b border-gray-100 pb-2">Shop All</Link>
+                
+                <div className="space-y-4 pt-2">
+                  <h4 className="text-xs text-gray-400 font-bold mb-2">Categories</h4>
+                  {categories.map((cat, idx) => (
+                    <Link 
+                      key={idx} 
+                      to={cat.path} 
+                      onClick={() => setShowMobileMenu(false)} 
+                      className="flex items-center space-x-3 text-gray-600 hover:text-maroon ml-4"
+                    >
+                      {cat.icon}
+                      <span className="capitalize">{cat.name}</span>
+                    </Link>
+                  ))}
+                </div>
+
+                <Link to="/about" onClick={() => setShowMobileMenu(false)} className="border-b border-gray-100 pb-2 mt-4">About Us</Link>
+                <Link to="/contact" onClick={() => setShowMobileMenu(false)} className="border-b border-gray-100 pb-2">Contact</Link>
+              </div>
+            </div>
+            
+            <div className="p-6 bg-cream/10 border-t border-gold/20">
+               <Link to="/buyer-login" onClick={() => setShowMobileMenu(false)} className="w-full block text-center border-2 border-maroon text-maroon font-semibold py-3 rounded-full mb-3">Buyer Login</Link>
+               <Link to="/owner-login" onClick={() => setShowMobileMenu(false)} className="w-full block text-center bg-maroon text-white font-semibold py-3 rounded-full">Owner Console</Link>
+            </div>
           </div>
         </div>
       )}
