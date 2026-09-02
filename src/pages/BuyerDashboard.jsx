@@ -3,6 +3,8 @@ import { useNavigate, Link } from 'react-router-dom';
 import OrderService from '../services/OrderService.js';
 import UserService from '../services/UserService.js';
 import useCartStore from '../store/useCartStore.js';
+import AuthService from '../services/AuthService.js';
+import useAuthStore from '../store/useAuthStore.js';
 import { generateInvoice } from '../utils/InvoiceGenerator.js';
 
 const TIMELINE_STAGES = [
@@ -73,9 +75,8 @@ const BuyerDashboard = () => {
     }
   }, [activeTab, userProfile]);
 
-  const handleLogout = () => {
-    localStorage.removeItem('role');
-    localStorage.removeItem('currentUser');
+  const handleLogout = async () => {
+    await AuthService.logout();
     navigate('/buyer-login');
   };
 

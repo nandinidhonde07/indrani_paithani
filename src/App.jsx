@@ -21,13 +21,28 @@ import Footer from './components/Footer.jsx';
 import { FaWhatsapp, FaArrowUp, FaHome, FaShoppingBag, FaHeart, FaShoppingCart, FaUser } from 'react-icons/fa';
 import useAppStore from './store/useAppStore.js';
 import useCartStore from './store/useCartStore.js';
+import useAuthStore from './store/useAuthStore.js';
+import AuthService from './services/AuthService.js';
 
-// Simple auth guard based on localStorage "role" ("buyer" or "owner")
-const ProtectedRoute = ({ children, role }) => {
-  const storedRole = localStorage.getItem('role');
-  if (storedRole !== role) {
-    return <Navigate to={role === 'owner' ? '/owner-login' : '/buyer-login'} replace />;
+const ProtectedRoute = ({ children, requiredRole }) => {
+  const { isAuthenticated, role, isLoading } = useAuthStore();
+  
+  if (isLoading) {
+    return <div className="flex justify-center items-center h-screen"><span className="text-maroon font-heading text-xl animate-pulse">Verifying Identity...</span></div>;
   }
+  
+  if (!isAuthenticated) {
+    return <Navigate to={requiredRole === 'owner' ? '/owner-login' : '/buyer-login'} replace />;
+  }
+
+  if (requiredRole === 'owner' && role !== 'owner') {
+    return <div className="flex flex-col justify-center items-center h-screen bg-cream">
+             <h1 className="text-3xl font-heading text-maroon mb-4">Access Denied</h1>
+             <p className="text-gray-600 mb-8">You are not authorized to view this portal.</p>
+             <button onClick={() => AuthService.logout()} className="bg-maroon text-white px-6 py-2 rounded">Sign Out</button>
+           </div>;
+  }
+
   return children;
 };
 
@@ -41,6 +56,7 @@ const App = () => {
   useEffect(() => {
     initStore();
     initCartStore();
+    AuthService.init();
     const handleScroll = () => {
       // Manage transparency of navbar
       if (window.scrollY > 50) {
@@ -91,7 +107,7 @@ const App = () => {
           <Route
             path="/buyer-dashboard/*"
             element={
-              <ProtectedRoute role="buyer">
+              <ProtectedRoute requiredRole="buyer">
                 <BuyerDashboard />
               </ProtectedRoute>
             }
@@ -99,7 +115,7 @@ const App = () => {
           <Route
             path="/admin/*"
             element={
-              <ProtectedRoute role="owner">
+              <ProtectedRoute requiredRole="owner">
                 <AdminDashboard />
               </ProtectedRoute>
             }

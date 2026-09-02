@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import AuthService from '../services/AuthService.js';
 import productsData from '../data/products.json';
 import HomepageCMS from './admin/HomepageCMS';
 import MediaLibraryCMS from './admin/MediaLibraryCMS';
@@ -47,8 +48,8 @@ const AdminDashboard = () => {
     }
   }, []);
 
-  const handleLogout = () => {
-    localStorage.removeItem('role');
+  const handleLogout = async () => {
+    await AuthService.logout();
     navigate('/owner-login');
   };
 

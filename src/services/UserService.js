@@ -1,3 +1,5 @@
+import useAuthStore from '../store/useAuthStore';
+
 class UserService {
   static USERS_KEY = 'buyer_users';
   static CURRENT_USER_KEY = 'currentUser';
@@ -18,8 +20,14 @@ class UserService {
 
   static async getCurrentUser() {
     return new Promise((resolve) => {
-      const user = JSON.parse(localStorage.getItem(this.CURRENT_USER_KEY) || 'null');
-      resolve(user);
+      const authUser = useAuthStore.getState().user;
+      const localProfile = JSON.parse(localStorage.getItem(this.CURRENT_USER_KEY) || 'null');
+      
+      if (!authUser) {
+        resolve(localProfile);
+      } else {
+        resolve({ ...localProfile, ...authUser });
+      }
     });
   }
 

@@ -3,11 +3,14 @@ import { useNavigate, Link } from 'react-router-dom';
 import OrderService from '../services/OrderService.js';
 import useCartStore from '../store/useCartStore.js';
 
+import useAuthStore from '../store/useAuthStore.js';
+
 const Checkout = () => {
   const navigate = useNavigate();
   
   // Grab user if logged in
-  const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{"email":"guest@example.com"}');
+  const authUser = useAuthStore(state => state.user);
+  const currentUser = authUser || { email: 'guest@example.com' };
   
   // Step 0: Auth Check, 1: Cart, 2: Address, 3: Payment, 4: Summary, 5: Confirmation
   const [step, setStep] = useState(currentUser.email === 'guest@example.com' ? 0 : 1); 
