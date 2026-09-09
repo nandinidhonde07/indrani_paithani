@@ -4,6 +4,8 @@ import QRCode from 'qrcode';
 import OrderService from '../services/OrderService.js';
 import useCartStore from '../store/useCartStore.js';
 import useAuthStore from '../store/useAuthStore.js';
+import { generateInvoice } from '../utils/InvoiceGenerator.js';
+
 
 const Checkout = () => {
   const navigate = useNavigate();
@@ -460,13 +462,20 @@ const Checkout = () => {
             </div>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8">
-              <Link to="/buyer-dashboard" className="bg-maroon hover:bg-gold text-white font-semibold px-8 py-4 rounded-full transition shadow-md">
+              <button 
+                onClick={() => generateInvoice(placedOrder)}
+                className="bg-gold hover:bg-maroon hover:text-white text-maroon font-bold px-8 py-4 rounded-full transition shadow-md flex items-center justify-center space-x-2"
+              >
+                <span>📄 Download Invoice (PDF)</span>
+              </button>
+              <Link to="/buyer-dashboard" className="bg-maroon hover:bg-gold text-white font-semibold px-8 py-4 rounded-full transition shadow-md text-center">
                 Track Your Order in Dashboard
               </Link>
-              <Link to="/" className="border-2 border-maroon text-maroon hover:bg-cream font-semibold px-8 py-4 rounded-full transition">
+              <Link to="/" className="border-2 border-maroon text-maroon hover:bg-cream font-semibold px-8 py-4 rounded-full transition text-center">
                 Continue Shopping
               </Link>
             </div>
+
           </div>
         )}
 
