@@ -3,6 +3,8 @@ import { useSearchParams, Link, useNavigate } from 'react-router-dom';
 import productsData from '../data/products.json';
 import { FiHeart, FiEye, FiShoppingCart, FiStar, FiX } from 'react-icons/fi';
 import useCartStore from '../store/useCartStore.js';
+import SidebarFilter from '../components/SidebarFilter.jsx';
+import TrustBadges from '../components/TrustBadges.jsx';
 
 const Shop = () => {
   const [searchParams] = useSearchParams();
@@ -16,6 +18,7 @@ const Shop = () => {
   // Filter states
   const [searchQuery, setSearchQuery] = useState(initialQuery);
   const [selectedCategory, setSelectedCategory] = useState(initialCategory);
+  const [selectedVariety, setSelectedVariety] = useState([]);
   const [maxPrice, setMaxPrice] = useState(400000);
   const [selectedFabric, setSelectedFabric] = useState('');
   const [selectedMotif, setSelectedMotif] = useState('');
@@ -69,6 +72,17 @@ const Shop = () => {
         (selectedCategory === 'Bags' && p.category.toLowerCase().includes('bag'))
       );
     }
+
+    if (selectedVariety.length > 0) {
+      result = result.filter(p =>
+        selectedVariety.some(v =>
+          (p.fabric && p.fabric.toLowerCase().includes(v.toLowerCase())) ||
+          (p.name && p.name.toLowerCase().includes(v.toLowerCase())) ||
+          (p.category && p.category.toLowerCase().includes(v.toLowerCase()))
+        )
+      );
+    }
+
     if (selectedFabric) result = result.filter(p => p.fabric === selectedFabric);
     if (selectedMotif) result = result.filter(p => p.motif === selectedMotif);
     if (selectedColor) result = result.filter(p => p.color === selectedColor);
@@ -85,7 +99,7 @@ const Shop = () => {
     }
 
     setFilteredProducts(result);
-  }, [searchQuery, selectedCategory, selectedFabric, selectedMotif, selectedColor, maxPrice, sortBy, products]);
+  }, [searchQuery, selectedCategory, selectedVariety, selectedFabric, selectedMotif, selectedColor, maxPrice, sortBy, products]);
 
   const addToCart = useCartStore(state => state.addToCart);
   const addToWishlist = useCartStore(state => state.toggleWishlist);
@@ -93,6 +107,16 @@ const Shop = () => {
   const buyNow = (product) => {
     addToCart(product);
     navigate('/checkout');
+  };
+
+  const resetAllFilters = () => {
+    setSelectedCategory('');
+    setSelectedVariety([]);
+    setSelectedFabric('');
+    setSelectedMotif('');
+    setSelectedColor('');
+    setMaxPrice(400000);
+    setSearchQuery('');
   };
 
   const handleCompareToggle = (product) => {
@@ -110,12 +134,15 @@ const Shop = () => {
   return (
     <div className="bg-cream min-h-screen pt-32 pb-10 px-6 relative">
       <div className="container mx-auto">
-        <h1 className="text-3xl md:text-5xl font-heading text-maroon text-center mb-8 tracking-widest">
+        <h1 className="text-3xl md:text-5xl font-heading text-maroon text-center mb-4 tracking-widest">
           The Luxury Saree Boutique
         </h1>
+        <p className="text-center text-xs md:text-sm text-gray-600 mb-8 max-w-2xl mx-auto font-light">
+          Explore handwoven Yeola Paithani sarees, 100% Silk Mark Certified bridal heirlooms and handcrafted accessories.
+        </p>
 
         {/* Category Filter Boxes */}
-        <div className="flex flex-wrap justify-center gap-4 mb-12 px-2">
+        <div className="flex flex-wrap justify-center gap-3 mb-10 px-2">
           {[
             "All",
             "Pure Silk",
@@ -133,10 +160,10 @@ const Shop = () => {
               <button
                 key={idx}
                 onClick={() => setSelectedCategory(cat === "All" ? "" : cat)}
-                className={`flex flex-col items-center justify-center h-14 px-6 min-w-[120px] rounded-xl border transition-all duration-300 font-heading text-sm uppercase tracking-widest cursor-pointer ${
+                className={`flex flex-col items-center justify-center h-12 px-5 min-w-[110px] rounded-xl border transition-all duration-300 font-heading text-xs uppercase tracking-wider cursor-pointer ${
                   isSelected
-                    ? 'bg-gold/10 border-gold text-black shadow-[0_4px_14px_rgba(212,175,55,0.2)]'
-                    : 'bg-white border-gold/30 text-black hover:border-gold hover:bg-cream hover:-translate-y-1 hover:shadow-md'
+                    ? 'bg-maroon text-white border-gold shadow-md'
+                    : 'bg-white border-gold/30 text-black hover:border-gold hover:bg-cream hover:-translate-y-0.5'
                 }`}
               >
                 {cat}
@@ -147,91 +174,19 @@ const Shop = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Advanced Filter Sidebar */}
-          <aside className="bg-white p-6 rounded-2xl shadow-premium border border-gold/15 h-fit space-y-6">
-            <h2 className="text-xl font-heading text-maroon border-b border-gold/20 pb-2">Filter Boutique</h2>
-
-            {/* Price Slider */}
-            <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase mb-2">
-                Max Budget: ₹{maxPrice.toLocaleString('en-IN')}
-              </label>
-              <input
-                type="range"
-                min="10000"
-                max="400000"
-                step="5000"
-                value={maxPrice}
-                onChange={(e) => setMaxPrice(parseInt(e.target.value))}
-                className="w-full accent-maroon"
-              />
-            </div>
-
-            {/* Collection Category Filter removed, replaced by top tabs */}
-
-            {/* Color Filter */}
-            <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase mb-2">Color</label>
-              <select
-                value={selectedColor}
-                onChange={(e) => setSelectedColor(e.target.value)}
-                className="w-full px-3 py-2 border rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-gold bg-white"
-              >
-                <option value="">All Colors</option>
-                <option value="Red-Orange">Red-Orange</option>
-                <option value="Saffron Orange">Saffron Orange</option>
-                <option value="Purple">Purple</option>
-                <option value="Pink">Pink</option>
-                <option value="Multicolor">Multicolor</option>
-                <option value="Cream">Cream</option>
-              </select>
-            </div>
-
-            {/* Motif Filter */}
-            <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase mb-2">Motif Pattern</label>
-              <select
-                value={selectedMotif}
-                onChange={(e) => setSelectedMotif(e.target.value)}
-                className="w-full px-3 py-2 border rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-gold bg-white"
-              >
-                <option value="">All Motifs</option>
-                <option value="Parrot / Bird">Parrot / Bird</option>
-                <option value="Peacock / Parrot">Peacock / Parrot</option>
-                <option value="Swan / Lotus">Swan / Lotus</option>
-                <option value="Peacock">Peacock</option>
-              </select>
-            </div>
-
-            {/* Sort Options */}
-            <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase mb-2">Sort By</label>
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                className="w-full px-3 py-2 border rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-gold bg-white"
-              >
-                <option value="popularity">Popularity</option>
-                <option value="newest">Newest Arrivals</option>
-                <option value="best-selling">Best Selling (Rating)</option>
-                <option value="low-to-high">Price: Low to High</option>
-                <option value="high-to-low">Price: High to Low</option>
-              </select>
-            </div>
-
-            <button
-              onClick={() => {
-                setSelectedCategory('');
-                setSelectedFabric('');
-                setSelectedMotif('');
-                setSelectedColor('');
-                setMaxPrice(400000);
-                setSearchQuery('');
-              }}
-              className="w-full bg-cream text-maroon border border-gold/30 text-xs py-2 rounded-lg font-semibold hover:bg-maroon hover:text-white transition"
-            >
-              Reset Filters
-            </button>
-          </aside>
+          <SidebarFilter
+            selectedVariety={selectedVariety}
+            setSelectedVariety={setSelectedVariety}
+            selectedColor={selectedColor}
+            setSelectedColor={setSelectedColor}
+            maxPrice={maxPrice}
+            setMaxPrice={setMaxPrice}
+            selectedMotif={selectedMotif}
+            setSelectedMotif={setSelectedMotif}
+            sortBy={sortBy}
+            setSortBy={setSortBy}
+            onResetFilters={resetAllFilters}
+          />
 
           {/* MAIN PRODUCT GRID */}
           <main className="lg:col-span-3 space-y-6">
@@ -240,7 +195,7 @@ const Shop = () => {
               {compareList.length > 0 && (
                 <button
                   onClick={() => setShowCompareModal(true)}
-                  className="bg-gold text-maroon font-bold px-4 py-1.5 rounded-full text-xs hover:bg-maroon hover:text-white transition"
+                  className="bg-gold text-maroon font-bold px-4 py-1.5 rounded-full text-xs hover:bg-maroon hover:text-white transition shadow-sm"
                 >
                   Compare ({compareList.length}) Selected
                 </button>
@@ -257,11 +212,20 @@ const Shop = () => {
                   </div>
                 ))}
               </div>
+            ) : filteredProducts.length === 0 ? (
+              <div className="bg-white rounded-2xl p-12 text-center border border-gold/20 space-y-4">
+                <p className="text-gray-500 font-light">No sarees found matching your filter criteria.</p>
+                <button
+                  onClick={resetAllFilters}
+                  className="bg-maroon text-white text-xs px-6 py-2.5 rounded-full font-bold hover:bg-gold transition"
+                >
+                  Reset All Filters
+                </button>
+              </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                 {filteredProducts.map(p => {
                   const discount = p.originalPrice ? Math.round(((p.originalPrice - p.price) / p.originalPrice) * 100) : 0;
-                  const hasSecondary = p.images && p.images.length > 1;
 
                   return (
                     <div
@@ -277,7 +241,6 @@ const Shop = () => {
                         />
 
                         {/* Badges */}
-
                         <div className="absolute top-3 left-3 flex flex-col space-y-1">
                           {discount > 0 && (
                             <span className="bg-red-600 text-white text-[8px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
@@ -390,6 +353,9 @@ const Shop = () => {
             )}
           </main>
         </div>
+
+        {/* TRUST BADGES SECTION */}
+        <TrustBadges className="mt-16" />
       </div>
 
       {/* QUICK VIEW MODAL */}
@@ -398,14 +364,14 @@ const Shop = () => {
           <div className="bg-white rounded-3xl overflow-hidden max-w-3xl w-full grid grid-cols-1 md:grid-cols-2 relative shadow-2xl">
             <button
               onClick={() => setQuickViewProduct(null)}
-              className="absolute top-4 right-4 bg-maroon text-white w-8 h-8 rounded-full flex items-center justify-center font-bold hover:bg-gold transition"
+              className="absolute top-4 right-4 bg-maroon text-white w-8 h-8 rounded-full flex items-center justify-center font-bold hover:bg-gold transition z-10"
             >
               ✕
             </button>
             <div className="aspect-[3/4]">
               <img src={quickViewProduct.image} alt={quickViewProduct.name} className="w-full h-full object-cover" />
             </div>
-            <div className="p-8 space-y-6 flex flex-col justify-between">
+            <div className="p-8 space-y-6 flex flex-col justify-between text-black">
               <div>
                 <span className="text-xs tracking-wider text-gold font-medium uppercase">{quickViewProduct.category}</span>
                 <h2 className="text-2xl font-heading text-maroon">{quickViewProduct.name}</h2>
@@ -419,22 +385,35 @@ const Shop = () => {
                 <p className="text-sm text-gray-600 font-light mt-4 leading-relaxed">{quickViewProduct.description}</p>
               </div>
 
-              <div className="flex gap-4">
-                <button
-                  onClick={() => {
-                    addToCart(quickViewProduct);
-                    setQuickViewProduct(null);
-                  }}
-                  className="bg-maroon hover:bg-gold text-white font-semibold flex-1 py-3 rounded-full transition shadow-md"
+              <div className="flex flex-col gap-3">
+                <div className="flex gap-4">
+                  <button
+                    onClick={() => {
+                      addToCart(quickViewProduct);
+                      setQuickViewProduct(null);
+                    }}
+                    className="bg-maroon hover:bg-gold text-white font-semibold flex-1 py-3 rounded-full transition shadow-md"
+                  >
+                    Add To Cart
+                  </button>
+                  <Link
+                    to={`/product/${quickViewProduct.id}`}
+                    className="border border-maroon text-maroon font-semibold flex-1 py-3 rounded-full text-center hover:bg-cream transition"
+                  >
+                    View Details
+                  </Link>
+                </div>
+                {/* WhatsApp button */}
+                <a
+                  href={`https://wa.me/919876543210?text=${encodeURIComponent(
+                    `Hello Indrani Paithani! I am interested in ordering *${quickViewProduct.name}* (Price: ₹${quickViewProduct.price.toLocaleString('en-IN')}). Link: ${window.location.origin}/product/${quickViewProduct.id}`
+                  )}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full bg-[#25D366] hover:bg-[#1EBE57] text-white font-bold py-2.5 rounded-full flex items-center justify-center space-x-2 transition text-xs"
                 >
-                  Add To Cart
-                </button>
-                <Link
-                  to={`/product/${quickViewProduct.id}`}
-                  className="border border-maroon text-maroon font-semibold flex-1 py-3 rounded-full text-center hover:bg-cream transition"
-                >
-                  View Gallery
-                </Link>
+                  <span>💬 Order on WhatsApp</span>
+                </a>
               </div>
             </div>
           </div>

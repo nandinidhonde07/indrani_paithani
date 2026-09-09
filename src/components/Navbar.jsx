@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { FiHeart, FiShoppingCart, FiUser, FiX, FiPlus, FiMinus, FiMenu } from 'react-icons/fi';
-import { FaUserShield, FaChevronDown, FaStore, FaGem, FaGift, FaHeartbeat } from 'react-icons/fa';
+import { FiHeart, FiShoppingCart, FiUser, FiX, FiMenu } from 'react-icons/fi';
+import { FaChevronDown, FaStore, FaGem, FaGift } from 'react-icons/fa';
 import productsData from '../data/products.json';
 import useCartStore from '../store/useCartStore.js';
 import useAuthStore from '../store/useAuthStore.js';
 import AuthService from '../services/AuthService.js';
+import CartDrawer from './CartDrawer.jsx';
 
 const Navbar = ({ isScrolled, isTransparentInit }) => {
   const [search, setSearch] = useState('');
@@ -17,17 +18,14 @@ const Navbar = ({ isScrolled, isTransparentInit }) => {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   
   const cart = useCartStore(state => state.cart);
-  const updateQuantity = useCartStore(state => state.updateQuantity);
-  const removeFromCart = useCartStore(state => state.removeFromCart);
-  
+  const totalCartCount = cart.reduce((acc, item) => acc + item.quantity, 0);
+
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
   const user = useAuthStore(state => state.user);
   const role = useAuthStore(state => state.role);
 
   const navigate = useNavigate();
   const searchRef = useRef(null);
-
-  // Cart sync is handled by zustand store automatically!
 
   useEffect(() => {
     if (search.trim().length > 1) {
@@ -57,12 +55,6 @@ const Navbar = ({ isScrolled, isTransparentInit }) => {
       navigate(`/shop?query=${encodeURIComponent(search.trim())}`);
       setSuggestions([]);
     }
-  };
-
-  // Removed local updateQuantity and removeFromCart, using zustand directly
-
-  const calculateTotal = () => {
-    return cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
   };
 
   const categories = [
@@ -103,7 +95,7 @@ const Navbar = ({ isScrolled, isTransparentInit }) => {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 1, delay: 0.2 }}
-        className={`fixed w-full top-0 z-50 transition-all duration-300 ${navbarBg}`}
+        className={`fixed w-full top-0 z-40 transition-all duration-300 ${navbarBg}`}
       >
         <nav className="container mx-auto flex items-center justify-between px-6 relative w-full">
           
@@ -135,7 +127,6 @@ const Navbar = ({ isScrolled, isTransparentInit }) => {
                   <FaChevronDown size={8} />
                 </span>
               </NavLink>
-
 
               {showMegaMenu && (
                 <div className="absolute left-1/2 transform -translate-x-1/2 top-full w-[600px] bg-white text-black border border-gold/25 shadow-2xl rounded-2xl p-8 grid grid-cols-2 gap-8 z-50 animate-fade-in">
@@ -223,16 +214,20 @@ const Navbar = ({ isScrolled, isTransparentInit }) => {
 
             {/* Icons */}
             <div className="flex items-center space-x-5">
-              <Link to="/buyer-dashboard/wishlist" className={iconClass}>
+              <Link to="/buyer-dashboard/wishlist" className={iconClass} title="Wishlist">
                 <FiHeart size={18} />
               </Link>
               
               {/* Shopping bag opens slide-out cart drawer */}
-              <button onClick={() => setShowCartDrawer(true)} className={`${iconClass} relative`}>
+              <button 
+                onClick={() => setShowCartDrawer(true)} 
+                className={`${iconClass} relative`}
+                title="Shopping Bag"
+              >
                 <FiShoppingCart size={18} />
-                {cart.length > 0 && (
-                  <span className={`absolute -top-2 -right-2 w-4 h-4 text-[9px] rounded-full flex items-center justify-center font-bold ${isTransparent ? 'bg-white text-black' : 'bg-[#111111] text-white'}`}>
-                    {cart.length}
+                {totalCartCount > 0 && (
+                  <span className={`absolute -top-1.5 -right-2 w-4 h-4 text-[9px] rounded-full flex items-center justify-center font-bold ${isTransparent ? 'bg-white text-black' : 'bg-maroon text-white border border-gold'}`}>
+                    {totalCartCount}
                   </span>
                 )}
               </button>
@@ -255,7 +250,7 @@ const Navbar = ({ isScrolled, isTransparentInit }) => {
                 </button>
 
                 {showAuthDropdown && (
-                  <div className="absolute right-0 top-full mt-2 w-52 bg-white border border-[#E5E5E5] shadow-2xl rounded-2xl p-2 z-50 text-[#111111] before:absolute before:-top-4 before:left-0 before:w-full before:h-4">
+                  <div className="absolute right-0 top-full mt-2 w-52 bg-white border border-[#E5E5E5] shadow-2xl rounded-2xl p-2 z-50 text-[#111111]">
                     {isAuthenticated ? (
                       <>
                         <div className="px-4 py-2 border-b border-gray-100">
@@ -307,73 +302,13 @@ const Navbar = ({ isScrolled, isTransparentInit }) => {
         </nav>
       </motion.header>
 
-      {/* MINI CART DRAWER */}
-      {showCartDrawer && (
-        <div className="fixed inset-0 z-50 bg-black/60 flex justify-end">
-          <div className="w-full max-w-md bg-white h-full flex flex-col justify-between shadow-2xl relative text-black">
-            
-            {/* Header */}
-            <div className="p-6 border-b border-gold/20 flex justify-between items-center bg-cream/10">
-              <h3 className="font-heading text-xl text-maroon font-bold">Shopping Bag ({cart.length})</h3>
-              <button onClick={() => setShowCartDrawer(false)} className="text-gray-500 hover:text-maroon">
-                <FiX size={24} />
-              </button>
-            </div>
-
-            {/* List */}
-            <div className="p-6 flex-grow overflow-y-auto space-y-4">
-              {cart.length > 0 ? (
-                cart.map(item => (
-                  <div key={item.id} className="flex space-x-4 border-b pb-4">
-                    <img src={item.image} alt={item.name} className="w-16 h-20 object-cover rounded-lg" />
-                    <div className="flex-grow space-y-1">
-                      <h4 className="font-semibold text-sm text-maroon">{item.name}</h4>
-                      <span className="text-[10px] text-gray-400 block">{item.category}</span>
-                      <div className="flex items-center space-x-3">
-                        <button onClick={() => updateQuantity(item.id, item.quantity - 1)} className="border p-1 rounded hover:bg-cream"><FiMinus size={10} /></button>
-                        <span className="text-xs font-semibold">{item.quantity}</span>
-                        <button onClick={() => updateQuantity(item.id, item.quantity + 1)} className="border p-1 rounded hover:bg-cream"><FiPlus size={10} /></button>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <p className="font-semibold text-sm">₹{(item.price * item.quantity).toLocaleString('en-IN')}</p>
-                      <button onClick={() => removeFromCart(item.id)} className="text-xs text-red-500 hover:underline mt-2">Remove</button>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <div className="text-center py-20 text-gray-500 text-sm">
-                  Your luxury shopping bag is empty.
-                </div>
-              )}
-            </div>
-
-            {/* Summary & checkout footer */}
-            {cart.length > 0 && (
-              <div className="p-6 border-t border-gold/20 space-y-4 bg-cream/5">
-                <div className="flex justify-between font-bold text-base text-maroon">
-                  <span>Bag Subtotal:</span>
-                  <span>₹{calculateTotal().toLocaleString('en-IN')}</span>
-                </div>
-                <button
-                  onClick={() => {
-                    setShowCartDrawer(false);
-                    navigate('/checkout');
-                  }}
-                  className="w-full bg-maroon hover:bg-gold text-white font-semibold py-3 rounded-full transition text-center block"
-                >
-                  Proceed to Checkout
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
+      {/* SLIDE-OVER CART DRAWER */}
+      <CartDrawer isOpen={showCartDrawer} onClose={() => setShowCartDrawer(false)} />
 
       {/* MOBILE MENU DRAWER */}
       {showMobileMenu && (
         <div className="fixed inset-0 z-50 bg-black/60 flex justify-start lg:hidden">
-          <div className="w-3/4 max-w-sm bg-white h-full flex flex-col shadow-2xl relative text-black animate-slide-right">
+          <div className="w-3/4 max-w-sm bg-white h-full flex flex-col shadow-2xl relative text-black">
             
             <div className="p-6 border-b border-gold/20 flex justify-between items-center bg-cream/10">
               <h3 className="font-heading text-xl text-maroon font-bold tracking-widest">MENU</h3>
