@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: indrani-paithani
+    env: static
+    buildCommand: npm run build
+    staticPublishPath: ./dist
+    envVars:
+      - key: NODE_VERSION
+        value: 20.18.0
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
