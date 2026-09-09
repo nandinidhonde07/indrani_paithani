@@ -10,14 +10,36 @@ class UserService {
       if (users.length === 0) {
         users = [
           {
+            firstName: 'Priya',
+            lastName: 'Deshmukh',
             name: 'Priya Deshmukh',
             email: 'buyer@indranipaithani.com',
             password: 'buyer123',
             phone: '+91 9876543210',
+            altPhone: '+91 9822012345',
             mobileVerified: true,
+            emailVerified: true,
             age: 28,
             gender: 'Female',
-            address: 'Flat 402, Royal Palms, MG Road, Pune, Maharashtra - 411001'
+            dob: '1996-05-14',
+            anniversaryDate: '2021-11-20',
+            marketingOptIn: true,
+            avatarUrl: '/assets/official_logo.jpg',
+            address: 'Flat 402, Royal Palms, MG Road, Pune, Maharashtra - 411001',
+            addresses: [
+              {
+                id: 'addr_default_1',
+                label: 'Home',
+                street: 'Flat 402, Royal Palms, MG Road',
+                landmark: 'Near Central Mall',
+                pincode: '411001',
+                city: 'Pune',
+                state: 'Maharashtra',
+                country: 'India',
+                isDefault: true
+              }
+            ],
+            connectedAuth: ['Email / Password', 'Google SSO']
           }
         ];
         localStorage.setItem(this.USERS_KEY, JSON.stringify(users));
@@ -38,7 +60,9 @@ class UserService {
       const authUser = useAuthStore.getState().user;
       const localProfile = JSON.parse(localStorage.getItem(this.CURRENT_USER_KEY) || 'null');
       
-      if (!authUser) {
+      if (!authUser && !localProfile) {
+        resolve(null);
+      } else if (!authUser) {
         resolve(localProfile);
       } else {
         resolve({ ...authUser, ...localProfile });
@@ -48,9 +72,15 @@ class UserService {
 
   static async updateCurrentUser(updates) {
     return new Promise(async (resolve) => {
-      const current = (await this.getCurrentUser()) || { name: 'Valued Buyer', email: 'guest@example.com' };
+      const current = (await this.getCurrentUser()) || { name: 'Valued Client', email: 'guest@example.com' };
 
       const updatedUser = { ...current, ...updates };
+      
+      // Ensure name is formatted properly if firstName/lastName exist
+      if (updates.firstName || updates.lastName) {
+        updatedUser.name = `${updatedUser.firstName || ''} ${updatedUser.lastName || ''}`.trim() || updatedUser.name;
+      }
+
       localStorage.setItem(this.CURRENT_USER_KEY, JSON.stringify(updatedUser));
 
       // Also update in auth store if logged in
@@ -71,6 +101,88 @@ class UserService {
 
       resolve(updatedUser);
     });
+  }
+
+  // Address Management Methods
+  static async addAddress(newAddrData) {
+    const user = await this.getCurrentUser();
+    if (!user) return null;
+
+    const addresses = Array.isArray(user.addresses) ? [...user.addresses] : [];
+    const newAddressObj = {
+      id: 'addr_' + Date.now(),
+      label: newAddrData.label || 'Home',
+      street: newAddrData.street || '',
+      landmark: newAddrData.landmark || '',
+      pincode: newAddrData.pincode || '',
+      city: newAddrData.city || '',
+      state: newAddrData.state || '',
+      country: newAddrData.country || 'India',
+      isDefault: addresses.length === 0 ? true : !!newAddrData.isDefault
+    };
+
+    if (newAddressObj.isDefault) {
+      addresses.forEach(a => a.isDefault = false);
+    }
+
+    addresses.push(newAddressObj);
+    const primaryAddressStr = `${newAddressObj.street}, ${newAddressObj.city}, ${newAddressObj.state} - ${newAddressObj.pincode}`;
+
+    return await this.updateCurrentUser({
+      addresses,
+      address: newAddressObj.isDefault ? primaryAddressStr : user.address
+    });
+  }
+
+  static async setDefaultAddress(addressId) {
+    const user = await this.getCurrentUser();
+    if (!user || !Array.isArray(user.addresses)) return null;
+
+    let selectedAddressStr = user.address;
+    const updatedAddresses = user.addresses.map(a => {
+      const isMatch = a.id === addressId;
+      if (isMatch) {
+        selectedAddressStr = `${a.street}, ${a.city}, ${a.state} - ${a.pincode}`;
+      }
+      return { ...a, isDefault: isMatch };
+    });
+
+    return await this.updateCurrentUser({
+      addresses: updatedAddresses,
+      address: selectedAddressStr
+    });
+  }
+
+  static async deleteAddress(addressId) {
+    const user = await this.getCurrentUser();
+    if (!user || !Array.isArray(user.addresses)) return null;
+
+    const filtered = user.addresses.filter(a => a.id !== addressId);
+    if (filtered.length > 0 && !filtered.some(a => a.isDefault)) {
+      filtered[0].isDefault = true;
+    }
+
+    const defaultAddr = filtered.find(a => a.isDefault);
+    const newAddressStr = defaultAddr 
+      ? `${defaultAddr.street}, ${defaultAddr.city}, ${defaultAddr.state} - ${defaultAddr.pincode}`
+      : '';
+
+    return await this.updateCurrentUser({
+      addresses: filtered,
+      address: newAddressStr
+    });
+  }
+
+  // Change Password Helper
+  static async changePassword(currentPassword, newPassword) {
+    const user = await this.getCurrentUser();
+    if (!user) throw new Error("No active user session found.");
+
+    if (user.password && user.password !== currentPassword) {
+      throw new Error("Current password entered is incorrect.");
+    }
+
+    return await this.updateCurrentUser({ password: newPassword });
   }
 }
 
