@@ -23,6 +23,8 @@ const BuyerSignup = () => {
   const [city, setCity] = useState('');
   const [state, setState] = useState('');
   const [country] = useState('India');
+  const [deliveryInstructions, setDeliveryInstructions] = useState('');
+
 
   // Account Preferences
   const [marketingOptIn, setMarketingOptIn] = useState(true);
@@ -114,6 +116,7 @@ const BuyerSignup = () => {
       marketingOptIn,
       avatarUrl: '/assets/official_logo.jpg',
       address: primaryAddressStr,
+      deliveryInstructions,
       addresses: [
         {
           id: 'addr_' + Date.now(),
@@ -124,9 +127,11 @@ const BuyerSignup = () => {
           city,
           state,
           country,
+          deliveryInstructions,
           isDefault: true
         }
       ],
+
       connectedAuth: ['Email / Password']
     };
 
@@ -375,7 +380,19 @@ const BuyerSignup = () => {
                 />
               </div>
             </div>
+
+            <div>
+              <label className="block text-xs font-bold text-gray-600 uppercase mb-1">Special Delivery Instructions (Optional)</label>
+              <input
+                type="text"
+                value={deliveryInstructions}
+                onChange={(e) => setDeliveryInstructions(e.target.value)}
+                className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-gold text-xs"
+                placeholder="e.g. Call before delivery / Leave at gate with security"
+              />
+            </div>
           </div>
+
 
           {/* SECTION 3: Security & Preferences */}
           <div className="space-y-4 pt-2">

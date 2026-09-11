@@ -123,12 +123,20 @@ const OrderManagementCMS = () => {
                   <h4 className="text-xs uppercase font-bold text-gray-400 mb-2">Customer Info</h4>
                   <p className="font-semibold text-black">{selectedOrder.buyerName}</p>
                   <p className="text-sm text-gray-600">{selectedOrder.buyerEmail}</p>
-                  <p className="text-sm text-gray-600">{selectedOrder.phone}</p>
+                  <p className="text-sm text-gray-600">Primary Ph: {selectedOrder.phone}</p>
+                  {selectedOrder.altPhone && <p className="text-xs text-gray-500">Alt Ph: {selectedOrder.altPhone}</p>}
                 </div>
                 <div>
-                  <h4 className="text-xs uppercase font-bold text-gray-400 mb-2">Shipping Address</h4>
+                  <h4 className="text-xs uppercase font-bold text-gray-400 mb-2">Shipping Address & Delivery Instructions</h4>
                   <p className="text-sm text-gray-600 leading-relaxed bg-white p-3 rounded-lg border">{selectedOrder.shippingAddress}</p>
+                  {selectedOrder.deliveryInstructions && (
+                    <div className="bg-cream/40 p-2.5 rounded-lg border border-gold/20 mt-2 text-xs">
+                      <span className="font-bold text-maroon block text-[10px] uppercase">Special Delivery Notes:</span>
+                      <span className="text-gray-700 italic">{selectedOrder.deliveryInstructions}</span>
+                    </div>
+                  )}
                 </div>
+
                 <div>
                   <h4 className="text-xs uppercase font-bold text-gray-400 mb-2">Payment Info</h4>
                   <p className="text-sm"><span className="font-semibold">Method:</span> {selectedOrder.paymentMethod}</p>
