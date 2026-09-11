@@ -390,8 +390,16 @@ const BuyerDashboard = () => {
                     {userProfile?.address || 'No primary delivery address saved.'}
                   </p>
                 </div>
+
+                <div className="bg-cream/40 p-4 rounded-2xl border border-gold/20 text-xs space-y-1">
+                  <span className="font-bold text-maroon block text-[10px] uppercase">Default Delivery Instructions</span>
+                  <p className="text-gray-800 italic font-medium leading-relaxed">
+                    {userProfile?.deliveryInstructions || 'Standard Courier Delivery (No special instructions)'}
+                  </p>
+                </div>
               </div>
             </div>
+
 
             {/* PREVIOUS ORDERS BREAKDOWN */}
             <div className="bg-white p-8 rounded-3xl shadow-premium border border-gold/15 space-y-6">

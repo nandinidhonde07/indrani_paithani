@@ -4,12 +4,52 @@ class UserService {
   static USERS_KEY = 'buyer_users';
   static CURRENT_USER_KEY = 'currentUser';
 
+  static _normalizeUserSchema(user) {
+    if (!user) return null;
+    const name = user.name || user.registeredName || 'Valued Client';
+    const nameParts = name.trim().split(' ');
+    
+    return {
+      ...user,
+      name,
+      firstName: user.firstName || nameParts[0] || 'Valued',
+      lastName: user.lastName || (nameParts.length > 1 ? nameParts.slice(1).join(' ') : 'Client'),
+      email: user.email || 'buyer@indranipaithani.com',
+      phone: user.phone || '+91 9876543210',
+      altPhone: user.altPhone || '',
+      mobileVerified: user.mobileVerified !== false,
+      emailVerified: true,
+      gender: user.gender || 'Female',
+      dob: user.dob || '',
+      anniversaryDate: user.anniversaryDate || '',
+      marketingOptIn: user.marketingOptIn !== false,
+      avatarUrl: user.avatarUrl || '/assets/official_logo.jpg',
+      address: user.address || 'Pune, Maharashtra - 411001',
+      deliveryInstructions: user.deliveryInstructions || 'Call before delivery',
+      addresses: Array.isArray(user.addresses) && user.addresses.length > 0 ? user.addresses : [
+        {
+          id: 'addr_default_1',
+          label: 'Home',
+          street: user.address || 'Flat 402, Royal Palms, MG Road',
+          landmark: '',
+          pincode: '411001',
+          city: 'Pune',
+          state: 'Maharashtra',
+          country: 'India',
+          deliveryInstructions: user.deliveryInstructions || 'Call before delivery',
+          isDefault: true
+        }
+      ],
+      connectedAuth: Array.isArray(user.connectedAuth) ? user.connectedAuth : ['Email / Password', 'Google SSO']
+    };
+  }
+
   static async getUsers() {
     return new Promise((resolve) => {
       let users = JSON.parse(localStorage.getItem(this.USERS_KEY) || '[]');
       if (users.length === 0) {
         users = [
-          {
+          this._normalizeUserSchema({
             firstName: 'Priya',
             lastName: 'Deshmukh',
             name: 'Priya Deshmukh',
@@ -26,25 +66,12 @@ class UserService {
             marketingOptIn: true,
             avatarUrl: '/assets/official_logo.jpg',
             address: 'Flat 402, Royal Palms, MG Road, Pune, Maharashtra - 411001',
-            addresses: [
-              {
-                id: 'addr_default_1',
-                label: 'Home',
-                street: 'Flat 402, Royal Palms, MG Road',
-                landmark: 'Near Central Mall',
-                pincode: '411001',
-                city: 'Pune',
-                state: 'Maharashtra',
-                country: 'India',
-                isDefault: true
-              }
-            ],
-            connectedAuth: ['Email / Password', 'Google SSO']
-          }
+            deliveryInstructions: 'Call before delivery'
+          })
         ];
         localStorage.setItem(this.USERS_KEY, JSON.stringify(users));
       }
-      resolve(users);
+      resolve(users.map(u => this._normalizeUserSchema(u)));
     });
   }
 
@@ -63,9 +90,9 @@ class UserService {
       if (!authUser && !localProfile) {
         resolve(null);
       } else if (!authUser) {
-        resolve(localProfile);
+        resolve(this._normalizeUserSchema(localProfile));
       } else {
-        resolve({ ...authUser, ...localProfile });
+        resolve(this._normalizeUserSchema({ ...authUser, ...localProfile }));
       }
     });
   }
@@ -74,9 +101,8 @@ class UserService {
     return new Promise(async (resolve) => {
       const current = (await this.getCurrentUser()) || { name: 'Valued Client', email: 'guest@example.com' };
 
-      const updatedUser = { ...current, ...updates };
+      const updatedUser = this._normalizeUserSchema({ ...current, ...updates });
       
-      // Ensure name is formatted properly if firstName/lastName exist
       if (updates.firstName || updates.lastName) {
         updatedUser.name = `${updatedUser.firstName || ''} ${updatedUser.lastName || ''}`.trim() || updatedUser.name;
       }
@@ -118,6 +144,7 @@ class UserService {
       city: newAddrData.city || '',
       state: newAddrData.state || '',
       country: newAddrData.country || 'India',
+      deliveryInstructions: newAddrData.deliveryInstructions || '',
       isDefault: addresses.length === 0 ? true : !!newAddrData.isDefault
     };
 
@@ -130,7 +157,8 @@ class UserService {
 
     return await this.updateCurrentUser({
       addresses,
-      address: newAddressObj.isDefault ? primaryAddressStr : user.address
+      address: newAddressObj.isDefault ? primaryAddressStr : user.address,
+      deliveryInstructions: newAddressObj.isDefault ? newAddressObj.deliveryInstructions : user.deliveryInstructions
     });
   }
 
@@ -139,17 +167,21 @@ class UserService {
     if (!user || !Array.isArray(user.addresses)) return null;
 
     let selectedAddressStr = user.address;
+    let selectedDeliveryNotes = user.deliveryInstructions;
+
     const updatedAddresses = user.addresses.map(a => {
       const isMatch = a.id === addressId;
       if (isMatch) {
         selectedAddressStr = `${a.street}, ${a.city}, ${a.state} - ${a.pincode}`;
+        selectedDeliveryNotes = a.deliveryInstructions || selectedDeliveryNotes;
       }
       return { ...a, isDefault: isMatch };
     });
 
     return await this.updateCurrentUser({
       addresses: updatedAddresses,
-      address: selectedAddressStr
+      address: selectedAddressStr,
+      deliveryInstructions: selectedDeliveryNotes
     });
   }
 
