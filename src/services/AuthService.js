@@ -13,11 +13,20 @@ class AuthService {
   static OWNER_EMAIL = 'nandini.dhonde1@gmail.com';
 
   static init() {
+    // Restore session from LocalStorage first so refreshes never lose active login
+    const savedOwnerSession = JSON.parse(localStorage.getItem('indrani_owner_session') || 'null');
+    const savedLocalUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+
+    if (savedOwnerSession) {
+      useAuthStore.getState().setAuth(savedOwnerSession, this.ROLES.OWNER);
+    } else if (savedLocalUser) {
+      useAuthStore.getState().setAuth(savedLocalUser, this.ROLES.BUYER);
+    } else {
+      useAuthStore.getState().setLoading(false);
+    }
+
     onAuthStateChanged(auth, (user) => {
       if (user) {
-        // If a user is logged in, determine their role based on email and where they are trying to access?
-        // Actually, role should be inherent to the user.
-        // If they are the owner email, give them OWNER role, else BUYER.
         const role = user.email === this.OWNER_EMAIL ? this.ROLES.OWNER : this.ROLES.BUYER;
         
         useAuthStore.getState().setAuth({
@@ -31,7 +40,14 @@ class AuthService {
           ActivityLogger.log('Owner Session Restored', `${user.displayName} session resumed.`, user.displayName);
         }
       } else {
-        useAuthStore.getState().clearAuth();
+        // Only clear auth if no local session exists
+        const hasOwner = localStorage.getItem('indrani_owner_session');
+        const hasUser = localStorage.getItem('currentUser');
+        if (!hasOwner && !hasUser) {
+          useAuthStore.getState().clearAuth();
+        } else {
+          useAuthStore.getState().setLoading(false);
+        }
       }
     });
   }
@@ -63,17 +79,18 @@ class AuthService {
       const user = result.user;
       
       if (user.email === this.OWNER_EMAIL) {
-        useAuthStore.getState().setAuth({
+        const ownerObj = {
           uid: user.uid,
           name: user.displayName,
           email: user.email,
           photoURL: user.photoURL
-        }, this.ROLES.OWNER);
+        };
+        localStorage.setItem('indrani_owner_session', JSON.stringify(ownerObj));
+        useAuthStore.getState().setAuth(ownerObj, this.ROLES.OWNER);
         
         ActivityLogger.log('Owner Login', `${user.displayName} logged in via Google.`, user.displayName);
         return { success: true, user: useAuthStore.getState().user };
       } else {
-        // Unauthorized owner attempt
         await signOut(auth);
         useAuthStore.getState().clearAuth();
         return { success: false, error: "Access Denied: You are not authorized to access the Owner Portal." };
@@ -90,12 +107,16 @@ class AuthService {
       if (user && role === this.ROLES.OWNER) {
         ActivityLogger.log('Owner Logout', `${user.name} logged out.`, user.name);
       }
-      await signOut(auth);
+      localStorage.removeItem('currentUser');
+      localStorage.removeItem('indrani_owner_session');
+      await signOut(auth).catch(() => {});
       useAuthStore.getState().clearAuth();
       return { success: true };
     } catch (error) {
-      console.error("Logout Error:", error);
-      return { success: false, error: "Failed to log out. Please try again." };
+      localStorage.removeItem('currentUser');
+      localStorage.removeItem('indrani_owner_session');
+      useAuthStore.getState().clearAuth();
+      return { success: true };
     }
   }
 

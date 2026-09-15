@@ -28,11 +28,13 @@ const OwnerLogin = () => {
     const isValidPassword = password === 'admin123' || password.length >= 6;
 
     if (isOwnerEmail && isValidPassword) {
-      useAuthStore.getState().setAuth({
+      const ownerObj = {
         uid: 'owner_' + Date.now(),
         name: 'Nandini Dhonde (Owner)',
         email: AuthService.OWNER_EMAIL
-      }, AuthService.ROLES.OWNER);
+      };
+      localStorage.setItem('indrani_owner_session', JSON.stringify(ownerObj));
+      useAuthStore.getState().setAuth(ownerObj, AuthService.ROLES.OWNER);
 
       setIsLoading(false);
       navigate('/admin');

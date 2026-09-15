@@ -3,7 +3,7 @@ import { create } from 'zustand';
 const useAuthStore = create((set) => ({
   user: null,
   isAuthenticated: false,
-  isLoading: true,
+  isLoading: false,
   role: 'GUEST',
 
   setAuth: (user, role) => set({ user, isAuthenticated: !!user, role, isLoading: false }),
