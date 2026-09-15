@@ -2,16 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AuthService from '../services/AuthService.js';
 import OrderService from '../services/OrderService.js';
-import productsData from '../data/products.json';
 import HomepageCMS from './admin/HomepageCMS';
-import MediaLibraryCMS from './admin/MediaLibraryCMS';
 import FounderCMS from './admin/FounderCMS';
 import PolicyCMS from './admin/PolicyCMS';
 import ProductCMS from './admin/ProductCMS';
 import ContactCMS from './admin/ContactCMS';
 import OrderManagementCMS from './admin/OrderManagementCMS';
-import InquiriesCMS from './admin/InquiriesCMS';
-import ReviewModerationCMS from './admin/ReviewModerationCMS';
 
 const DEFAULT_CATEGORIES = [
   "Pure Silk Paithani", "Bridal Paithani", "Wedding Collection",
@@ -27,13 +23,6 @@ const DEFAULT_TESTIMONIALS = [
   { id: '3', author: "Radhika Patil", location: "Nashik", rating: 5, quote: "The silk quality and rich zari borders exceeded my expectations. Truly heirloom quality!", saree: "Heritage Lotus Swan Paithani" }
 ];
 
-const DEFAULT_INSTAGRAM_POSTS = [
-  { id: '1', image: '/assets/products/muniya_1.png', caption: 'Handwoven with royal gold zari motifs.', likes: 412, tag: '#IndraniPaithaniBride' },
-  { id: '2', image: '/assets/products/lotus_swan_flat.png', caption: 'Traditional Yeola Silk in vibrant emerald hue.', likes: 389, tag: '#YeolaPaithani' },
-  { id: '3', image: '/assets/products/purple_parrot.png', caption: 'Royal purple silk crafted for celebratory moments.', likes: 520, tag: '#LuxuryHandloom' },
-  { id: '4', image: '/assets/products/muniya_2.png', caption: 'Elegance woven in pure silk yarn.', likes: 295, tag: '#HeritageSarees' }
-];
-
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -46,34 +35,14 @@ const AdminDashboard = () => {
   const [editingCatIndex, setEditingCatIndex] = useState(null);
   const [editingCatValue, setEditingCatValue] = useState('');
 
-  // Testimonials State
+  // Testimonials State (Add / Edit / Delete)
   const [testimonials, setTestimonials] = useState([]);
   const [showAddTestimonial, setShowAddTestimonial] = useState(false);
+  const [editingTestimonial, setEditingTestimonial] = useState(null);
   const [newTestimonial, setNewTestimonial] = useState({ author: '', location: '', rating: 5, quote: '', saree: '' });
-
-  // Instagram State
-  const [instagramPosts, setInstagramPosts] = useState([]);
-  const [showAddInsta, setShowAddInsta] = useState(false);
-  const [newInsta, setNewInsta] = useState({ image: '', caption: '', likes: 100, tag: '#IndraniPaithani' });
 
   // Selected Customer Modal State
   const [selectedCustomer, setSelectedCustomer] = useState(null);
-
-  // Settings State
-  const [storeSettings, setStoreSettings] = useState({
-    storeName: 'Indrani Paithani',
-    tagline: 'Where Heritage Meets Luxury',
-    helplinePhone: '+91 7507755836',
-    supportEmail: 'nandini.dhonde1@gmail.com',
-    storeAddress: 'Indrani Paithani Heritage Studio, Yeola, Nashik, Maharashtra - 422401',
-    announcementBar: '✨ 100% Silk Mark Certified Handloom Yeola Paithani Sarees | Free Insured Shipping Across India',
-    gstPercentage: '5',
-    freeShippingThreshold: '0',
-    enableCOD: true,
-    ownerEmail: 'nandini.dhonde1@gmail.com',
-    ownerPassword: 'admin123'
-  });
-  const [settingsMessage, setSettingsMessage] = useState(null);
 
   // Load Data
   const loadDashboardData = async () => {
@@ -108,18 +77,6 @@ const AdminDashboard = () => {
       localStorage.setItem('indrani_testimonials', JSON.stringify(DEFAULT_TESTIMONIALS));
       setTestimonials(DEFAULT_TESTIMONIALS);
     }
-
-    // Load Instagram
-    const localInsta = localStorage.getItem('indrani_instagram_posts');
-    if (localInsta) setInstagramPosts(JSON.parse(localInsta));
-    else {
-      localStorage.setItem('indrani_instagram_posts', JSON.stringify(DEFAULT_INSTAGRAM_POSTS));
-      setInstagramPosts(DEFAULT_INSTAGRAM_POSTS);
-    }
-
-    // Load Settings
-    const localSettings = localStorage.getItem('indrani_store_settings');
-    if (localSettings) setStoreSettings(JSON.parse(localSettings));
   };
 
   useEffect(() => {
@@ -142,6 +99,7 @@ const AdminDashboard = () => {
     const updated = products.map(p => p.id === productId ? { ...p, stock: p.stock + 5 } : p);
     setProducts(updated);
     localStorage.setItem('products', JSON.stringify(updated));
+    localStorage.setItem('indrani_products', JSON.stringify(updated));
   };
 
   // Category Handlers
@@ -176,50 +134,41 @@ const AdminDashboard = () => {
     }
   };
 
-  // Testimonials Handlers
-  const handleAddTestimonialSubmit = (e) => {
+  // Testimonials Handlers (ADD / EDIT / DELETE)
+  const handleSaveTestimonialSubmit = (e) => {
     e.preventDefault();
-    const item = { id: String(Date.now()), ...newTestimonial };
-    const updated = [item, ...testimonials];
+    let updated;
+    if (editingTestimonial) {
+      updated = testimonials.map(t => t.id === editingTestimonial.id ? { ...t, ...newTestimonial } : t);
+    } else {
+      const item = { id: String(Date.now()), ...newTestimonial };
+      updated = [item, ...testimonials];
+    }
     setTestimonials(updated);
     localStorage.setItem('indrani_testimonials', JSON.stringify(updated));
     setShowAddTestimonial(false);
+    setEditingTestimonial(null);
     setNewTestimonial({ author: '', location: '', rating: 5, quote: '', saree: '' });
   };
 
+  const handleEditTestimonial = (t) => {
+    setEditingTestimonial(t);
+    setNewTestimonial({
+      author: t.author || '',
+      location: t.location || '',
+      rating: t.rating || 5,
+      quote: t.quote || '',
+      saree: t.saree || ''
+    });
+    setShowAddTestimonial(true);
+  };
+
   const handleDeleteTestimonial = (id) => {
-    if (confirm('Delete this testimonial?')) {
+    if (confirm('Delete this testimonial permanently?')) {
       const updated = testimonials.filter(t => t.id !== id);
       setTestimonials(updated);
       localStorage.setItem('indrani_testimonials', JSON.stringify(updated));
     }
-  };
-
-  // Instagram Handlers
-  const handleAddInstaSubmit = (e) => {
-    e.preventDefault();
-    const item = { id: String(Date.now()), ...newInsta };
-    const updated = [item, ...instagramPosts];
-    setInstagramPosts(updated);
-    localStorage.setItem('indrani_instagram_posts', JSON.stringify(updated));
-    setShowAddInsta(false);
-    setNewInsta({ image: '', caption: '', likes: 100, tag: '#IndraniPaithani' });
-  };
-
-  const handleDeleteInsta = (id) => {
-    if (confirm('Delete this Instagram post?')) {
-      const updated = instagramPosts.filter(i => i.id !== id);
-      setInstagramPosts(updated);
-      localStorage.setItem('indrani_instagram_posts', JSON.stringify(updated));
-    }
-  };
-
-  // Settings Handler
-  const handleSaveSettings = (e) => {
-    e.preventDefault();
-    localStorage.setItem('indrani_store_settings', JSON.stringify(storeSettings));
-    setSettingsMessage('✓ Settings & Security saved successfully!');
-    setTimeout(() => setSettingsMessage(null), 3000);
   };
 
   // Calculate Overview Stats
@@ -227,16 +176,16 @@ const AdminDashboard = () => {
   const lowStockProducts = products.filter(p => p.stock <= 3);
 
   return (
-    <div className="min-h-screen bg-cream flex flex-col md:flex-row text-black">
+    <div className="min-h-screen bg-cream flex flex-col md:flex-row text-black items-start">
       {/* Sidebar Navigation */}
-      <aside className="w-full md:w-64 bg-maroon text-white p-6 flex flex-col justify-between shrink-0">
+      <aside className="w-full md:w-64 bg-maroon text-white p-6 flex flex-col justify-between shrink-0 md:h-screen md:sticky md:top-0 shadow-xl overflow-y-auto custom-scrollbar">
         <div className="space-y-6">
           <div className="border-b border-gold/30 pb-4">
-            <h2 className="text-xl font-heading text-gold tracking-widest text-center">INDRANI OWNER</h2>
+            <h2 className="text-xl font-heading text-gold tracking-widest text-center font-bold">INDRANI OWNER</h2>
             <p className="text-xs text-cream/70 font-light mt-1 text-center">Luxury Heritage Suite</p>
           </div>
 
-          <nav className="space-y-1 overflow-y-auto max-h-[70vh] pr-2 custom-scrollbar">
+          <nav className="space-y-1.5 pr-1">
             {[
               { id: 'dashboard', label: '📊 Dashboard Overview' },
               { id: 'products', label: '👗 Products Catalog' },
@@ -246,36 +195,30 @@ const AdminDashboard = () => {
               { id: 'homepage_cms', label: '🏠 Homepage CMS' },
               { id: 'founder_cms', label: '👑 Founder CMS' },
               { id: 'testimonials', label: '⭐ Patron Testimonials' },
-              { id: 'instagram', label: '📸 Instagram Gallery' },
               { id: 'contact', label: '📞 Contact Info CMS' },
-              { id: 'inquiries', label: '💬 Buyer Inquiries' },
-              { id: 'reviews', label: '🌟 Review Moderation' },
               { id: 'policy', label: '📜 Policy Pages' },
-              { id: 'media', label: '🖼️ Media Library' },
-              { id: 'banners', label: '📢 Banner Management' },
-              { id: 'analytics', label: '📈 Revenue Analytics' },
-              { id: 'settings', label: '⚙️ Store Settings & Security' }
+              { id: 'analytics', label: '📈 Revenue Analytics' }
             ].map(tab => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`w-full text-left py-2.5 px-3 rounded-xl font-light text-[13px] transition ${
+                className={`w-full text-left py-2.5 px-3.5 rounded-xl font-medium text-[13px] transition flex items-center justify-between ${
                   activeTab === tab.id ? 'bg-gold text-maroon font-bold shadow-md' : 'hover:bg-gold/15 text-cream/90'
                 }`}
               >
-                {tab.label}
+                <span>{tab.label}</span>
               </button>
             ))}
           </nav>
         </div>
 
-        <button onClick={handleLogout} className="mt-6 bg-black/40 hover:bg-black/70 text-white text-xs py-3 rounded-xl transition font-bold uppercase tracking-wider">
+        <button onClick={handleLogout} className="mt-8 bg-black/40 hover:bg-black/70 text-white text-xs py-3 rounded-xl transition font-bold uppercase tracking-wider">
           Logout Console
         </button>
       </aside>
 
       {/* Main Content Area */}
-      <main className="flex-grow p-6 md:p-10 overflow-y-auto">
+      <main className="flex-1 p-6 md:p-10 min-w-0 overflow-y-auto bg-cream min-h-screen">
         
         {/* TAB 1: DASHBOARD OVERVIEW */}
         {activeTab === 'dashboard' && (
@@ -328,9 +271,9 @@ const AdminDashboard = () => {
                 <span className="text-2xl block">👥</span>
                 <span className="text-xs font-bold text-maroon block">Customer CRM</span>
               </button>
-              <button onClick={() => setActiveTab('settings')} className="p-4 bg-white hover:bg-gold/10 rounded-2xl border border-gold/20 text-center transition space-y-1 shadow-sm">
-                <span className="text-2xl block">⚙️</span>
-                <span className="text-xs font-bold text-maroon block">Store Settings</span>
+              <button onClick={() => setActiveTab('testimonials')} className="p-4 bg-white hover:bg-gold/10 rounded-2xl border border-gold/20 text-center transition space-y-1 shadow-sm">
+                <span className="text-2xl block">⭐</span>
+                <span className="text-xs font-bold text-maroon block">Patron Testimonials</span>
               </button>
             </div>
 
@@ -595,53 +538,94 @@ const AdminDashboard = () => {
           </div>
         )}
 
-        {/* TAB 8: TESTIMONIALS CMS */}
+        {/* TAB: TESTIMONIALS CMS (ADD, EDIT, DELETE SUPPORT) */}
         {activeTab === 'testimonials' && (
-          <div className="space-y-8">
+          <div className="space-y-8 animate-fade-in">
             <div className="flex justify-between items-center border-b border-gold/20 pb-4">
               <div>
                 <h2 className="text-3xl font-heading text-maroon font-bold">Patron Testimonials & Stories</h2>
-                <p className="text-xs text-gray-500 font-light mt-1">Manage customer reviews and royal patron feedback displayed on the home page.</p>
+                <p className="text-xs text-gray-500 font-light mt-1">Add, edit, or delete customer reviews and royal patron feedback displayed on the home page.</p>
               </div>
-              <button onClick={() => setShowAddTestimonial(true)} className="bg-maroon hover:bg-gold text-white font-bold py-2.5 px-5 rounded-full text-xs shadow-md transition">
+              <button 
+                onClick={() => {
+                  setEditingTestimonial(null);
+                  setNewTestimonial({ author: '', location: '', rating: 5, quote: '', saree: '' });
+                  setShowAddTestimonial(true);
+                }} 
+                className="bg-maroon hover:bg-gold text-white font-bold py-2.5 px-5 rounded-full text-xs shadow-md transition"
+              >
                 + Add Testimonial
               </button>
             </div>
 
-            {/* Add Testimonial Modal */}
+            {/* Add / Edit Testimonial Modal Form */}
             {showAddTestimonial && (
-              <form onSubmit={handleAddTestimonialSubmit} className="bg-white p-6 rounded-2xl shadow-premium border border-gold/20 space-y-4 max-w-xl">
-                <h3 className="font-heading text-lg text-maroon font-bold">Add Patron Testimonial</h3>
+              <form onSubmit={handleSaveTestimonialSubmit} className="bg-white p-6 rounded-2xl shadow-premium border border-gold/20 space-y-4 max-w-xl animate-fade-in">
+                <div className="flex justify-between items-center border-b pb-2">
+                  <h3 className="font-heading text-lg text-maroon font-bold">
+                    {editingTestimonial ? '✏️ Edit Patron Testimonial' : '➕ Add Patron Testimonial'}
+                  </h3>
+                  <button type="button" onClick={() => { setShowAddTestimonial(false); setEditingTestimonial(null); }} className="text-gray-400 hover:text-black text-sm">✕</button>
+                </div>
                 <div className="grid grid-cols-2 gap-4 text-xs">
                   <div>
                     <label className="block font-bold text-gray-600 uppercase mb-1">Author Name *</label>
-                    <input type="text" required placeholder="e.g. Radhika Deshmukh" value={newTestimonial.author} onChange={e => setNewTestimonial({ ...newTestimonial, author: e.target.value })} className="w-full px-3 py-2 border rounded-xl" />
+                    <input 
+                      type="text" 
+                      required 
+                      placeholder="e.g. Radhika Deshmukh" 
+                      value={newTestimonial.author} 
+                      onChange={e => setNewTestimonial({ ...newTestimonial, author: e.target.value })} 
+                      className="w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-gold outline-none" 
+                    />
                   </div>
                   <div>
                     <label className="block font-bold text-gray-600 uppercase mb-1">City / Location *</label>
-                    <input type="text" required placeholder="e.g. Mumbai / Pune" value={newTestimonial.location} onChange={e => setNewTestimonial({ ...newTestimonial, location: e.target.value })} className="w-full px-3 py-2 border rounded-xl" />
+                    <input 
+                      type="text" 
+                      required 
+                      placeholder="e.g. Mumbai / Pune" 
+                      value={newTestimonial.location} 
+                      onChange={e => setNewTestimonial({ ...newTestimonial, location: e.target.value })} 
+                      className="w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-gold outline-none" 
+                    />
                   </div>
                   <div className="col-span-2">
                     <label className="block font-bold text-gray-600 uppercase mb-1">Saree / Product Purchased</label>
-                    <input type="text" placeholder="e.g. Royal Maharani Kath Silk Paithani" value={newTestimonial.saree} onChange={e => setNewTestimonial({ ...newTestimonial, saree: e.target.value })} className="w-full px-3 py-2 border rounded-xl" />
+                    <input 
+                      type="text" 
+                      placeholder="e.g. Royal Maharani Kath Silk Paithani" 
+                      value={newTestimonial.saree} 
+                      onChange={e => setNewTestimonial({ ...newTestimonial, saree: e.target.value })} 
+                      className="w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-gold outline-none" 
+                    />
                   </div>
                   <div className="col-span-2">
                     <label className="block font-bold text-gray-600 uppercase mb-1">Review Quote *</label>
-                    <textarea rows={3} required placeholder="Write the patron review quote here..." value={newTestimonial.quote} onChange={e => setNewTestimonial({ ...newTestimonial, quote: e.target.value })} className="w-full px-3 py-2 border rounded-xl" />
+                    <textarea 
+                      rows={3} 
+                      required 
+                      placeholder="Write the patron review quote here..." 
+                      value={newTestimonial.quote} 
+                      onChange={e => setNewTestimonial({ ...newTestimonial, quote: e.target.value })} 
+                      className="w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-gold outline-none" 
+                    />
                   </div>
                 </div>
-                <div className="flex gap-2 justify-end">
-                  <button type="button" onClick={() => setShowAddTestimonial(false)} className="px-4 py-2 border rounded-xl text-xs">Cancel</button>
-                  <button type="submit" className="bg-maroon text-white font-bold px-6 py-2 rounded-xl text-xs">Save Testimonial</button>
+                <div className="flex gap-2 justify-end pt-2 border-t">
+                  <button type="button" onClick={() => { setShowAddTestimonial(false); setEditingTestimonial(null); }} className="px-4 py-2 border rounded-xl text-xs font-semibold hover:bg-gray-50">Cancel</button>
+                  <button type="submit" className="bg-maroon hover:bg-gold text-white font-bold px-6 py-2 rounded-xl text-xs shadow-md transition">
+                    {editingTestimonial ? 'Update Testimonial' : 'Save Testimonial'}
+                  </button>
                 </div>
               </form>
             )}
 
-            {/* Testimonials List */}
+            {/* Testimonials Grid List */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {testimonials.map(t => (
-                <div key={t.id} className="bg-white p-6 rounded-2xl shadow-premium border border-gold/15 space-y-3 relative">
-                  <div className="flex justify-between items-start">
+                <div key={t.id} className="bg-white p-6 rounded-2xl shadow-premium border border-gold/15 space-y-3 relative group">
+                  <div className="flex justify-between items-start pr-20">
                     <div>
                       <h4 className="font-bold text-maroon text-sm">{t.author}</h4>
                       <span className="text-xs text-gray-400">{t.location}</span>
@@ -650,149 +634,33 @@ const AdminDashboard = () => {
                   </div>
                   <p className="text-xs text-gray-700 italic font-medium">"{t.quote}"</p>
                   {t.saree && <span className="text-[10px] bg-cream/40 text-maroon font-bold px-2 py-1 rounded border border-gold/20 inline-block">{t.saree}</span>}
-                  <button onClick={() => handleDeleteTestimonial(t.id)} className="absolute top-4 right-4 text-xs text-red-500 hover:text-red-700 font-bold">✕ Delete</button>
+                  
+                  {/* Action Buttons: EDIT and DELETE */}
+                  <div className="absolute top-4 right-4 flex space-x-2">
+                    <button 
+                      onClick={() => handleEditTestimonial(t)} 
+                      className="text-xs bg-gold/20 hover:bg-gold text-maroon font-bold py-1 px-2.5 rounded-lg transition"
+                      title="Edit Testimonial"
+                    >
+                      Edit
+                    </button>
+                    <button 
+                      onClick={() => handleDeleteTestimonial(t.id)} 
+                      className="text-xs bg-red-100 hover:bg-red-600 hover:text-white text-red-600 font-bold py-1 px-2.5 rounded-lg transition"
+                      title="Delete Testimonial"
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
           </div>
         )}
 
-        {/* TAB 9: INSTAGRAM GALLERY CMS */}
-        {activeTab === 'instagram' && (
-          <div className="space-y-8">
-            <div className="flex justify-between items-center border-b border-gold/20 pb-4">
-              <div>
-                <h2 className="text-3xl font-heading text-maroon font-bold">Instagram Social Gallery</h2>
-                <p className="text-xs text-gray-500 font-light mt-1">Curate live Instagram posts, tagged patron photos, and campaign photos.</p>
-              </div>
-              <button onClick={() => setShowAddInsta(true)} className="bg-maroon hover:bg-gold text-white font-bold py-2.5 px-5 rounded-full text-xs shadow-md transition">
-                + Add Post
-              </button>
-            </div>
-
-            {/* Add Instagram Post Modal */}
-            {showAddInsta && (
-              <form onSubmit={handleAddInstaSubmit} className="bg-white p-6 rounded-2xl shadow-premium border border-gold/20 space-y-4 max-w-xl">
-                <h3 className="font-heading text-lg text-maroon font-bold">Add Instagram Post</h3>
-                <div className="space-y-3 text-xs">
-                  <div>
-                    <label className="block font-bold text-gray-600 uppercase mb-1">Image URL *</label>
-                    <input type="text" required placeholder="/assets/products/muniya_1.png or https://..." value={newInsta.image} onChange={e => setNewInsta({ ...newInsta, image: e.target.value })} className="w-full px-3 py-2 border rounded-xl" />
-                  </div>
-                  <div>
-                    <label className="block font-bold text-gray-600 uppercase mb-1">Caption</label>
-                    <input type="text" placeholder="e.g. Handwoven gold zari pallu..." value={newInsta.caption} onChange={e => setNewInsta({ ...newInsta, caption: e.target.value })} className="w-full px-3 py-2 border rounded-xl" />
-                  </div>
-                  <div>
-                    <label className="block font-bold text-gray-600 uppercase mb-1">Hashtag / Tag</label>
-                    <input type="text" placeholder="#IndraniPaithaniBride" value={newInsta.tag} onChange={e => setNewInsta({ ...newInsta, tag: e.target.value })} className="w-full px-3 py-2 border rounded-xl" />
-                  </div>
-                </div>
-                <div className="flex gap-2 justify-end">
-                  <button type="button" onClick={() => setShowAddInsta(false)} className="px-4 py-2 border rounded-xl text-xs">Cancel</button>
-                  <button type="submit" className="bg-maroon text-white font-bold px-6 py-2 rounded-xl text-xs">Save Post</button>
-                </div>
-              </form>
-            )}
-
-            {/* Instagram Grid */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {instagramPosts.map(post => (
-                <div key={post.id} className="bg-white rounded-2xl border border-gold/15 overflow-hidden shadow-sm relative group">
-                  <img src={post.image} alt={post.caption} className="w-full h-48 object-cover" />
-                  <div className="p-3 text-xs space-y-1">
-                    <p className="font-bold text-maroon text-[10px]">{post.tag}</p>
-                    <p className="text-gray-600 truncate">{post.caption}</p>
-                    <span className="text-[10px] text-gray-400 font-semibold">❤️ {post.likes} Likes</span>
-                  </div>
-                  <button onClick={() => handleDeleteInsta(post.id)} className="absolute top-2 right-2 bg-red-600 text-white text-[10px] font-bold px-2 py-1 rounded shadow">
-                    Delete
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* TAB 17: STORE SETTINGS & SECURITY */}
-        {activeTab === 'settings' && (
-          <div className="space-y-8">
-            <div className="border-b border-gold/20 pb-4">
-              <h2 className="text-3xl font-heading text-maroon font-bold">Store Settings & Security</h2>
-              <p className="text-xs text-gray-500 font-light mt-1">Configure brand details, shipping rules, tax settings, and owner credentials.</p>
-            </div>
-
-            {settingsMessage && (
-              <div className="bg-green-100 border border-green-300 text-green-800 px-4 py-3 rounded-2xl text-xs font-bold">
-                {settingsMessage}
-              </div>
-            )}
-
-            <form onSubmit={handleSaveSettings} className="space-y-6 max-w-2xl">
-              
-              {/* Store General Info */}
-              <div className="bg-white p-6 rounded-2xl shadow-premium border border-gold/15 space-y-4">
-                <h3 className="font-heading text-lg text-maroon font-bold border-b pb-2">1. Store General Information</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-                  <div>
-                    <label className="block font-bold text-gray-600 uppercase mb-1">Store Name</label>
-                    <input type="text" value={storeSettings.storeName} onChange={e => setStoreSettings({ ...storeSettings, storeName: e.target.value })} className="w-full px-3 py-2 border rounded-xl" />
-                  </div>
-                  <div>
-                    <label className="block font-bold text-gray-600 uppercase mb-1">Helpline Phone / WhatsApp</label>
-                    <input type="text" value={storeSettings.helplinePhone} onChange={e => setStoreSettings({ ...storeSettings, helplinePhone: e.target.value })} className="w-full px-3 py-2 border rounded-xl font-mono" />
-                  </div>
-                  <div className="col-span-2">
-                    <label className="block font-bold text-gray-600 uppercase mb-1">Support Email</label>
-                    <input type="email" value={storeSettings.supportEmail} onChange={e => setStoreSettings({ ...storeSettings, supportEmail: e.target.value })} className="w-full px-3 py-2 border rounded-xl font-mono" />
-                  </div>
-                  <div className="col-span-2">
-                    <label className="block font-bold text-gray-600 uppercase mb-1">Top Announcement Bar Text</label>
-                    <input type="text" value={storeSettings.announcementBar} onChange={e => setStoreSettings({ ...storeSettings, announcementBar: e.target.value })} className="w-full px-3 py-2 border rounded-xl font-medium" />
-                  </div>
-                </div>
-              </div>
-
-              {/* E-Commerce Policy Rules */}
-              <div className="bg-white p-6 rounded-2xl shadow-premium border border-gold/15 space-y-4">
-                <h3 className="font-heading text-lg text-maroon font-bold border-b pb-2">2. E-Commerce & Tax Configuration</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-                  <div>
-                    <label className="block font-bold text-gray-600 uppercase mb-1">GST Tax Percentage (%)</label>
-                    <input type="number" value={storeSettings.gstPercentage} onChange={e => setStoreSettings({ ...storeSettings, gstPercentage: e.target.value })} className="w-full px-3 py-2 border rounded-xl font-bold" />
-                  </div>
-                  <div>
-                    <label className="block font-bold text-gray-600 uppercase mb-1">Free Shipping Threshold (₹)</label>
-                    <input type="number" value={storeSettings.freeShippingThreshold} onChange={e => setStoreSettings({ ...storeSettings, freeShippingThreshold: e.target.value })} className="w-full px-3 py-2 border rounded-xl font-bold" />
-                  </div>
-                </div>
-              </div>
-
-              {/* Owner Security */}
-              <div className="bg-white p-6 rounded-2xl shadow-premium border border-gold/15 space-y-4">
-                <h3 className="font-heading text-lg text-maroon font-bold border-b pb-2">3. Owner Credentials & Security</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-                  <div>
-                    <label className="block font-bold text-gray-600 uppercase mb-1">Owner Email Address</label>
-                    <input type="email" value={storeSettings.ownerEmail} onChange={e => setStoreSettings({ ...storeSettings, ownerEmail: e.target.value })} className="w-full px-3 py-2 border rounded-xl font-mono" />
-                  </div>
-                  <div>
-                    <label className="block font-bold text-gray-600 uppercase mb-1">Owner Password</label>
-                    <input type="password" value={storeSettings.ownerPassword} onChange={e => setStoreSettings({ ...storeSettings, ownerPassword: e.target.value })} className="w-full px-3 py-2 border rounded-xl" />
-                  </div>
-                </div>
-              </div>
-
-              <button type="submit" className="w-full bg-maroon hover:bg-gold text-white font-bold py-4 rounded-full text-xs uppercase tracking-widest transition shadow-lg">
-                Save All Store Settings
-              </button>
-            </form>
-          </div>
-        )}
-
-        {/* OTHER CMS MODULES */}
+        {/* REVENUE ANALYTICS CMS MODULE */}
         {activeTab === 'analytics' && (
-          <div className="space-y-8">
+          <div className="space-y-8 animate-fade-in">
             <h2 className="text-3xl font-heading text-maroon font-bold">Revenue Analytics</h2>
             <div className="bg-white p-8 rounded-2xl shadow-premium border border-gold/10 space-y-4">
               <div className="grid grid-cols-3 gap-4 text-center">
@@ -813,13 +681,11 @@ const AdminDashboard = () => {
           </div>
         )}
 
-        {activeTab === 'media' && <MediaLibraryCMS />}
+        {/* OTHER CMS MODULES */}
         {activeTab === 'homepage_cms' && <HomepageCMS />}
         {activeTab === 'founder_cms' && <FounderCMS />}
         {activeTab === 'policy' && <PolicyCMS />}
         {activeTab === 'contact' && <ContactCMS />}
-        {activeTab === 'inquiries' && <InquiriesCMS />}
-        {activeTab === 'reviews' && <ReviewModerationCMS />}
 
       </main>
     </div>
