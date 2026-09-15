@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import OrderService from '../services/OrderService.js';
 import UserService from '../services/UserService.js';
 import useCartStore from '../store/useCartStore.js';
@@ -17,6 +17,7 @@ const AVATAR_PRESETS = [
 
 const BuyerDashboard = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [activeTab, setActiveTab] = useState('profile');
 
   const cart = useCartStore(state => state.cart);
@@ -114,6 +115,17 @@ const BuyerDashboard = () => {
       window.removeEventListener('storage', fetchOrders);
     };
   }, []);
+
+  useEffect(() => {
+    const path = location.pathname.toLowerCase();
+    if (path.includes('/wishlist')) setActiveTab('wishlist');
+    else if (path.includes('/cart')) setActiveTab('cart');
+    else if (path.includes('/orders')) setActiveTab('orders');
+    else if (path.includes('/address')) setActiveTab('address');
+    else if (path.includes('/security')) setActiveTab('security');
+    else if (path.includes('/help')) setActiveTab('help');
+    else if (path.includes('/profile')) setActiveTab('profile');
+  }, [location.pathname]);
 
   const handleLogout = async () => {
     await AuthService.logout();

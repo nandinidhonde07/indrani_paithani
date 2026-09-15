@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import AuthService from '../services/AuthService.js';
 import OrderService from '../services/OrderService.js';
 import HomepageCMS from './admin/HomepageCMS';
@@ -25,6 +25,7 @@ const DEFAULT_TESTIMONIALS = [
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [activeTab, setActiveTab] = useState('dashboard');
   const [products, setProducts] = useState([]);
   const [orders, setOrders] = useState([]);
@@ -88,6 +89,21 @@ const AdminDashboard = () => {
       window.removeEventListener('storage', loadDashboardData);
     };
   }, []);
+
+  useEffect(() => {
+    const path = location.pathname.toLowerCase();
+    if (path.includes('/products')) setActiveTab('products');
+    else if (path.includes('/categories')) setActiveTab('categories');
+    else if (path.includes('/orders')) setActiveTab('orders');
+    else if (path.includes('/customers')) setActiveTab('customers');
+    else if (path.includes('/homepage')) setActiveTab('homepage_cms');
+    else if (path.includes('/founder')) setActiveTab('founder_cms');
+    else if (path.includes('/testimonials')) setActiveTab('testimonials');
+    else if (path.includes('/contact')) setActiveTab('contact');
+    else if (path.includes('/policy')) setActiveTab('policy');
+    else if (path.includes('/analytics')) setActiveTab('analytics');
+    else setActiveTab('dashboard');
+  }, [location.pathname]);
 
   const handleLogout = async () => {
     await AuthService.logout();

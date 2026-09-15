@@ -340,50 +340,6 @@ const Home = () => {
     );
   };
 
-  const renderLookbook = () => {
-    const list = instaGallery.length > 0 ? instaGallery : [
-      { image: "/assets/products/muniya_1.png", caption: "Handwoven gold zari motifs.", tag: "#IndraniPaithaniBride" },
-      { image: "/assets/products/lotus_swan_flat.png", caption: "Traditional Yeola Silk in vibrant emerald hue.", tag: "#YeolaPaithani" },
-      { image: "/assets/products/purple_parrot.png", caption: "Royal purple silk crafted for celebratory moments.", tag: "#LuxuryHandloom" },
-      { image: "/assets/products/muniya_2.png", caption: "Elegance woven in pure silk yarn.", tag: "#HeritageSarees" }
-    ];
-
-    return (
-      <section key="lookbook" className="py-24 bg-cream">
-        <div className="container mx-auto px-6 max-w-6xl text-center">
-          <h2 className="text-3xl font-heading text-maroon mb-16 tracking-widest">Instagram Lookbook</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {list.slice(0, 4).map((item, idx) => (
-              <a 
-                href="https://www.instagram.com/indranipaitani.yeola?utm_source=q"
-                target="_blank"
-                rel="noopener noreferrer"
-                key={idx} 
-                className="group relative rounded-2xl overflow-hidden shadow-premium aspect-square bg-white border border-gold/15 block"
-              >
-                <img src={item.image || "https://picsum.photos/seed/insta1/500/500"} alt={item.caption || "Insta"} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
-                <div className="absolute inset-0 bg-maroon/40 opacity-0 group-hover:opacity-100 transition duration-300 flex flex-col items-center justify-center p-3 text-center">
-                  <span className="text-gold font-bold text-xs">{item.tag || '#IndraniPaithani'}</span>
-                  <span className="text-white text-[11px] font-medium truncate mt-1">{item.caption}</span>
-                </div>
-              </a>
-            ))}
-          </div>
-          <div className="mt-12">
-            <a 
-              href="https://www.instagram.com/indranipaitani.yeola?utm_source=q"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-block border border-maroon text-maroon font-semibold px-10 py-3 rounded-full hover:bg-maroon hover:text-white transition duration-300 shadow-sm text-xs uppercase tracking-widest"
-            >
-              View on Instagram
-            </a>
-          </div>
-        </div>
-      </section>
-    );
-  };
-
   const sectionMap = {
     hero: renderHero,
     collections: renderCollections,
@@ -391,8 +347,7 @@ const Home = () => {
     quality: renderQuality,
     founder: renderFounder,
     bridal: renderBridal,
-    testimonials: renderTestimonials,
-    lookbook: renderLookbook
+    testimonials: renderTestimonials
   };
 
   return (
@@ -412,7 +367,6 @@ const Home = () => {
           {renderFounder()}
           {renderBridal()}
           {renderTestimonials()}
-          {renderLookbook()}
         </>
       )}
     </div>

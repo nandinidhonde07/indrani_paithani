@@ -14,8 +14,7 @@
       { "id": "quality", "name": "Quality & Heritage", "enabled": true },
       { "id": "founder", "name": "Founder Section", "enabled": true },
       { "id": "bridal", "name": "Bridal Collection", "enabled": true },
-      { "id": "testimonials", "name": "Testimonials", "enabled": true },
-      { "id": "lookbook", "name": "Instagram Lookbook", "enabled": true }
+      { "id": "testimonials", "name": "Testimonials", "enabled": true }
     ],
     "heroVideo": null,
     "heroImage": "/assets/homepage_bg_v2.jpg",
