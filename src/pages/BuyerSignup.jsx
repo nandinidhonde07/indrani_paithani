@@ -11,6 +11,7 @@ const BuyerSignup = () => {
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [phone, setPhone] = useState('+91 ');
   const [altPhone, setAltPhone] = useState('');
   const [gender, setGender] = useState('Female');
@@ -29,23 +30,29 @@ const BuyerSignup = () => {
   // Account Preferences
   const [marketingOptIn, setMarketingOptIn] = useState(true);
 
+  // Status & Errors
+  const [error, setError] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+
   // OTP Verification State
   const [otpSent, setOtpSent] = useState(false);
   const [generatedOtp, setGeneratedOtp] = useState('');
   const [inputOtp, setInputOtp] = useState('');
   const [mobileVerified, setMobileVerified] = useState(false);
   const [otpError, setOtpError] = useState('');
-  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
 
   const navigate = useNavigate();
 
   const handleGoogleSignup = async () => {
     setIsGoogleLoading(true);
-    const res = await AuthService.loginBuyer();
+    setError(null);
+    const res = await AuthService.loginWithGoogle();
     setIsGoogleLoading(false);
     if (res.success) {
-      alert('🎉 Welcome! Account created successfully via Google.');
       navigate('/buyer-dashboard');
+    } else {
+      setError(res.error);
     }
   };
 
@@ -75,7 +82,7 @@ const BuyerSignup = () => {
   const handleSendOtp = () => {
     const cleanPhone = phone.replace(/\s+/g, '');
     if (!cleanPhone || cleanPhone.length < 10) {
-      alert('Please enter a valid 10-digit mobile number with +91 code.');
+      alert('Please enter a valid mobile number with country code.');
       return;
     }
     const mockOtp = Math.floor(100000 + Math.random() * 900000).toString();
@@ -96,69 +103,47 @@ const BuyerSignup = () => {
 
   const handleSignup = async (e) => {
     e.preventDefault();
+    setError(null);
 
-    if (!mobileVerified) {
-      alert('Please verify your mobile number via OTP before completing registration.');
+    if (password !== confirmPassword) {
+      setError('Passwords do not match. Please re-enter your password.');
       return;
     }
 
-    const users = JSON.parse(localStorage.getItem('buyer_users') || '[]');
-    if (users.find(u => u.email.toLowerCase() === email.toLowerCase())) {
-      alert('This email address is already registered. Please login instead.');
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters long.');
       return;
     }
 
-    const fullName = `${firstName.trim()} ${lastName.trim()}`.trim();
-    const primaryAddressStr = `${street}, ${landmark ? landmark + ', ' : ''}${city}, ${state} - ${pincode}`;
+    setIsLoading(true);
 
-    const newUser = {
-      firstName: firstName.trim(),
-      lastName: lastName.trim(),
-      name: fullName,
+    const res = await AuthService.registerWithEmailPassword({
+      firstName,
+      lastName,
       email,
       password,
       phone,
       altPhone,
-      mobileVerified: true,
-      emailVerified: true,
       gender,
       dob,
       anniversaryDate,
-      marketingOptIn,
-      avatarUrl: '/assets/official_logo.jpg',
-      address: primaryAddressStr,
+      street,
+      landmark,
+      pincode,
+      city,
+      state,
+      country,
       deliveryInstructions,
-      addresses: [
-        {
-          id: 'addr_' + Date.now(),
-          label: 'Home',
-          street,
-          landmark,
-          pincode,
-          city,
-          state,
-          country,
-          deliveryInstructions,
-          isDefault: true
-        }
-      ],
+      marketingOptIn
+    });
 
-      connectedAuth: ['Email / Password']
-    };
+    setIsLoading(false);
 
-    users.push(newUser);
-    localStorage.setItem('buyer_users', JSON.stringify(users));
-
-    // Log user in
-    useAuthStore.getState().setAuth({
-      uid: 'user_' + Date.now(),
-      ...newUser
-    }, 'buyer');
-
-    await UserService.updateCurrentUser(newUser);
-
-    alert('🎉 Account created successfully! Welcome to the Indrani Paithani Royal Family.');
-    navigate('/buyer-dashboard');
+    if (res.success) {
+      navigate('/buyer-dashboard');
+    } else {
+      setError(res.error);
+    }
   };
 
   return (
@@ -173,6 +158,12 @@ const BuyerSignup = () => {
             Register to explore handwoven Yeola Paithani sarees, track orders, and receive exclusive patron benefits.
           </p>
         </div>
+
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-xl text-xs font-semibold leading-relaxed">
+            {error}
+          </div>
+        )}
 
         {/* 1-Tap Google Sign Up */}
         <div>
@@ -248,7 +239,7 @@ const BuyerSignup = () => {
             {/* Mobile Phone (+91 & OTP Verification) */}
             <div className="bg-purple-50/50 p-4 rounded-2xl border border-purple-100 space-y-3">
               <label className="block text-xs font-bold text-purple-900 uppercase tracking-wider flex items-center justify-between">
-                <span>Mobile Number (OTP Verification) *</span>
+                <span>Mobile Number (Verification) *</span>
                 {mobileVerified && <span className="text-green-700 text-[10px] font-bold">✓ OTP Verified</span>}
               </label>
 
@@ -268,7 +259,7 @@ const BuyerSignup = () => {
                     onClick={handleSendOtp}
                     className="bg-maroon hover:bg-gold text-white font-bold px-4 py-2.5 rounded-xl text-xs transition shadow-xs whitespace-nowrap"
                   >
-                    {otpSent ? 'Resend OTP' : 'Send OTP'}
+                    {otpSent ? 'Resend Code' : 'Send OTP'}
                   </button>
                 ) : (
                   <span className="bg-green-100 text-green-700 font-bold px-4 py-2.5 rounded-xl text-xs flex items-center space-x-1 shrink-0">
@@ -301,7 +292,7 @@ const BuyerSignup = () => {
               {otpError && <p className="text-xs text-red-600 font-semibold">{otpError}</p>}
               {generatedOtp && !mobileVerified && (
                 <p className="text-[11px] text-purple-800 bg-white p-2 rounded-xl border border-purple-200">
-                  💡 Demo Verification Code: <span className="font-bold font-mono text-black">{generatedOtp}</span>
+                  💡 Verification Code: <span className="font-bold font-mono text-black">{generatedOtp}</span>
                 </p>
               )}
             </div>
@@ -436,16 +427,29 @@ const BuyerSignup = () => {
               <span>3. Account Security & Preferences</span>
             </h3>
 
-            <div>
-              <label className="block text-xs font-bold text-gray-600 uppercase mb-1">Password *</label>
-              <input
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-gold text-xs"
-                placeholder="••••••••"
-              />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-bold text-gray-600 uppercase mb-1">Password *</label>
+                <input
+                  type="password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-gold text-xs"
+                  placeholder="Minimum 6 characters"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-gray-600 uppercase mb-1">Confirm Password *</label>
+                <input
+                  type="password"
+                  required
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-gold text-xs"
+                  placeholder="Re-enter password"
+                />
+              </div>
             </div>
 
             <label className="flex items-center space-x-3 cursor-pointer bg-cream/30 p-3 rounded-xl border border-gold/15">
@@ -463,13 +467,14 @@ const BuyerSignup = () => {
 
           <button
             type="submit"
-            className="w-full bg-maroon hover:bg-gold text-white font-bold py-4 rounded-full transition shadow-lg text-xs uppercase tracking-widest mt-6"
+            disabled={isLoading}
+            className="w-full bg-maroon hover:bg-gold text-white font-bold py-4 rounded-full transition shadow-lg text-xs uppercase tracking-widest mt-6 disabled:opacity-50"
           >
-            Create Verified Account
+            {isLoading ? 'Creating Account...' : 'Create Verified Account'}
           </button>
         </form>
 
-        <div className="text-center text-xs text-gray-500 pt-2">
+        <div className="text-center text-xs text-gray-500 pt-2 border-t border-gray-100">
           Already have an account?{' '}
           <Link to="/buyer-login" className="text-maroon font-bold hover:underline">
             Login Here

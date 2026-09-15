@@ -1,6 +1,14 @@
-import { signInWithPopup, signOut, onAuthStateChanged } from "firebase/auth";
+import { 
+  signInWithPopup, 
+  signOut, 
+  onAuthStateChanged,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  updateProfile
+} from "firebase/auth";
 import { auth, googleProvider } from "../config/firebase";
 import useAuthStore from "../store/useAuthStore";
+import UserService from "./UserService";
 import ActivityLogger from './ActivityLogger';
 
 class AuthService {
@@ -13,105 +21,178 @@ class AuthService {
   static OWNER_EMAIL = 'nandini.dhonde1@gmail.com';
 
   static init() {
-    // Restore session from LocalStorage first so refreshes never lose active login
-    const savedOwnerSession = JSON.parse(localStorage.getItem('indrani_owner_session') || 'null');
-    const savedLocalUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
-
-    if (savedOwnerSession) {
-      useAuthStore.getState().setAuth(savedOwnerSession, this.ROLES.OWNER);
-    } else if (savedLocalUser) {
-      useAuthStore.getState().setAuth(savedLocalUser, this.ROLES.BUYER);
-    } else {
-      useAuthStore.getState().setLoading(false);
-    }
-
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        const role = user.email === this.OWNER_EMAIL ? this.ROLES.OWNER : this.ROLES.BUYER;
-        
-        useAuthStore.getState().setAuth({
-          uid: user.uid,
-          name: user.displayName,
-          email: user.email,
-          photoURL: user.photoURL
-        }, role);
-
+    onAuthStateChanged(auth, async (firebaseUser) => {
+      if (firebaseUser) {
+        let profile = await UserService.getProfileByUid(firebaseUser.uid);
+        if (!profile) {
+          const rawName = firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'Valued Patron';
+          const nameParts = rawName.trim().split(' ');
+          profile = await UserService.createOrUpdateProfile({
+            uid: firebaseUser.uid,
+            email: firebaseUser.email || '',
+            name: rawName,
+            firstName: nameParts[0] || 'Patron',
+            lastName: nameParts.length > 1 ? nameParts.slice(1).join(' ') : '',
+            avatarUrl: firebaseUser.photoURL || '/assets/official_logo.jpg'
+          });
+        }
+        const role = firebaseUser.email === this.OWNER_EMAIL ? this.ROLES.OWNER : this.ROLES.BUYER;
+        useAuthStore.getState().setAuth(profile, role);
         if (role === this.ROLES.OWNER) {
-          ActivityLogger.log('Owner Session Restored', `${user.displayName} session resumed.`, user.displayName);
+          ActivityLogger.log('Owner Session Restored', `${profile.name} session resumed.`, profile.name);
         }
       } else {
-        // Only clear auth if no local session exists
-        const hasOwner = localStorage.getItem('indrani_owner_session');
-        const hasUser = localStorage.getItem('currentUser');
-        if (!hasOwner && !hasUser) {
-          useAuthStore.getState().clearAuth();
+        const savedOwnerSession = JSON.parse(localStorage.getItem('indrani_owner_session') || 'null');
+        if (savedOwnerSession) {
+          useAuthStore.getState().setAuth(savedOwnerSession, this.ROLES.OWNER);
         } else {
-          useAuthStore.getState().setLoading(false);
+          localStorage.removeItem('currentUser');
+          useAuthStore.getState().clearAuth();
         }
       }
     });
   }
 
+  static async registerWithEmailPassword(data) {
+    const {
+      email,
+      password,
+      firstName = '',
+      lastName = '',
+      phone = '',
+      altPhone = '',
+      gender = 'Female',
+      dob = '',
+      anniversaryDate = '',
+      street = '',
+      landmark = '',
+      pincode = '',
+      city = '',
+      state = '',
+      country = 'India',
+      deliveryInstructions = '',
+      marketingOptIn = true
+    } = data;
+
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      const fullName = `${firstName.trim()} ${lastName.trim()}`.trim();
+      if (fullName) {
+        await updateProfile(user, { displayName: fullName }).catch(() => {});
+      }
+
+      let primaryAddressStr = '';
+      let initialAddresses = [];
+      if (street || pincode) {
+        primaryAddressStr = `${street}${landmark ? ', ' + landmark : ''}${city ? ', ' + city : ''}${state ? ', ' + state : ''}${pincode ? ' - ' + pincode : ''}`;
+        initialAddresses = [{
+          id: 'addr_' + Date.now(),
+          label: 'Home',
+          street,
+          landmark,
+          pincode,
+          city,
+          state,
+          country: country || 'India',
+          deliveryInstructions,
+          isDefault: true
+        }];
+      }
+
+      const profileData = {
+        uid: user.uid,
+        auth_user_id: user.uid,
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
+        name: fullName || user.email.split('@')[0],
+        email: user.email,
+        phone: phone || '',
+        altPhone: altPhone || '',
+        gender: gender || 'Female',
+        dob: dob || '',
+        anniversaryDate: anniversaryDate || '',
+        marketingOptIn: marketingOptIn !== false,
+        avatarUrl: user.photoURL || '/assets/official_logo.jpg',
+        address: primaryAddressStr || 'No primary delivery address saved.',
+        deliveryInstructions: deliveryInstructions || '',
+        addresses: initialAddresses,
+        authProvider: 'Email / Password'
+      };
+
+      const profile = await UserService.createOrUpdateProfile(profileData);
+      const role = user.email === this.OWNER_EMAIL ? this.ROLES.OWNER : this.ROLES.BUYER;
+      useAuthStore.getState().setAuth(profile, role);
+
+      return { success: true, user: profile };
+    } catch (error) {
+      console.error("Firebase Email/Password Signup Error:", error);
+      return { success: false, error: this.getErrorMessage(error) };
+    }
+  }
+
+  static async loginWithEmailPassword(email, password) {
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      let profile = await UserService.getProfileByUid(user.uid);
+      if (!profile) {
+        const rawName = user.displayName || user.email.split('@')[0];
+        const nameParts = rawName.trim().split(' ');
+        profile = await UserService.createOrUpdateProfile({
+          uid: user.uid,
+          email: user.email,
+          name: rawName,
+          firstName: nameParts[0] || 'Patron',
+          lastName: nameParts.length > 1 ? nameParts.slice(1).join(' ') : '',
+          avatarUrl: user.photoURL || '/assets/official_logo.jpg',
+          authProvider: 'Email / Password'
+        });
+      }
+
+      const role = user.email === this.OWNER_EMAIL ? this.ROLES.OWNER : this.ROLES.BUYER;
+      useAuthStore.getState().setAuth(profile, role);
+
+      return { success: true, user: profile };
+    } catch (error) {
+      console.error("Firebase Email/Password Login Error:", error);
+      return { success: false, error: this.getErrorMessage(error) };
+    }
+  }
+
   static async loginBuyer() {
+    return this.loginWithGoogle();
+  }
+
+  static async loginWithGoogle() {
     try {
       const result = await signInWithPopup(auth, googleProvider);
       const user = result.user;
-      
+
+      let profile = await UserService.getProfileByUid(user.uid);
+      if (!profile) {
+        const rawName = user.displayName || user.email.split('@')[0];
+        const nameParts = rawName.trim().split(' ');
+        profile = await UserService.createOrUpdateProfile({
+          uid: user.uid,
+          email: user.email,
+          name: rawName,
+          firstName: nameParts[0] || 'Patron',
+          lastName: nameParts.length > 1 ? nameParts.slice(1).join(' ') : '',
+          avatarUrl: user.photoURL || '/assets/official_logo.jpg',
+          authProvider: 'Google SSO'
+        });
+      }
+
       const role = user.email === this.OWNER_EMAIL ? this.ROLES.OWNER : this.ROLES.BUYER;
-      
-      const userObj = {
-        uid: user.uid,
-        name: user.displayName || 'Google Royal Patron',
-        firstName: (user.displayName || 'Google Patron').split(' ')[0],
-        lastName: (user.displayName || 'Patron').split(' ').slice(1).join(' ') || 'Patron',
-        email: user.email,
-        photoURL: user.photoURL || '/assets/official_logo.jpg',
-        phone: '+91 9876543210',
-        mobileVerified: true,
-        emailVerified: true,
-        address: 'Flat 101, Silk Residency, FC Road, Pune, Maharashtra - 411004',
-        deliveryInstructions: 'Call before delivery'
-      };
+      useAuthStore.getState().setAuth(profile, role);
 
-      localStorage.setItem('currentUser', JSON.stringify(userObj));
-      useAuthStore.getState().setAuth(userObj, role);
-      
-      return { success: true, user: useAuthStore.getState().user };
+      return { success: true, user: profile };
     } catch (error) {
-      console.warn("Firebase Google Login popup error/fallback:", error);
-      if (error.code === 'auth/popup-closed-by-user') {
-        return { success: false, error: "Google login popup was closed. Please try again." };
-      }
-
-      // Prompt user for their Google email address so a fake email is NEVER used
-      const userEmail = prompt("Please enter your Google Email address to continue:", "");
-      if (!userEmail || !userEmail.trim() || !userEmail.includes('@')) {
-        return { success: false, error: "A valid email address is required to proceed with Google Login." };
-      }
-
-      const cleanEmail = userEmail.trim().toLowerCase();
-      const derivedName = cleanEmail.split('@')[0]
-        .replace(/[._]/g, ' ')
-        .replace(/\b\w/g, c => c.toUpperCase());
-
-      const userObj = {
-        uid: 'google_' + Date.now(),
-        name: derivedName,
-        firstName: derivedName.split(' ')[0] || 'User',
-        lastName: derivedName.split(' ').slice(1).join(' ') || 'Patron',
-        email: cleanEmail,
-        photoURL: '/assets/official_logo.jpg',
-        phone: '+91 9876543210',
-        mobileVerified: true,
-        emailVerified: true,
-        address: 'Flat 101, Silk Residency, FC Road, Pune, Maharashtra - 411004',
-        deliveryInstructions: 'Call before delivery'
-      };
-
-      const role = cleanEmail === this.OWNER_EMAIL ? this.ROLES.OWNER : this.ROLES.BUYER;
-      localStorage.setItem('currentUser', JSON.stringify(userObj));
-      useAuthStore.getState().setAuth(userObj, role);
-      return { success: true, user: userObj };
+      console.error("Firebase Google Login Error:", error);
+      return { success: false, error: this.getErrorMessage(error) };
     }
   }
 
@@ -119,19 +200,23 @@ class AuthService {
     try {
       const result = await signInWithPopup(auth, googleProvider);
       const user = result.user;
-      
+
       if (user.email === this.OWNER_EMAIL) {
-        const ownerObj = {
-          uid: user.uid,
-          name: user.displayName,
-          email: user.email,
-          photoURL: user.photoURL
-        };
-        localStorage.setItem('indrani_owner_session', JSON.stringify(ownerObj));
-        useAuthStore.getState().setAuth(ownerObj, this.ROLES.OWNER);
-        
+        let profile = await UserService.getProfileByUid(user.uid);
+        if (!profile) {
+          profile = await UserService.createOrUpdateProfile({
+            uid: user.uid,
+            name: user.displayName || 'Owner',
+            email: user.email,
+            avatarUrl: user.photoURL || '/assets/official_logo.jpg'
+          });
+        }
+
+        localStorage.setItem('indrani_owner_session', JSON.stringify(profile));
+        useAuthStore.getState().setAuth(profile, this.ROLES.OWNER);
+
         ActivityLogger.log('Owner Login', `${user.displayName} logged in via Google.`, user.displayName);
-        return { success: true, user: useAuthStore.getState().user };
+        return { success: true, user: profile };
       } else {
         await signOut(auth);
         useAuthStore.getState().clearAuth();
@@ -163,19 +248,35 @@ class AuthService {
   }
 
   static getErrorMessage(error) {
-    if (error.code === 'auth/popup-closed-by-user') {
-      return "Login popup was closed before completion. Please try again.";
+    if (!error) return "An unexpected error occurred.";
+    const code = error.code || '';
+    
+    switch (code) {
+      case 'auth/user-not-found':
+        return "Account not found. Please create an account first.";
+      case 'auth/wrong-password':
+        return "Incorrect password. Please try again.";
+      case 'auth/invalid-credential':
+        return "Account not found or invalid credentials. Please check your email and password.";
+      case 'auth/email-already-in-use':
+        return "An account with this email address already exists. Please login instead.";
+      case 'auth/weak-password':
+        return "Password should be at least 6 characters long.";
+      case 'auth/invalid-email':
+        return "Please enter a valid email address.";
+      case 'auth/popup-closed-by-user':
+        return "Google Sign-In popup was closed before completion. Please try again.";
+      case 'auth/popup-blocked':
+        return "Google Sign-In popup was blocked by your browser. Please allow popups for this site.";
+      case 'auth/unauthorized-domain':
+        return "This domain is not authorized for Google Sign-In. Please check Firebase configuration.";
+      case 'auth/network-request-failed':
+        return "Network error. Please check your internet connection.";
+      case 'auth/too-many-requests':
+        return "Too many failed attempts. Please try again later.";
+      default:
+        return error.message || "Authentication failed. Please check your details and try again.";
     }
-    if (error.code === 'auth/popup-blocked') {
-      return "Login popup was blocked by your browser. Please allow popups for this site.";
-    }
-    if (error.code === 'auth/unauthorized-domain') {
-      return "This domain is not authorized for Google Sign-In. Please check Firebase settings.";
-    }
-    if (error.code === 'auth/network-request-failed') {
-      return "Network error. Please check your internet connection.";
-    }
-    return error.message || "An unexpected authentication error occurred.";
   }
 }
 

@@ -1,132 +1,133 @@
 import useAuthStore from '../store/useAuthStore';
+import { auth } from '../config/firebase';
 
 class UserService {
-  static USERS_KEY = 'buyer_users';
+  static PROFILES_KEY = 'indrani_profiles_db';
   static CURRENT_USER_KEY = 'currentUser';
 
+  static _getProfilesDb() {
+    try {
+      return JSON.parse(localStorage.getItem(this.PROFILES_KEY) || '{}');
+    } catch (e) {
+      return {};
+    }
+  }
+
+  static _saveProfilesDb(db) {
+    localStorage.setItem(this.PROFILES_KEY, JSON.stringify(db));
+  }
+
   static _normalizeUserSchema(user) {
-    if (!user) return null;
-    const name = user.name || user.registeredName || 'Valued Client';
-    const nameParts = name.trim().split(' ');
-    
+    if (!user || !user.uid) return null;
+    const uid = user.uid;
+    const rawName = user.name || user.displayName || user.email?.split('@')[0] || 'Valued Patron';
+    const nameParts = rawName.trim().split(' ');
+    const firstName = user.firstName || nameParts[0] || 'Patron';
+    const lastName = user.lastName || (nameParts.length > 1 ? nameParts.slice(1).join(' ') : '');
+    const fullName = `${firstName} ${lastName}`.trim() || rawName;
+
     return {
-      ...user,
-      name,
-      firstName: user.firstName || nameParts[0] || 'Valued',
-      lastName: user.lastName || (nameParts.length > 1 ? nameParts.slice(1).join(' ') : 'Client'),
+      id: user.id || `profile_${uid}`,
+      auth_user_id: uid,
+      uid: uid,
+      firstName,
+      lastName,
+      name: fullName,
+      fullName: fullName,
       email: user.email || '',
-      phone: user.phone || '+91 9876543210',
+      phone: user.phone || 'Not added yet',
       altPhone: user.altPhone || '',
-      mobileVerified: user.mobileVerified !== false,
-      emailVerified: true,
-      gender: user.gender || 'Female',
+      mobileVerified: !!user.mobileVerified,
+      emailVerified: !!user.emailVerified,
+      gender: user.gender || 'Not specified',
       dob: user.dob || '',
       anniversaryDate: user.anniversaryDate || '',
       marketingOptIn: user.marketingOptIn !== false,
-      avatarUrl: user.avatarUrl || '/assets/official_logo.jpg',
-      address: user.address || 'Pune, Maharashtra - 411001',
-      deliveryInstructions: user.deliveryInstructions || 'Call before delivery',
-      addresses: Array.isArray(user.addresses) && user.addresses.length > 0 ? user.addresses : [
-        {
-          id: 'addr_default_1',
-          label: 'Home',
-          street: user.address || 'Flat 402, Royal Palms, MG Road',
-          landmark: '',
-          pincode: '411001',
-          city: 'Pune',
-          state: 'Maharashtra',
-          country: 'India',
-          deliveryInstructions: user.deliveryInstructions || 'Call before delivery',
-          isDefault: true
-        }
-      ],
-      connectedAuth: Array.isArray(user.connectedAuth) ? user.connectedAuth : ['Email / Password', 'Google SSO']
+      avatarUrl: user.avatarUrl || user.photoURL || '/assets/official_logo.jpg',
+      address: user.address || 'No saved address',
+      deliveryInstructions: user.deliveryInstructions || '',
+      addresses: Array.isArray(user.addresses) ? user.addresses : [],
+      authProvider: user.authProvider || (user.photoURL?.includes('google') ? 'Google SSO' : 'Email / Password'),
+      createdAt: user.createdAt || new Date().toISOString(),
+      lastLoginAt: new Date().toISOString()
     };
   }
 
-  static async getUsers() {
-    return new Promise((resolve) => {
-      let users = JSON.parse(localStorage.getItem(this.USERS_KEY) || '[]');
-      if (users.length === 0) {
-        users = [
-          this._normalizeUserSchema({
-            firstName: 'Priya',
-            lastName: 'Deshmukh',
-            name: 'Priya Deshmukh',
-            email: 'buyer@indranipaithani.com',
-            password: 'buyer123',
-            phone: '+91 9876543210',
-            altPhone: '+91 9822012345',
-            mobileVerified: true,
-            emailVerified: true,
-            age: 28,
-            gender: 'Female',
-            dob: '1996-05-14',
-            anniversaryDate: '2021-11-20',
-            marketingOptIn: true,
-            avatarUrl: '/assets/official_logo.jpg',
-            address: 'Flat 402, Royal Palms, MG Road, Pune, Maharashtra - 411001',
-            deliveryInstructions: 'Call before delivery'
-          })
-        ];
-        localStorage.setItem(this.USERS_KEY, JSON.stringify(users));
-      }
-      resolve(users.map(u => this._normalizeUserSchema(u)));
-    });
+  static async getProfileByUid(uid) {
+    if (!uid) return null;
+    const db = this._getProfilesDb();
+    if (db[uid]) {
+      return this._normalizeUserSchema(db[uid]);
+    }
+    return null;
   }
 
-  static async saveUsers(users) {
-    return new Promise((resolve) => {
-      localStorage.setItem(this.USERS_KEY, JSON.stringify(users));
-      resolve(users);
-    });
+  static async createOrUpdateProfile(profileData) {
+    if (!profileData || !profileData.uid) return null;
+    const uid = profileData.uid;
+    const db = this._getProfilesDb();
+    const existing = db[uid] || {};
+    const merged = { ...existing, ...profileData, uid, auth_user_id: uid };
+    const normalized = this._normalizeUserSchema(merged);
+    
+    db[uid] = normalized;
+    this._saveProfilesDb(db);
+    localStorage.setItem(this.CURRENT_USER_KEY, JSON.stringify(normalized));
+    
+    return normalized;
+  }
+
+  static async getUsers() {
+    const db = this._getProfilesDb();
+    return Object.values(db).map(p => this._normalizeUserSchema(p));
   }
 
   static async getCurrentUser() {
-    return new Promise((resolve) => {
-      const authUser = useAuthStore.getState().user;
+    const authStoreUser = useAuthStore.getState().user;
+    const firebaseUser = auth.currentUser;
+    const uid = authStoreUser?.uid || firebaseUser?.uid;
+
+    if (!uid) {
       const localProfile = JSON.parse(localStorage.getItem(this.CURRENT_USER_KEY) || 'null');
-      
-      if (!authUser && !localProfile) {
-        resolve(null);
-      } else if (!authUser) {
-        resolve(this._normalizeUserSchema(localProfile));
-      } else {
-        resolve(this._normalizeUserSchema({ ...authUser, ...localProfile }));
+      if (localProfile && localProfile.uid) {
+        return this._normalizeUserSchema(localProfile);
       }
-    });
+      return null;
+    }
+
+    const dbProfile = await this.getProfileByUid(uid);
+    if (dbProfile) {
+      return dbProfile;
+    }
+
+    // Create fresh profile if none exists for this UID
+    const baseInfo = {
+      uid,
+      email: authStoreUser?.email || firebaseUser?.email || '',
+      name: authStoreUser?.name || firebaseUser?.displayName || '',
+      avatarUrl: authStoreUser?.photoURL || firebaseUser?.photoURL || '/assets/official_logo.jpg'
+    };
+    return await this.createOrUpdateProfile(baseInfo);
   }
 
   static async updateCurrentUser(updates) {
-    return new Promise(async (resolve) => {
-      const current = (await this.getCurrentUser()) || { name: 'Valued Client', email: 'guest@example.com' };
+    const current = await this.getCurrentUser();
+    if (!current || !current.uid) {
+      throw new Error("No authenticated user active.");
+    }
 
-      const updatedUser = this._normalizeUserSchema({ ...current, ...updates });
-      
-      if (updates.firstName || updates.lastName) {
-        updatedUser.name = `${updatedUser.firstName || ''} ${updatedUser.lastName || ''}`.trim() || updatedUser.name;
-      }
-
-      localStorage.setItem(this.CURRENT_USER_KEY, JSON.stringify(updatedUser));
-
-      // Also update in auth store if logged in
-      const authUser = useAuthStore.getState().user;
-      if (authUser) {
-        useAuthStore.getState().setAuth({ ...authUser, ...updatedUser }, useAuthStore.getState().role);
-      }
-
-      // Also update in the users array
-      const users = await this.getUsers();
-      const userIndex = users.findIndex(u => u.email === updatedUser.email);
-      if (userIndex !== -1) {
-        users[userIndex] = { ...users[userIndex], ...updatedUser };
-      } else {
-        users.push(updatedUser);
-      }
-      await this.saveUsers(users);
-
-      resolve(updatedUser);
+    const updated = await this.createOrUpdateProfile({
+      ...current,
+      ...updates,
+      uid: current.uid
     });
+
+    const authUser = useAuthStore.getState().user;
+    if (authUser) {
+      useAuthStore.getState().setAuth({ ...authUser, ...updated }, useAuthStore.getState().role);
+    }
+
+    return updated;
   }
 
   // Address Management Methods
@@ -197,24 +198,12 @@ class UserService {
     const defaultAddr = filtered.find(a => a.isDefault);
     const newAddressStr = defaultAddr 
       ? `${defaultAddr.street}, ${defaultAddr.city}, ${defaultAddr.state} - ${defaultAddr.pincode}`
-      : '';
+      : 'No saved address';
 
     return await this.updateCurrentUser({
       addresses: filtered,
       address: newAddressStr
     });
-  }
-
-  // Change Password Helper
-  static async changePassword(currentPassword, newPassword) {
-    const user = await this.getCurrentUser();
-    if (!user) throw new Error("No active user session found.");
-
-    if (user.password && user.password !== currentPassword) {
-      throw new Error("Current password entered is incorrect.");
-    }
-
-    return await this.updateCurrentUser({ password: newPassword });
   }
 }
 

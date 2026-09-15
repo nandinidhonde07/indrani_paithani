@@ -5,7 +5,7 @@ import useAuthStore from '../store/useAuthStore';
 
 const OwnerLogin = () => {
   const [email, setEmail] = useState('nandini.dhonde1@gmail.com');
-  const [password, setPassword] = useState('admin123');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
@@ -18,32 +18,27 @@ const OwnerLogin = () => {
     }
   }, [isAuthenticated, role, navigate]);
 
-  const handleDirectOwnerLogin = (e) => {
+  const handleDirectOwnerLogin = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     setError(null);
 
-    // Verify owner credentials
-    const isOwnerEmail = email.toLowerCase() === AuthService.OWNER_EMAIL.toLowerCase() || email.toLowerCase() === 'owner@indranipaithani.com';
-    const isValidPassword = password === 'admin123' || password.length >= 6;
-
-    if (isOwnerEmail && isValidPassword) {
-      const ownerObj = {
-        uid: 'owner_' + Date.now(),
-        name: 'Nandini Dhonde (Owner)',
-        email: AuthService.OWNER_EMAIL
-      };
-      localStorage.setItem('indrani_owner_session', JSON.stringify(ownerObj));
-      useAuthStore.getState().setAuth(ownerObj, AuthService.ROLES.OWNER);
-
+    if (email.toLowerCase() !== AuthService.OWNER_EMAIL.toLowerCase()) {
       setIsLoading(false);
+      setError('Access Denied: Only the designated owner email address can access the Owner Portal.');
+      return;
+    }
+
+    const result = await AuthService.loginWithEmailPassword(email, password);
+    setIsLoading(false);
+
+    if (result.success && result.user.email === AuthService.OWNER_EMAIL) {
       navigate('/admin');
-    } else if (!isOwnerEmail) {
-      setIsLoading(false);
-      setError('Access Denied: Only designated owner email addresses can access the Owner Portal.');
+    } else if (result.success) {
+      await AuthService.logout();
+      setError('Access Denied: You are not authorized to access the Owner Portal.');
     } else {
-      setIsLoading(false);
-      setError('Invalid password. Default demo owner password is "admin123".');
+      setError(result.error);
     }
   };
 
@@ -61,19 +56,19 @@ const OwnerLogin = () => {
   };
 
   return (
-    <div className="bg-[#111111] min-h-screen flex items-center justify-center px-6 py-12">
+    <div className="bg-[#111111] min-h-screen flex items-center justify-center px-6 py-12 text-black">
       <div className="bg-white rounded-3xl p-8 md:p-12 shadow-premium max-w-md w-full border border-gold/10 space-y-6 relative overflow-hidden">
         {/* Decorative Top Border */}
         <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-maroon via-gold to-maroon"></div>
 
         <div className="text-center">
-          <img src="/assets/official_logo.jpg" alt="Indrani Paithani Logo" className="h-16 w-auto mx-auto mb-4 object-contain" />
-          <h1 className="text-3xl font-heading text-maroon">Owner Portal</h1>
+          <img src="/assets/official_logo.jpg" alt="Indrani Paithani Logo" className="h-16 w-auto mx-auto mb-4 object-contain rounded-full shadow-sm" />
+          <h1 className="text-3xl font-heading text-maroon font-bold">Owner Portal</h1>
           <p className="text-sm text-gray-500 font-light mt-2">Authorized Personnel Console</p>
         </div>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-xl text-xs text-center">
+          <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-xl text-xs text-center font-semibold leading-relaxed">
             {error}
           </div>
         )}
@@ -99,15 +94,16 @@ const OwnerLogin = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full px-4 py-2.5 border rounded-xl focus:outline-none focus:ring-2 focus:ring-maroon text-sm"
+              placeholder="••••••••"
             />
           </div>
 
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full bg-maroon hover:bg-gold text-white font-bold py-3 rounded-full transition shadow-md text-sm uppercase tracking-wider"
+            className="w-full bg-maroon hover:bg-gold text-white font-bold py-3 rounded-full transition shadow-md text-sm uppercase tracking-wider disabled:opacity-50"
           >
-            Access Owner Console
+            {isLoading ? 'Verifying...' : 'Access Owner Console'}
           </button>
         </form>
 

@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import AuthService from '../services/AuthService';
 import useAuthStore from '../store/useAuthStore';
-import UserService from '../services/UserService';
 
 const BuyerLogin = () => {
   const [email, setEmail] = useState('');
@@ -24,70 +23,20 @@ const BuyerLogin = () => {
     setError(null);
     setIsLoading(true);
 
-    let users = JSON.parse(localStorage.getItem('buyer_users') || '[]');
-    let matchedUser = users.find(u => u.email.toLowerCase() === email.toLowerCase() && u.password === password);
+    const result = await AuthService.loginWithEmailPassword(email, password);
+    setIsLoading(false);
 
-    // Fallback for default demo buyer account
-    if (!matchedUser && email.toLowerCase() === 'buyer@indranipaithani.com' && password === 'buyer123') {
-      matchedUser = {
-        firstName: 'Priya',
-        lastName: 'Deshmukh',
-        name: 'Priya Deshmukh',
-        email: 'buyer@indranipaithani.com',
-        password: 'buyer123',
-        phone: '+91 9876543210',
-        altPhone: '+91 9123456789',
-        mobileVerified: true,
-        emailVerified: true,
-        gender: 'Female',
-        dob: '1995-08-15',
-        anniversaryDate: '2020-11-25',
-        address: 'Flat 402, Royal Palms Apartment, MG Road, Pune, Maharashtra - 411001',
-        deliveryInstructions: 'Call before delivery / Leave with security at gate',
-        addresses: [
-          {
-            id: 'addr_demo_1',
-            label: 'Home',
-            street: 'Flat 402, Royal Palms Apartment, MG Road',
-            landmark: 'Near Central Park',
-            pincode: '411001',
-            city: 'Pune',
-            state: 'Maharashtra',
-            country: 'India',
-            deliveryInstructions: 'Call before delivery / Leave with security at gate',
-            isDefault: true
-          }
-        ]
-      };
-      users.push(matchedUser);
-      localStorage.setItem('buyer_users', JSON.stringify(users));
-    }
-
-    if (matchedUser) {
-      useAuthStore.getState().setAuth({
-        uid: 'user_' + Date.now(),
-        name: matchedUser.name,
-        email: matchedUser.email,
-        phone: matchedUser.phone,
-        mobileVerified: matchedUser.mobileVerified !== false,
-        age: matchedUser.age,
-        gender: matchedUser.gender,
-        address: matchedUser.address
-      }, 'buyer');
-
-      await UserService.updateCurrentUser(matchedUser);
-      setIsLoading(false);
+    if (result.success) {
       navigate('/buyer-dashboard');
     } else {
-      setIsLoading(false);
-      setError('Invalid email or password. Please check your credentials or create an account.');
+      setError(result.error);
     }
   };
 
   const handleGoogleLogin = async () => {
     setIsLoading(true);
     setError(null);
-    const result = await AuthService.loginBuyer();
+    const result = await AuthService.loginWithGoogle();
     setIsLoading(false);
     
     if (result.success) {
@@ -98,16 +47,16 @@ const BuyerLogin = () => {
   };
 
   return (
-    <div className="bg-cream min-h-screen flex items-center justify-center px-6 py-12">
+    <div className="bg-cream min-h-screen flex items-center justify-center px-6 py-12 text-black">
       <div className="bg-white rounded-3xl p-8 md:p-12 shadow-premium max-w-md w-full border border-gold/10 space-y-6">
         <div className="text-center">
-          <img src="/assets/official_logo.jpg" alt="Indrani Paithani Logo" className="h-16 w-auto mx-auto mb-4 object-contain" />
-          <h1 className="text-3xl font-heading text-maroon">Buyer Login</h1>
+          <img src="/assets/official_logo.jpg" alt="Indrani Paithani Logo" className="h-16 w-auto mx-auto mb-4 object-contain rounded-full shadow-sm" />
+          <h1 className="text-3xl font-heading text-maroon font-bold">Buyer Login</h1>
           <p className="text-sm text-gray-500 font-light mt-2">Access your royal orders & verified profile</p>
         </div>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-xl text-xs">
+          <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-xl text-xs font-semibold leading-relaxed">
             {error}
           </div>
         )}
@@ -168,20 +117,9 @@ const BuyerLogin = () => {
           >
             {isLoading ? 'Authenticating...' : 'Login with Email'}
           </button>
-
-          <button
-            type="button"
-            onClick={() => {
-              setEmail('buyer@indranipaithani.com');
-              setPassword('buyer123');
-            }}
-            className="w-full bg-cream/50 hover:bg-gold/20 text-maroon font-bold py-2 rounded-xl border border-gold/30 text-xs transition"
-          >
-            ⚡ Fill Demo Buyer Credentials (Priya Deshmukh)
-          </button>
         </form>
 
-        <div className="text-center text-xs text-gray-500 pt-2 border-t">
+        <div className="text-center text-xs text-gray-500 pt-2 border-t border-gray-100">
           New customer?{' '}
           <Link to="/buyer-signup" className="text-maroon font-bold hover:underline">
             Create Verified Account

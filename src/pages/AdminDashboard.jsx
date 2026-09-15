@@ -192,7 +192,15 @@ const AdminDashboard = () => {
   const totalRevenue = realOrders.reduce((acc, o) => acc + (o.grandTotal || 0), 0);
   const totalOrdersCount = realOrders.length;
   const productsInStockCount = products.reduce((acc, p) => acc + (parseInt(p.stock) || 0), 0);
-  const registeredUsers = JSON.parse(localStorage.getItem('buyer_users') || '[]');
+  const profilesDb = JSON.parse(localStorage.getItem('indrani_profiles_db') || '{}');
+  const registeredUsersFromProfiles = Object.values(profilesDb);
+  const registeredUsersFromLegacy = JSON.parse(localStorage.getItem('buyer_users') || '[]');
+  const registeredUsers = [...registeredUsersFromProfiles];
+  registeredUsersFromLegacy.forEach(u => {
+    if (!registeredUsers.some(p => (p.email && p.email.toLowerCase() === u.email?.toLowerCase()))) {
+      registeredUsers.push(u);
+    }
+  });
   const activeCustomersCount = registeredUsers.length;
   const lowStockProducts = products.filter(p => p.stock <= 3);
 
@@ -475,7 +483,15 @@ const AdminDashboard = () => {
                 </thead>
                 <tbody>
                   {(() => {
-                    const registeredUsers = JSON.parse(localStorage.getItem('buyer_users') || '[]');
+                    const profilesDb = JSON.parse(localStorage.getItem('indrani_profiles_db') || '{}');
+                    const registeredUsersFromProfiles = Object.values(profilesDb);
+                    const registeredUsersFromLegacy = JSON.parse(localStorage.getItem('buyer_users') || '[]');
+                    const registeredUsers = [...registeredUsersFromProfiles];
+                    registeredUsersFromLegacy.forEach(u => {
+                      if (!registeredUsers.some(p => (p.email && p.email.toLowerCase() === u.email?.toLowerCase()))) {
+                        registeredUsers.push(u);
+                      }
+                    });
 
                     if (registeredUsers.length === 0) {
                       return (
