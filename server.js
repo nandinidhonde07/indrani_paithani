@@ -2,12 +2,38 @@ import http from 'http';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { execSync } from 'child_process';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const PORT = process.env.PORT || 3000;
 const DIST_DIR = path.join(__dirname, 'dist');
+
+// Ensure dist bundle is up to date on server start
+const distIndexPath = path.join(DIST_DIR, 'index.html');
+const rootIndexPath = path.join(__dirname, 'index.html');
+
+try {
+  let needBuild = !fs.existsSync(distIndexPath);
+  if (!needBuild && fs.existsSync(rootIndexPath)) {
+    const rootContent = fs.readFileSync(rootIndexPath, 'utf8');
+    const distContent = fs.readFileSync(distIndexPath, 'utf8');
+    const rootVerMatch = rootContent.match(/build-version"\s+content="([^"]+)"/);
+    const distVerMatch = distContent.match(/build-version"\s+content="([^"]+)"/);
+    if (rootVerMatch && distVerMatch && rootVerMatch[1] !== distVerMatch[1]) {
+      console.log(`[Auto-Build] Version mismatch (Root: ${rootVerMatch[1]} vs Dist: ${distVerMatch[1]}). Rebuilding...`);
+      needBuild = true;
+    }
+  }
+  if (needBuild) {
+    console.log('[Auto-Build] Building production bundle via Vite...');
+    execSync('npx vite build', { stdio: 'inherit' });
+    console.log('[Auto-Build] Production bundle build complete!');
+  }
+} catch (err) {
+  console.warn('[Auto-Build Note]:', err.message);
+}
 
 const MIME_TYPES = {
   '.html': 'text/html; charset=utf-8',
