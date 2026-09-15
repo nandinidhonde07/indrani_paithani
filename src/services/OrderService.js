@@ -85,12 +85,15 @@ class OrderService {
     const orders = this._getOrders();
     const guestOrders = JSON.parse(localStorage.getItem('indrani_guest_order_ids') || '[]');
     
-    // Match orders by buyer email OR guest order IDs placed in this session
-    return orders.filter(o => 
-      (buyerEmail && o.buyerEmail && o.buyerEmail.toLowerCase() === buyerEmail.toLowerCase()) ||
-      guestOrders.includes(o.orderId) ||
-      (!buyerEmail || buyerEmail === 'guest@example.com')
-    ).sort((a, b) => new Date(b.orderDate) - new Date(a.orderDate));
+    if (buyerEmail && buyerEmail !== 'guest@example.com') {
+      return orders.filter(o => 
+        (o.buyerEmail && o.buyerEmail.toLowerCase() === buyerEmail.toLowerCase()) ||
+        guestOrders.includes(o.orderId)
+      ).sort((a, b) => new Date(b.orderDate) - new Date(a.orderDate));
+    }
+
+    return orders.filter(o => guestOrders.includes(o.orderId))
+      .sort((a, b) => new Date(b.orderDate) - new Date(a.orderDate));
   }
 
   /**

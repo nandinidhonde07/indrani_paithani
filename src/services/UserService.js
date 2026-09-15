@@ -14,7 +14,7 @@ class UserService {
       name,
       firstName: user.firstName || nameParts[0] || 'Valued',
       lastName: user.lastName || (nameParts.length > 1 ? nameParts.slice(1).join(' ') : 'Client'),
-      email: user.email || 'buyer@indranipaithani.com',
+      email: user.email || '',
       phone: user.phone || '+91 9876543210',
       altPhone: user.altPhone || '',
       mobileVerified: user.mobileVerified !== false,

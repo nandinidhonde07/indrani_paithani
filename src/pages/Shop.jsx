@@ -35,11 +35,11 @@ const Shop = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const stored = localStorage.getItem('products');
+    const stored = localStorage.getItem('products') || localStorage.getItem('indrani_products');
     if (stored) {
       setProducts(JSON.parse(stored));
     } else {
-      setProducts(productsData);
+      setProducts([]);
     }
 
     const timer = setTimeout(() => {
