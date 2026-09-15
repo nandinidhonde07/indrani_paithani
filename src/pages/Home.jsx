@@ -47,29 +47,33 @@ const Home = () => {
     { name: "Paithani Dupattas", image: "https://picsum.photos/seed/dupattas/500/600", path: "/shop?category=Paithani%20Dupattas" }
   ];
 
-  const testimonials = [
-    {
-      name: "Priya Deshmukh",
-      photo: "https://picsum.photos/seed/user_priya/100/100",
-      quote: "The saree is absolutely breathtaking. The pure gold zari work is incredibly fine and authentic. Highly recommended!",
-      rating: 5,
-      location: "Pune, Maharashtra"
-    },
-    {
-      name: "Aditi Kulkarni",
-      photo: "https://picsum.photos/seed/user_aditi/100/100",
-      quote: "Pure royal feels! Wore it for my daughter's wedding and got endless compliments. Customer support was wonderful.",
-      rating: 5,
-      location: "Mumbai, Maharashtra"
-    },
-    {
-      name: "Sneha Patil",
-      photo: "https://picsum.photos/seed/user_sneha/100/100",
-      quote: "Authentic weave direct from Yeola weavers. Uncompromising check, trust, and beautiful packing box.",
-      rating: 5,
-      location: "Nashik, Maharashtra"
+  const [testimonialsList, setTestimonialsList] = useState([]);
+  const [instaGallery, setInstaGallery] = useState([]);
+
+  useEffect(() => {
+    const savedTests = localStorage.getItem('indrani_testimonials');
+    if (savedTests) {
+      setTestimonialsList(JSON.parse(savedTests));
+    } else {
+      setTestimonialsList([
+        { author: "Ananya Deshmukh", location: "Mumbai", rating: 5, quote: "The Yeola Pure Silk Paithani I ordered for my wedding was breathtaking. Authentic zari and exquisite peacock pallu!" },
+        { author: "Sunita Joshi", location: "Pune", rating: 5, quote: "Prompt insured delivery and magnificent craftsmanship. Indrani Paithani is our family's trusted heritage store." },
+        { author: "Radhika Patil", location: "Nashik", rating: 5, quote: "The silk quality and rich zari borders exceeded my expectations. Truly heirloom quality!" }
+      ]);
     }
-  ];
+
+    const savedInsta = localStorage.getItem('indrani_instagram_posts');
+    if (savedInsta) {
+      setInstaGallery(JSON.parse(savedInsta));
+    } else {
+      setInstaGallery([
+        { image: "/assets/products/muniya_1.png", caption: "Handwoven gold zari motifs.", tag: "#IndraniPaithaniBride" },
+        { image: "/assets/products/lotus_swan_flat.png", caption: "Traditional Yeola Silk in vibrant emerald hue.", tag: "#YeolaPaithani" },
+        { image: "/assets/products/purple_parrot.png", caption: "Royal purple silk crafted for celebratory moments.", tag: "#LuxuryHandloom" },
+        { image: "/assets/products/muniya_2.png", caption: "Elegance woven in pure silk yarn.", tag: "#HeritageSarees" }
+      ]);
+    }
+  }, []);
 
   if (isCMSLoading || !homeData) return <div className="min-h-screen bg-cream flex items-center justify-center">Loading...</div>;
 
@@ -289,83 +293,97 @@ const Home = () => {
     </section>
   );
 
-  const renderTestimonials = () => (
-    <section key="testimonials" className="py-24 bg-white border-y border-gold/15">
-      <div className="container mx-auto px-6 max-w-3xl text-center space-y-8">
-        <h2 className="text-3xl md:text-4xl font-heading text-maroon tracking-wider">Patron Testimonials</h2>
-        <div className="relative min-h-[220px] flex items-center justify-center">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={activeTestimonial}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.3 }}
-              className="space-y-4"
-            >
-              <div className="text-gold text-lg">{"★".repeat(testimonials[activeTestimonial].rating)}</div>
-              <p className="text-gray-700 italic text-lg leading-relaxed">"{testimonials[activeTestimonial].quote}"</p>
-              <div className="flex items-center justify-center space-x-3 pt-4">
-                <img src={testimonials[activeTestimonial].photo} alt={testimonials[activeTestimonial].name} className="w-10 h-10 rounded-full object-cover" />
-                <div className="text-left">
-                  <h4 className="font-heading font-semibold text-maroon text-sm">{testimonials[activeTestimonial].name}</h4>
-                  <span className="text-[10px] text-gray-400 block">{testimonials[activeTestimonial].location}</span>
-                </div>
-              </div>
-            </motion.div>
-          </AnimatePresence>
-        </div>
-        <div className="flex justify-center space-x-2">
-          {testimonials.map((_, idx) => (
-            <button
-              key={idx}
-              onClick={() => setActiveTestimonial(idx)}
-              className={`w-2.5 h-2.5 rounded-full transition ${activeTestimonial === idx ? 'bg-maroon' : 'bg-gray-200'}`}
-            />
-          ))}
-        </div>
-      </div>
-    </section>
-  );
+  const renderTestimonials = () => {
+    const list = testimonialsList.length > 0 ? testimonialsList : [
+      { author: "Ananya Deshmukh", location: "Mumbai", rating: 5, quote: "The Yeola Pure Silk Paithani I ordered for my wedding was breathtaking. Authentic zari and exquisite peacock pallu!" }
+    ];
+    const currentTestimonial = list[activeTestimonial % list.length];
 
-  const renderLookbook = () => (
-    <section key="lookbook" className="py-24 bg-cream">
-      <div className="container mx-auto px-6 max-w-6xl text-center">
-        <h2 className="text-3xl font-heading text-maroon mb-16 tracking-widest">Instagram Lookbook</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {[
-            "https://picsum.photos/seed/insta1/500/500",
-            "https://picsum.photos/seed/insta2/500/600",
-            "https://picsum.photos/seed/insta3/500/400",
-            "https://picsum.photos/seed/insta4/500/550"
-          ].map((img, idx) => (
+    return (
+      <section key="testimonials" className="py-24 bg-white border-y border-gold/15">
+        <div className="container mx-auto px-6 max-w-3xl text-center space-y-8">
+          <h2 className="text-3xl md:text-4xl font-heading text-maroon tracking-wider">Patron Testimonials</h2>
+          <div className="relative min-h-[220px] flex items-center justify-center">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeTestimonial}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.3 }}
+                className="space-y-4"
+              >
+                <div className="text-gold text-lg">{"★".repeat(currentTestimonial.rating || 5)}</div>
+                <p className="text-gray-700 italic text-lg leading-relaxed">"{currentTestimonial.quote}"</p>
+                <div className="flex items-center justify-center space-x-3 pt-4">
+                  <div className="w-10 h-10 rounded-full bg-maroon text-gold flex items-center justify-center font-bold text-sm shadow-sm border border-gold">
+                    {(currentTestimonial.author || currentTestimonial.name || 'P')[0]}
+                  </div>
+                  <div className="text-left">
+                    <h4 className="font-heading font-semibold text-maroon text-sm">{currentTestimonial.author || currentTestimonial.name}</h4>
+                    <span className="text-[10px] text-gray-400 block">{currentTestimonial.location}</span>
+                  </div>
+                </div>
+              </motion.div>
+            </AnimatePresence>
+          </div>
+          <div className="flex justify-center space-x-2">
+            {list.map((_, idx) => (
+              <button
+                key={idx}
+                onClick={() => setActiveTestimonial(idx)}
+                className={`w-2.5 h-2.5 rounded-full transition ${activeTestimonial % list.length === idx ? 'bg-maroon' : 'bg-gray-200'}`}
+              />
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  };
+
+  const renderLookbook = () => {
+    const list = instaGallery.length > 0 ? instaGallery : [
+      { image: "/assets/products/muniya_1.png", caption: "Handwoven gold zari motifs.", tag: "#IndraniPaithaniBride" },
+      { image: "/assets/products/lotus_swan_flat.png", caption: "Traditional Yeola Silk in vibrant emerald hue.", tag: "#YeolaPaithani" },
+      { image: "/assets/products/purple_parrot.png", caption: "Royal purple silk crafted for celebratory moments.", tag: "#LuxuryHandloom" },
+      { image: "/assets/products/muniya_2.png", caption: "Elegance woven in pure silk yarn.", tag: "#HeritageSarees" }
+    ];
+
+    return (
+      <section key="lookbook" className="py-24 bg-cream">
+        <div className="container mx-auto px-6 max-w-6xl text-center">
+          <h2 className="text-3xl font-heading text-maroon mb-16 tracking-widest">Instagram Lookbook</h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {list.slice(0, 4).map((item, idx) => (
+              <a 
+                href="https://www.instagram.com/indranipaitani.yeola?utm_source=q"
+                target="_blank"
+                rel="noopener noreferrer"
+                key={idx} 
+                className="group relative rounded-2xl overflow-hidden shadow-premium aspect-square bg-white border border-gold/15 block"
+              >
+                <img src={item.image || "https://picsum.photos/seed/insta1/500/500"} alt={item.caption || "Insta"} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                <div className="absolute inset-0 bg-maroon/40 opacity-0 group-hover:opacity-100 transition duration-300 flex flex-col items-center justify-center p-3 text-center">
+                  <span className="text-gold font-bold text-xs">{item.tag || '#IndraniPaithani'}</span>
+                  <span className="text-white text-[11px] font-medium truncate mt-1">{item.caption}</span>
+                </div>
+              </a>
+            ))}
+          </div>
+          <div className="mt-12">
             <a 
               href="https://www.instagram.com/indranipaitani.yeola?utm_source=q"
               target="_blank"
               rel="noopener noreferrer"
-              key={idx} 
-              className="group relative rounded-2xl overflow-hidden shadow-premium aspect-square bg-white border border-gold/15 block"
+              className="inline-block border border-maroon text-maroon font-semibold px-10 py-3 rounded-full hover:bg-maroon hover:text-white transition duration-300 shadow-sm text-xs uppercase tracking-widest"
             >
-              <img src={img} alt="Insta" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
-              <div className="absolute inset-0 bg-maroon/40 opacity-0 group-hover:opacity-100 transition duration-300 flex items-center justify-center">
-                <span className="text-white text-xs tracking-wider uppercase font-semibold">View On Instagram</span>
-              </div>
+              View on Instagram
             </a>
-          ))}
+          </div>
         </div>
-        <div className="mt-12">
-          <a 
-            href="https://www.instagram.com/indranipaitani.yeola?utm_source=q"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-block border border-maroon text-maroon font-semibold px-10 py-3 rounded-full hover:bg-maroon hover:text-white transition duration-300 shadow-sm text-xs uppercase tracking-widest"
-          >
-            View on Instagram
-          </a>
-        </div>
-      </div>
-    </section>
-  );
+      </section>
+    );
+  };
 
   const sectionMap = {
     hero: renderHero,
