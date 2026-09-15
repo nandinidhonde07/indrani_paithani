@@ -244,27 +244,27 @@ const Navbar = ({ isScrolled, isTransparentInit }) => {
               <div 
                 ref={authDropdownRef} 
                 className="relative flex items-center h-full"
-                onMouseEnter={() => setShowAuthDropdown(true)}
               >
                 <button
                   type="button"
                   onClick={() => setShowAuthDropdown(prev => !prev)}
-                  className={`${iconClass} relative flex items-center space-x-1 p-2 rounded-full focus:outline-none`}
+                  className={`${iconClass} relative flex items-center space-x-1.5 px-3 py-1.5 rounded-full border border-gold/30 hover:border-gold focus:outline-none transition bg-cream/20`}
                   title="Account Options"
                   aria-label="User Account Options"
                 >
                   {isAuthenticated && user?.photoURL ? (
-                    <img src={user.photoURL} alt="Profile" className="w-6 h-6 rounded-full border border-gold object-cover" />
+                    <img src={user.photoURL} alt="Profile" className="w-5 h-5 rounded-full border border-gold object-cover" />
                   ) : (
-                    <FiUser size={20} />
+                    <FiUser size={16} />
                   )}
-                  {isAuthenticated && (
-                    <span className="w-2.5 h-2.5 rounded-full bg-green-500 absolute top-0 right-0 border-2 border-white"></span>
-                  )}
+                  <span className="text-[11px] font-semibold tracking-wider hidden sm:inline-block">
+                    {isAuthenticated ? (user?.name?.split(' ')[0] || 'Account') : 'Account'}
+                  </span>
+                  <FaChevronDown size={8} className={`transition-transform duration-300 ${showAuthDropdown ? 'rotate-180' : ''}`} />
                 </button>
 
                 {showAuthDropdown && (
-                  <div className="absolute right-0 top-full pt-1 w-64 z-50 text-[#111111] animate-fade-in before:content-[''] before:absolute before:-top-4 before:left-0 before:right-0 before:h-5">
+                  <div className="absolute right-0 top-full mt-2 w-64 z-50 text-[#111111] animate-fade-in">
                     <div className="bg-white border border-gold/30 shadow-2xl rounded-2xl p-3">
                       {isAuthenticated ? (
                         <div className="space-y-1">
