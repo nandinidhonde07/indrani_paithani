@@ -171,9 +171,54 @@ const AdminDashboard = () => {
     }
   };
 
-  // Calculate Overview Stats
+  // Calculate Real Overview Stats (Strictly website data, 0 demo seeds)
   const totalRevenue = orders.reduce((acc, o) => acc + (o.grandTotal || 0), 0);
+  const totalProductsInStock = products.reduce((acc, p) => acc + (parseInt(p.stock) || 0), 0);
   const lowStockProducts = products.filter(p => p.stock <= 3);
+
+  // Real Customers strictly from website buyers and registered users (No demo data)
+  const getRealCustomers = () => {
+    const registeredUsers = JSON.parse(localStorage.getItem('buyer_users') || '[]');
+    const customerMap = new Map();
+
+    registeredUsers.forEach(u => {
+      const key = u.email ? u.email.toLowerCase() : u.phone;
+      if (key) {
+        customerMap.set(key, {
+          name: u.name || `${u.firstName || ''} ${u.lastName || ''}`.trim() || 'Valued Patron',
+          email: u.email || 'N/A',
+          phone: u.phone || 'N/A',
+          altPhone: u.altPhone || '',
+          gender: u.gender || 'Female',
+          dob: u.dob || '',
+          anniversaryDate: u.anniversaryDate || '',
+          address: u.address || (u.addresses && u.addresses[0] ? `${u.addresses[0].street}, ${u.addresses[0].city}` : 'No address saved'),
+          deliveryInstructions: u.deliveryInstructions || ''
+        });
+      }
+    });
+
+    orders.forEach(o => {
+      const key = o.buyerEmail ? o.buyerEmail.toLowerCase() : o.phone;
+      if (key && !customerMap.has(key)) {
+        customerMap.set(key, {
+          name: o.buyerName || 'Valued Patron',
+          email: o.buyerEmail || 'N/A',
+          phone: o.phone || 'N/A',
+          altPhone: o.altPhone || '',
+          gender: 'Female',
+          dob: '',
+          anniversaryDate: '',
+          address: o.shippingAddress || 'N/A',
+          deliveryInstructions: o.deliveryInstructions || ''
+        });
+      }
+    });
+
+    return Array.from(customerMap.values());
+  };
+
+  const realCustomers = getRealCustomers();
 
   return (
     <div className="min-h-screen bg-cream flex flex-col md:flex-row text-black items-start">
@@ -238,7 +283,7 @@ const AdminDashboard = () => {
               <div className="bg-white p-6 rounded-2xl shadow-premium border border-gold/15 space-y-1">
                 <span className="text-xs text-gray-500 font-bold uppercase tracking-wider">Total Sales Revenue</span>
                 <p className="text-3xl font-bold font-heading text-maroon">₹{totalRevenue.toLocaleString('en-IN')}</p>
-                <span className="text-[10px] text-green-600 font-bold block">✓ From {orders.length} Royal Orders</span>
+                <span className="text-[10px] text-green-600 font-bold block">✓ Real Website Revenue</span>
               </div>
               <div className="bg-white p-6 rounded-2xl shadow-premium border border-gold/15 space-y-1">
                 <span className="text-xs text-gray-500 font-bold uppercase tracking-wider">Total Live Orders</span>
@@ -246,14 +291,14 @@ const AdminDashboard = () => {
                 <span className="text-[10px] text-blue-600 font-bold block">{orders.filter(o => o.status === 'Order Confirmed' || o.status === 'Preparing Your Paithani').length} Pending Dispatch</span>
               </div>
               <div className="bg-white p-6 rounded-2xl shadow-premium border border-gold/15 space-y-1">
-                <span className="text-xs text-gray-500 font-bold uppercase tracking-wider">Catalog Sarees</span>
-                <p className="text-3xl font-bold font-heading text-maroon">{products.length}</p>
-                <span className="text-[10px] text-purple-600 font-bold block">{categories.length} Active Categories</span>
+                <span className="text-xs text-gray-500 font-bold uppercase tracking-wider">Products In Stock</span>
+                <p className="text-3xl font-bold font-heading text-maroon">{totalProductsInStock}</p>
+                <span className="text-[10px] text-purple-600 font-bold block">{products.length} Catalog Items</span>
               </div>
               <div className="bg-white p-6 rounded-2xl shadow-premium border border-gold/15 space-y-1">
-                <span className="text-xs text-gray-500 font-bold uppercase tracking-wider">Low Stock Warning</span>
-                <p className="text-3xl font-bold font-heading text-red-600">{lowStockProducts.length}</p>
-                <span className="text-[10px] text-red-500 font-bold block">{lowStockProducts.length > 0 ? 'Requires Instant Restock' : 'Stock Levels Healthy'}</span>
+                <span className="text-xs text-gray-500 font-bold uppercase tracking-wider">Active Customers</span>
+                <p className="text-3xl font-bold font-heading text-maroon">{realCustomers.length}</p>
+                <span className="text-[10px] text-amber-600 font-bold block">Real Patrons & Buyers</span>
               </div>
             </div>
 
@@ -453,20 +498,17 @@ const AdminDashboard = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {(() => {
-                    const registeredUsers = JSON.parse(localStorage.getItem('buyer_users') || '[]');
-                    const demoFallbackUsers = [
-                      { name: 'Priya Deshmukh', email: 'priya@gmail.com', phone: '+91 9876543210', altPhone: '+91 9123456789', gender: 'Female', dob: '1995-08-15', anniversaryDate: '2020-11-25', address: 'Flat 402, Royal Palms Apartment, MG Road, Pune, Maharashtra - 411001', deliveryInstructions: 'Call before delivery / Leave with security at gate' },
-                      { name: 'Aditi Kulkarni', email: 'aditi@gmail.com', phone: '+91 9822012345', altPhone: 'Not provided', gender: 'Female', dob: '1992-04-20', anniversaryDate: '2018-05-12', address: 'Plot 12, Baner Highway, Pune, Maharashtra - 411045', deliveryInstructions: 'Ring bell twice upon delivery' },
-                      { name: 'Sneha Patil', email: 'sneha@gmail.com', phone: '+91 9765432109', altPhone: '+91 9890123456', gender: 'Female', dob: '1998-11-05', anniversaryDate: 'Not specified', address: 'Yeola Handloom Hub, Nashik, Maharashtra - 422401', deliveryInstructions: 'Standard courier delivery' }
-                    ];
-
-                    const displayList = registeredUsers.length > 0 ? registeredUsers : demoFallbackUsers;
-
-                    return displayList.map((cust, idx) => (
+                  {realCustomers.length === 0 ? (
+                    <tr>
+                      <td colSpan="5" className="py-8 text-center text-gray-500 text-xs font-medium">
+                        No active customer records found. Customer profiles will automatically populate here as patrons register or place real orders on your website.
+                      </td>
+                    </tr>
+                  ) : (
+                    realCustomers.map((cust, idx) => (
                       <tr key={idx} className="border-b border-gray-100 last:border-0 hover:bg-cream/20 transition">
                         <td className="py-3 font-semibold text-maroon">
-                          <div className="font-bold text-sm text-black">{cust.name || `${cust.firstName || ''} ${cust.lastName || ''}`.trim() || 'Valued Patron'}</div>
+                          <div className="font-bold text-sm text-black">{cust.name || 'Valued Patron'}</div>
                           <div className="text-[11px] text-gray-500 font-normal">{cust.email}</div>
                         </td>
                         <td className="py-3">
@@ -478,7 +520,7 @@ const AdminDashboard = () => {
                           {cust.dob && <div className="text-[10px] text-gray-400">DOB: {cust.dob}</div>}
                         </td>
                         <td className="py-3 text-gray-600 max-w-xs truncate">
-                          {cust.address || (cust.addresses && cust.addresses[0] ? `${cust.addresses[0].street}, ${cust.addresses[0].city}` : 'No address saved')}
+                          {cust.address}
                         </td>
                         <td className="py-3 text-right">
                           <button
@@ -489,8 +531,8 @@ const AdminDashboard = () => {
                           </button>
                         </td>
                       </tr>
-                    ));
-                  })()}
+                    ))
+                  )}
                 </tbody>
               </table>
             </div>

@@ -11,64 +11,11 @@ const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 class OrderService {
   constructor() {
     this.storageKey = 'indrani_orders';
-    // Initialize with default demo orders if empty
-    if (!localStorage.getItem(this.storageKey) || JSON.parse(localStorage.getItem(this.storageKey) || '[]').length === 0) {
-      const defaultSeedOrders = [
-        {
-          orderId: 'ORD-892401',
-          buyerEmail: 'priya@gmail.com',
-          buyerName: 'Priya Deshmukh',
-          phone: '+91 9876543210',
-          altPhone: '+91 9123456789',
-          shippingAddress: 'Flat 402, Royal Palms Apartment, MG Road, Pune, Maharashtra - 411001',
-          pincode: '411001',
-          deliveryInstructions: 'Call before delivery / Leave with security at gate',
-          orderDate: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-          estimatedDelivery: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(),
-          status: 'Order Confirmed',
-          paymentMethod: 'Instant UPI (VPA: priya@okaxis)',
-          paymentStatus: 'Paid (Verified UPI)',
-          subtotal: 28500,
-          gst: 1425,
-          shipping: 0,
-          grandTotal: 29925,
-          items: [
-            { id: '1', name: 'Royal Maharani Kath Pure Silk Paithani', price: 28500, quantity: 1, image: '/assets/products/muniya_1.png' }
-          ],
-          timeline: [
-            { status: 'Order Confirmed', date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(), message: 'Order placed successfully by client.' }
-          ]
-        },
-        {
-          orderId: 'ORD-761204',
-          buyerEmail: 'aditi@gmail.com',
-          buyerName: 'Aditi Kulkarni',
-          phone: '+91 9822012345',
-          altPhone: 'Not provided',
-          shippingAddress: 'Plot 12, Baner Highway, Pune, Maharashtra - 411045',
-          pincode: '411045',
-          deliveryInstructions: 'Ring bell twice upon delivery',
-          orderDate: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
-          estimatedDelivery: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000).toISOString(),
-          status: 'Shipped',
-          trackingNumber: 'BD78945612IN',
-          courier: 'BlueDart Express',
-          paymentMethod: 'Razorpay (Online Paid)',
-          paymentStatus: 'Paid (Razorpay)',
-          subtotal: 42000,
-          gst: 2100,
-          shipping: 0,
-          grandTotal: 44100,
-          items: [
-            { id: '2', name: 'Yeola Handloom Silk Swan Paithani', price: 42000, quantity: 1, image: '/assets/products/lotus_swan_flat.png' }
-          ],
-          timeline: [
-            { status: 'Order Confirmed', date: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(), message: 'Order placed.' },
-            { status: 'Shipped', date: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(), message: 'Shipped via BlueDart Express (BD78945612IN)' }
-          ]
-        }
-      ];
-      localStorage.setItem(this.storageKey, JSON.stringify(defaultSeedOrders));
+    // Purge demo orders if legacy seed exists
+    const isDemoCleared = localStorage.getItem('indrani_orders_cleared_v1');
+    if (!isDemoCleared) {
+      localStorage.setItem(this.storageKey, JSON.stringify([]));
+      localStorage.setItem('indrani_orders_cleared_v1', 'true');
     }
   }
 
