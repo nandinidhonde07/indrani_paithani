@@ -5,34 +5,40 @@ class CMSService {
 
   static async getContent() {
     return new Promise((resolve) => {
-      const storedStr = localStorage.getItem(this.CMS_KEY);
-      if (storedStr) {
-        const stored = JSON.parse(storedStr);
-        // Shallow merge top-level sections to ensure new fields in defaultSiteContent are available
-        const merged = { ...defaultSiteContent };
-        for (const key in stored) {
-          if (merged[key]) {
-            merged[key] = { ...merged[key], ...stored[key] };
-          } else {
-            merged[key] = stored[key];
+      try {
+        const storedStr = localStorage.getItem(this.CMS_KEY);
+        if (storedStr) {
+          const stored = JSON.parse(storedStr);
+          // Shallow merge top-level sections to ensure new fields in defaultSiteContent are available
+          const merged = { ...defaultSiteContent };
+          for (const key in stored) {
+            if (merged[key]) {
+              merged[key] = { ...merged[key], ...stored[key] };
+            } else {
+              merged[key] = stored[key];
+            }
           }
-        }
-        
-        // Ensure new hero fields are populated if they were missing or undefined in the old storage
-        if (!stored.home?.heroTitle || stored.home?.heroTitle === "INDRANI PAITHANI") {
-           merged.home.heroTitle = defaultSiteContent.home.heroTitle;
-           merged.home.heroSubtitle = defaultSiteContent.home.heroSubtitle;
-           merged.home.heroBadge = defaultSiteContent.home.heroBadge;
-           merged.home.heroLabel = defaultSiteContent.home.heroLabel;
-        }
+          
+          // Ensure new hero fields are populated if they were missing or undefined in the old storage
+          if (!stored.home?.heroTitle || stored.home?.heroTitle === "INDRANI PAITHANI") {
+             merged.home.heroTitle = defaultSiteContent.home.heroTitle;
+             merged.home.heroSubtitle = defaultSiteContent.home.heroSubtitle;
+             merged.home.heroBadge = defaultSiteContent.home.heroBadge;
+             merged.home.heroLabel = defaultSiteContent.home.heroLabel;
+          }
 
-        // Force update the hero image to bypass browser/CDN cache
-        if (merged.home && (merged.home.heroImage === '/assets/homepage_bg.jpg' || !merged.home.heroImage)) {
-           merged.home.heroImage = '/assets/homepage_bg_v2.jpg';
-        }
+          // Force update the hero image to bypass browser/CDN cache
+          if (merged.home && (merged.home.heroImage === '/assets/homepage_bg.jpg' || !merged.home.heroImage)) {
+             merged.home.heroImage = '/assets/homepage_bg_v2.jpg';
+          }
 
-        resolve(merged);
-      } else {
+          resolve(merged);
+        } else {
+          localStorage.setItem(this.CMS_KEY, JSON.stringify(defaultSiteContent));
+          resolve(defaultSiteContent);
+        }
+      } catch (err) {
+        console.warn("CMS Service load notice - fallback to defaultSiteContent:", err);
         localStorage.setItem(this.CMS_KEY, JSON.stringify(defaultSiteContent));
         resolve(defaultSiteContent);
       }

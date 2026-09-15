@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiChevronDown } from 'react-icons/fi';
 import productsData from '../data/products.json';
+import defaultSiteContent from '../data/defaultSiteContent.json';
 import useAppStore from '../store/useAppStore.js';
 
 const Home = () => {
@@ -14,8 +15,8 @@ const Home = () => {
   const [customers, setCustomers] = useState(0);
   const [designs, setDesigns] = useState(0);
 
-  const { cmsContent, isCMSLoading } = useAppStore();
-  const homeData = cmsContent?.home;
+  const { cmsContent } = useAppStore();
+  const homeData = (cmsContent && cmsContent.home) ? cmsContent.home : defaultSiteContent.home;
 
   useEffect(() => {
     setBestSellers(productsData.filter(p => p.bestSeller));
@@ -74,8 +75,6 @@ const Home = () => {
       ]);
     }
   }, []);
-
-  if (isCMSLoading || !homeData) return <div className="min-h-screen bg-cream flex items-center justify-center">Loading...</div>;
 
   const renderHero = () => (
     <section key="hero" className="relative h-screen w-full flex items-center overflow-hidden bg-[#0E0E0E]">
