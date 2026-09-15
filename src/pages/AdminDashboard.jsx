@@ -251,24 +251,131 @@ const AdminDashboard = () => {
                 <thead>
                   <tr className="border-b border-gray-200 text-gray-500">
                     <th className="py-2">Name</th>
-                    <th className="py-2">Email</th>
-                    <th className="py-2">Orders Count</th>
+                    <th className="py-2">Contact Details</th>
+                    <th className="py-2">Gender & DOB</th>
+                    <th className="py-2">Default Address</th>
+                    <th className="py-2 text-center">Status</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {[
-                    { name: 'Priya Deshmukh', email: 'priya@gmail.com', count: 2 },
-                    { name: 'Aditi Kulkarni', email: 'aditi@gmail.com', count: 1 },
-                    { name: 'Sneha Patil', email: 'sneha@gmail.com', count: 3 }
-                  ].map((cust, idx) => (
-                    <tr key={idx} className="border-b border-gray-100 last:border-0">
-                      <td className="py-3 font-medium">{cust.name}</td>
-                      <td className="py-3">{cust.email}</td>
-                      <td className="py-3">{cust.count}</td>
-                    </tr>
-                  ))}
+                  {(() => {
+                    const registeredUsers = JSON.parse(localStorage.getItem('buyer_users') || '[]');
+                    const demoFallbackUsers = [
+                      { name: 'Priya Deshmukh', email: 'priya@gmail.com', phone: '+91 9876543210', altPhone: '+91 9123456789', gender: 'Female', dob: '1995-08-15', address: 'Flat 402, Royal Palms Apartment, MG Road, Pune, Maharashtra - 411001', mobileVerified: true },
+                      { name: 'Aditi Kulkarni', email: 'aditi@gmail.com', phone: '+91 9822012345', altPhone: 'Not provided', gender: 'Female', dob: '1992-04-20', address: 'Plot 12, Baner Highway, Pune, Maharashtra - 411045', mobileVerified: true },
+                      { name: 'Sneha Patil', email: 'sneha@gmail.com', phone: '+91 9765432109', altPhone: '+91 9890123456', gender: 'Female', dob: '1998-11-05', address: 'Yeola Handloom Hub, Nashik, Maharashtra - 422401', mobileVerified: true }
+                    ];
+
+                    const displayList = registeredUsers.length > 0 ? registeredUsers : demoFallbackUsers;
+
+                    return displayList.map((cust, idx) => (
+                      <tr key={idx} className="border-b border-gray-100 last:border-0 hover:bg-cream/10 transition">
+                        <td className="py-3 font-semibold text-maroon">
+                          <div>{cust.name || `${cust.firstName || ''} ${cust.lastName || ''}`.trim() || 'Valued Patron'}</div>
+                          <div className="text-[11px] text-gray-400 font-normal">{cust.email}</div>
+                        </td>
+                        <td className="py-3 text-xs">
+                          <div><span className="font-semibold text-gray-700">Primary:</span> {cust.phone || 'N/A'}</div>
+                          {cust.altPhone && <div className="text-[11px] text-gray-500"><span className="font-semibold">Alt:</span> {cust.altPhone}</div>}
+                        </td>
+                        <td className="py-3 text-xs text-gray-600">
+                          <div>{cust.gender || 'Not specified'}</div>
+                          {cust.dob && <div className="text-[11px] text-gray-400">DOB: {cust.dob}</div>}
+                        </td>
+                        <td className="py-3 text-xs text-gray-600 max-w-xs truncate">
+                          {cust.address || (cust.addresses && cust.addresses[0] ? `${cust.addresses[0].street}, ${cust.addresses[0].city}` : 'No address saved')}
+                        </td>
+                        <td className="py-3 text-center">
+                          <span className="bg-green-100 text-green-700 text-[10px] font-bold px-2.5 py-1 rounded-full uppercase">
+                            ✓ Verified Patron
+                          </span>
+                        </td>
+                      </tr>
+                    ));
+                  })()}
                 </tbody>
               </table>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'categories' && (
+          <div className="space-y-8">
+            <h2 className="text-3xl font-heading text-maroon">Categories & Collections Management</h2>
+            <div className="bg-white rounded-2xl p-6 shadow-premium border border-gold/10 space-y-4">
+              <h3 className="text-lg font-heading text-maroon font-bold border-b pb-2">Active Store Categories ({categories.length})</h3>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                {categories.map((cat, idx) => (
+                  <div key={idx} className="p-4 rounded-xl border border-gold/20 bg-cream/20 flex justify-between items-center text-xs font-bold text-maroon">
+                    <span>{cat}</span>
+                    <span className="text-[10px] bg-maroon text-gold px-2 py-0.5 rounded-full uppercase">Active</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'testimonials' && (
+          <div className="space-y-8">
+            <h2 className="text-3xl font-heading text-maroon">Patron Testimonials & Stories</h2>
+            <div className="bg-white rounded-2xl p-6 shadow-premium border border-gold/10 space-y-4">
+              <p className="text-sm text-gray-600">Curate luxury reviews and royal patron stories displayed on the homepage.</p>
+              <div className="space-y-3">
+                {[
+                  { author: "Ananya Deshmukh", location: "Mumbai", quote: "The Yeola Pure Silk Paithani I ordered for my wedding was breathtaking. Authentic zari and exquisite peacock pallu!" },
+                  { author: "Sunita Joshi", location: "Pune", quote: "Prompt insured delivery and magnificent craftsmanship. Indrani Paithani is our family's trusted heritage store." }
+                ].map((t, i) => (
+                  <div key={i} className="p-4 bg-cream/20 rounded-xl border border-gold/15 space-y-1 text-xs">
+                    <p className="font-bold text-maroon">"{t.quote}"</p>
+                    <p className="text-gray-500 font-semibold">— {t.author}, {t.location}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'instagram' && (
+          <div className="space-y-8">
+            <h2 className="text-3xl font-heading text-maroon">Instagram Social Gallery</h2>
+            <div className="bg-white rounded-2xl p-6 shadow-premium border border-gold/10 space-y-4 text-xs">
+              <p className="text-gray-600">Manage live Instagram feed handles and tagged royal patron posts.</p>
+              <div className="p-4 bg-cream/30 rounded-xl border border-gold/20 font-mono text-maroon">
+                Handle: @indranipaithani_official | Tag: #IndraniPaithaniBride
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'banners' && (
+          <div className="space-y-8">
+            <h2 className="text-3xl font-heading text-maroon">Hero Banners & Announcement Bars</h2>
+            <div className="bg-white rounded-2xl p-6 shadow-premium border border-gold/10 space-y-4 text-xs">
+              <div className="p-4 bg-gold/10 rounded-xl border border-gold/30 text-maroon space-y-1">
+                <span className="font-bold block uppercase text-[10px]">Active Top Announcement Bar:</span>
+                <span className="font-semibold text-sm">✨ 100% Silk Mark Certified Handloom Yeola Paithani Sarees | Free Insured Shipping Across India</span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'settings' && (
+          <div className="space-y-8">
+            <h2 className="text-3xl font-heading text-maroon">Store Settings & Owner Credentials</h2>
+            <div className="bg-white rounded-2xl p-6 shadow-premium border border-gold/10 space-y-4 text-xs max-w-xl">
+              <div>
+                <label className="block font-bold text-gray-600 uppercase mb-1">Owner Email</label>
+                <input type="text" readOnly value="nandini.dhonde1@gmail.com" className="w-full px-4 py-2 border rounded-xl bg-gray-50 font-mono" />
+              </div>
+              <div>
+                <label className="block font-bold text-gray-600 uppercase mb-1">Store Helpline / WhatsApp</label>
+                <input type="text" readOnly value="+91 7507755836" className="w-full px-4 py-2 border rounded-xl bg-gray-50 font-mono" />
+              </div>
+              <div>
+                <label className="block font-bold text-gray-600 uppercase mb-1">Default GST Percentage</label>
+                <input type="text" readOnly value="5% (Saree & Textiles)" className="w-full px-4 py-2 border rounded-xl bg-gray-50 font-semibold" />
+              </div>
             </div>
           </div>
         )}

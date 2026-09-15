@@ -30,14 +30,34 @@ const BuyerLogin = () => {
     // Fallback for default demo buyer account
     if (!matchedUser && email.toLowerCase() === 'buyer@indranipaithani.com' && password === 'buyer123') {
       matchedUser = {
+        firstName: 'Priya',
+        lastName: 'Deshmukh',
         name: 'Priya Deshmukh',
         email: 'buyer@indranipaithani.com',
         password: 'buyer123',
         phone: '+91 9876543210',
+        altPhone: '+91 9123456789',
         mobileVerified: true,
-        age: 28,
+        emailVerified: true,
         gender: 'Female',
-        address: 'Flat 402, Royal Palms, MG Road, Pune, Maharashtra - 411001'
+        dob: '1995-08-15',
+        anniversaryDate: '2020-11-25',
+        address: 'Flat 402, Royal Palms Apartment, MG Road, Pune, Maharashtra - 411001',
+        deliveryInstructions: 'Call before delivery / Leave with security at gate',
+        addresses: [
+          {
+            id: 'addr_demo_1',
+            label: 'Home',
+            street: 'Flat 402, Royal Palms Apartment, MG Road',
+            landmark: 'Near Central Park',
+            pincode: '411001',
+            city: 'Pune',
+            state: 'Maharashtra',
+            country: 'India',
+            deliveryInstructions: 'Call before delivery / Leave with security at gate',
+            isDefault: true
+          }
+        ]
       };
       users.push(matchedUser);
       localStorage.setItem('buyer_users', JSON.stringify(users));

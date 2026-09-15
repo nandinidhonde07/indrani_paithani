@@ -24,7 +24,10 @@ const OwnerLogin = () => {
     setError(null);
 
     // Verify owner credentials
-    if (email.toLowerCase() === AuthService.OWNER_EMAIL.toLowerCase() || email.toLowerCase() === 'owner@indranipaithani.com') {
+    const isOwnerEmail = email.toLowerCase() === AuthService.OWNER_EMAIL.toLowerCase() || email.toLowerCase() === 'owner@indranipaithani.com';
+    const isValidPassword = password === 'admin123' || password.length >= 6;
+
+    if (isOwnerEmail && isValidPassword) {
       useAuthStore.getState().setAuth({
         uid: 'owner_' + Date.now(),
         name: 'Nandini Dhonde (Owner)',
@@ -33,9 +36,12 @@ const OwnerLogin = () => {
 
       setIsLoading(false);
       navigate('/admin');
+    } else if (!isOwnerEmail) {
+      setIsLoading(false);
+      setError('Access Denied: Only designated owner email addresses can access the Owner Portal.');
     } else {
       setIsLoading(false);
-      setError('Access Denied: Only designated owner emails can access the Owner Portal.');
+      setError('Invalid password. Default demo owner password is "admin123".');
     }
   };
 
