@@ -241,7 +241,11 @@ const Navbar = ({ isScrolled, isTransparentInit }) => {
               </button>
 
               {/* User portal */}
-              <div ref={authDropdownRef} className="relative flex items-center h-full">
+              <div 
+                ref={authDropdownRef} 
+                className="relative flex items-center h-full"
+                onMouseEnter={() => setShowAuthDropdown(true)}
+              >
                 <button
                   type="button"
                   onClick={() => setShowAuthDropdown(prev => !prev)}
@@ -260,76 +264,78 @@ const Navbar = ({ isScrolled, isTransparentInit }) => {
                 </button>
 
                 {showAuthDropdown && (
-                  <div className="absolute right-0 top-full mt-2 w-60 bg-white border border-gold/30 shadow-2xl rounded-2xl p-3 z-50 text-[#111111] animate-fade-in">
-                    {isAuthenticated ? (
-                      <div className="space-y-1">
-                        <div className="px-4 py-2 border-b border-gray-100 bg-cream/40 rounded-xl mb-2">
-                          <p className="text-xs font-bold text-maroon truncate">{user?.name || 'Valued Client'}</p>
-                          <p className="text-[10px] text-gray-500 truncate">{user?.email}</p>
-                        </div>
-                        <Link
-                          to="/buyer-dashboard"
-                          onClick={() => setShowAuthDropdown(false)}
-                          className="flex items-center space-x-2.5 px-4 py-2.5 hover:bg-cream rounded-xl text-xs font-semibold text-gray-800 transition"
-                        >
-                          <span className="text-sm">📦</span>
-                          <span>My Orders & Profile</span>
-                        </Link>
-                        {role === 'owner' && (
+                  <div className="absolute right-0 top-full pt-1 w-64 z-50 text-[#111111] animate-fade-in before:content-[''] before:absolute before:-top-4 before:left-0 before:right-0 before:h-5">
+                    <div className="bg-white border border-gold/30 shadow-2xl rounded-2xl p-3">
+                      {isAuthenticated ? (
+                        <div className="space-y-1">
+                          <div className="px-4 py-2 border-b border-gray-100 bg-cream/40 rounded-xl mb-2">
+                            <p className="text-xs font-bold text-maroon truncate">{user?.name || 'Valued Client'}</p>
+                            <p className="text-[10px] text-gray-500 truncate">{user?.email}</p>
+                          </div>
                           <Link
-                            to="/admin"
+                            to="/buyer-dashboard"
                             onClick={() => setShowAuthDropdown(false)}
-                            className="flex items-center space-x-2.5 px-4 py-2.5 hover:bg-amber-50 rounded-xl text-xs font-bold text-maroon transition"
+                            className="flex items-center space-x-2.5 px-4 py-2.5 hover:bg-cream rounded-xl text-xs font-semibold text-gray-800 transition"
+                          >
+                            <span className="text-sm">📦</span>
+                            <span>My Orders & Profile</span>
+                          </Link>
+                          {role === 'owner' && (
+                            <Link
+                              to="/admin"
+                              onClick={() => setShowAuthDropdown(false)}
+                              className="flex items-center space-x-2.5 px-4 py-2.5 hover:bg-amber-50 rounded-xl text-xs font-bold text-maroon transition"
+                            >
+                              <span className="text-sm">👑</span>
+                              <span>Owner Console</span>
+                            </Link>
+                          )}
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setShowAuthDropdown(false);
+                              AuthService.logout();
+                              navigate('/buyer-login');
+                            }}
+                            className="w-full flex items-center space-x-2.5 text-left px-4 py-2.5 hover:bg-red-50 text-red-600 rounded-xl text-xs font-semibold transition border-t border-gray-100 mt-2"
+                          >
+                            <span className="text-sm">🚪</span>
+                            <span>Logout</span>
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="space-y-1">
+                          <div className="px-3 py-1 text-[10px] uppercase tracking-wider text-gray-400 font-bold border-b border-gray-100 mb-1">
+                            Account Portal
+                          </div>
+                          <Link
+                            to="/buyer-login"
+                            onClick={() => setShowAuthDropdown(false)}
+                            className="flex items-center space-x-2.5 px-4 py-2.5 hover:bg-cream rounded-xl text-xs font-semibold text-gray-800 transition"
+                          >
+                            <span className="text-sm">🔑</span>
+                            <span>Buyer Login</span>
+                          </Link>
+                          <Link
+                            to="/buyer-signup"
+                            onClick={() => setShowAuthDropdown(false)}
+                            className="flex items-center space-x-2.5 px-4 py-2.5 hover:bg-cream rounded-xl text-xs font-bold text-maroon transition"
+                          >
+                            <span className="text-sm">📝</span>
+                            <span>Register / Create Account</span>
+                          </Link>
+                          <div className="border-t border-gray-100 my-1"></div>
+                          <Link
+                            to="/owner-login"
+                            onClick={() => setShowAuthDropdown(false)}
+                            className="flex items-center space-x-2.5 px-4 py-2.5 hover:bg-amber-50 rounded-xl text-xs font-bold text-gold transition"
                           >
                             <span className="text-sm">👑</span>
-                            <span>Owner Console</span>
+                            <span>Owner Portal Login</span>
                           </Link>
-                        )}
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setShowAuthDropdown(false);
-                            AuthService.logout();
-                            navigate('/buyer-login');
-                          }}
-                          className="w-full flex items-center space-x-2.5 text-left px-4 py-2.5 hover:bg-red-50 text-red-600 rounded-xl text-xs font-semibold transition border-t border-gray-100 mt-2"
-                        >
-                          <span className="text-sm">🚪</span>
-                          <span>Logout</span>
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="space-y-1">
-                        <div className="px-3 py-1 text-[10px] uppercase tracking-wider text-gray-400 font-bold border-b border-gray-100 mb-1">
-                          Account Portal
                         </div>
-                        <Link
-                          to="/buyer-login"
-                          onClick={() => setShowAuthDropdown(false)}
-                          className="flex items-center space-x-2.5 px-4 py-2.5 hover:bg-cream rounded-xl text-xs font-semibold text-gray-800 transition"
-                        >
-                          <span className="text-sm">🔑</span>
-                          <span>Buyer Login</span>
-                        </Link>
-                        <Link
-                          to="/buyer-signup"
-                          onClick={() => setShowAuthDropdown(false)}
-                          className="flex items-center space-x-2.5 px-4 py-2.5 hover:bg-cream rounded-xl text-xs font-bold text-maroon transition"
-                        >
-                          <span className="text-sm">📝</span>
-                          <span>Register / Create Account</span>
-                        </Link>
-                        <div className="border-t border-gray-100 my-1"></div>
-                        <Link
-                          to="/owner-login"
-                          onClick={() => setShowAuthDropdown(false)}
-                          className="flex items-center space-x-2.5 px-4 py-2.5 hover:bg-amber-50 rounded-xl text-xs font-bold text-gold transition"
-                        >
-                          <span className="text-sm">👑</span>
-                          <span>Owner Portal Login</span>
-                        </Link>
-                      </div>
-                    )}
+                      )}
+                    </div>
                   </div>
                 )}
               </div>
