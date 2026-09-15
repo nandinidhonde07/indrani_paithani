@@ -244,6 +244,8 @@ const Navbar = ({ isScrolled, isTransparentInit }) => {
               <div 
                 ref={authDropdownRef} 
                 className="relative flex items-center h-full"
+                onMouseEnter={() => setShowAuthDropdown(true)}
+                onMouseLeave={() => setShowAuthDropdown(false)}
               >
                 <button
                   type="button"
@@ -264,7 +266,7 @@ const Navbar = ({ isScrolled, isTransparentInit }) => {
                 </button>
 
                 {showAuthDropdown && (
-                  <div className="absolute right-0 top-full mt-2 w-64 z-50 text-[#111111] animate-fade-in">
+                  <div className="absolute right-0 top-full pt-2 w-64 z-50 text-[#111111] animate-fade-in before:content-[''] before:absolute before:-top-4 before:left-0 before:right-0 before:h-6">
                     <div className="bg-white border border-gold/30 shadow-2xl rounded-2xl p-3">
                       {isAuthenticated ? (
                         <div className="space-y-1">
