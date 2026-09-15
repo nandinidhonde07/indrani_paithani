@@ -112,51 +112,13 @@ const BuyerLogin = () => {
           </div>
         )}
 
-        <form onSubmit={handleEmailLogin} className="space-y-4">
-          <div>
-            <label className="block text-xs font-bold text-gray-500 uppercase mb-2">Email Address</label>
-            <input
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-2.5 border rounded-xl focus:outline-none focus:ring-2 focus:ring-gold text-sm"
-              placeholder="name@domain.com"
-            />
-          </div>
-
-          <div>
-            <label className="block text-xs font-bold text-gray-500 uppercase mb-2">Password</label>
-            <input
-              type="password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-2.5 border rounded-xl focus:outline-none focus:ring-2 focus:ring-gold text-sm"
-              placeholder="••••••••"
-            />
-          </div>
-
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="w-full bg-maroon hover:bg-gold text-white font-semibold py-3 rounded-full transition shadow-md text-sm uppercase tracking-wider disabled:opacity-50"
-          >
-            {isLoading ? 'Authenticating...' : 'Login with Email'}
-          </button>
-        </form>
-
-        <div className="relative flex py-2 items-center">
-          <div className="flex-grow border-t border-gray-200"></div>
-          <span className="flex-shrink mx-4 text-xs text-gray-400 font-semibold uppercase">Or Continue With</span>
-          <div className="flex-grow border-t border-gray-200"></div>
-        </div>
-
+        {/* 1-Tap Google Login */}
         <div>
           <button
+            type="button"
             onClick={handleGoogleLogin}
             disabled={isLoading}
-            className="w-full bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-semibold py-3 px-4 rounded-full transition shadow-sm flex items-center justify-center space-x-3 disabled:opacity-50 text-sm"
+            className="w-full bg-white border-2 border-gray-200 hover:border-gold hover:bg-gray-50 text-gray-800 font-bold py-3.5 px-4 rounded-full transition shadow-sm flex items-center justify-center space-x-3 disabled:opacity-50 text-xs uppercase tracking-wider"
           >
             <svg viewBox="0 0 24 24" className="h-5 w-5" xmlns="http://www.w3.org/2000/svg">
               <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
@@ -164,11 +126,62 @@ const BuyerLogin = () => {
               <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
               <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
             </svg>
-            <span>Continue with Google</span>
+            <span>{isLoading ? 'Connecting...' : 'Continue with Google'}</span>
           </button>
         </div>
 
-        <div className="text-center text-xs text-gray-500 pt-2">
+        <div className="relative flex py-1 items-center">
+          <div className="flex-grow border-t border-gray-200"></div>
+          <span className="flex-shrink mx-4 text-[10px] text-gray-400 font-bold uppercase tracking-wider">Or Login with Credentials</span>
+          <div className="flex-grow border-t border-gray-200"></div>
+        </div>
+
+        <form onSubmit={handleEmailLogin} className="space-y-4">
+          <div>
+            <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Email Address</label>
+            <input
+              type="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full px-4 py-2.5 border rounded-xl focus:outline-none focus:ring-2 focus:ring-gold text-xs"
+              placeholder="name@domain.com"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Password</label>
+            <input
+              type="password"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full px-4 py-2.5 border rounded-xl focus:outline-none focus:ring-2 focus:ring-gold text-xs"
+              placeholder="••••••••"
+            />
+          </div>
+
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="w-full bg-maroon hover:bg-gold text-white font-bold py-3.5 rounded-full transition shadow-md text-xs uppercase tracking-wider disabled:opacity-50"
+          >
+            {isLoading ? 'Authenticating...' : 'Login with Email'}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              setEmail('buyer@indranipaithani.com');
+              setPassword('buyer123');
+            }}
+            className="w-full bg-cream/50 hover:bg-gold/20 text-maroon font-bold py-2 rounded-xl border border-gold/30 text-xs transition"
+          >
+            ⚡ Fill Demo Buyer Credentials (Priya Deshmukh)
+          </button>
+        </form>
+
+        <div className="text-center text-xs text-gray-500 pt-2 border-t">
           New customer?{' '}
           <Link to="/buyer-signup" className="text-maroon font-bold hover:underline">
             Create Verified Account
