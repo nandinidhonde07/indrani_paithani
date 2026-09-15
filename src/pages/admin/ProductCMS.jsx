@@ -30,14 +30,25 @@ const ProductCMS = () => {
   const [formData, setFormData] = useState(emptyForm);
 
   useEffect(() => {
-    const localProds = localStorage.getItem('products');
-    if (localProds) {
-      setProducts(JSON.parse(localProds));
+    const isCleared = localStorage.getItem('indrani_catalog_cleared_v1');
+    if (!isCleared) {
+      localStorage.setItem('products', JSON.stringify([]));
+      localStorage.setItem('indrani_products', JSON.stringify([]));
+      localStorage.setItem('indrani_catalog_cleared_v1', 'true');
+      setProducts([]);
     } else {
-      localStorage.setItem('products', JSON.stringify(productsData));
-      setProducts(productsData);
+      const localProds = localStorage.getItem('products');
+      setProducts(localProds ? JSON.parse(localProds) : []);
     }
   }, []);
+
+  const handleClearAllProducts = () => {
+    if (window.confirm('⚠️ Are you sure you want to remove ALL products completely from your store catalog?')) {
+      localStorage.setItem('products', JSON.stringify([]));
+      localStorage.setItem('indrani_products', JSON.stringify([]));
+      setProducts([]);
+    }
+  };
 
   const handleSave = (e) => {
     e.preventDefault();
@@ -65,6 +76,7 @@ const ProductCMS = () => {
     }
 
     localStorage.setItem('products', JSON.stringify(updatedProducts));
+    localStorage.setItem('indrani_products', JSON.stringify(updatedProducts));
     setProducts(updatedProducts);
     setIsFormOpen(false);
     setEditingProduct(null);
@@ -88,6 +100,7 @@ const ProductCMS = () => {
     if (window.confirm('Delete this product permanently?')) {
       const updated = products.filter(p => p.id !== id);
       localStorage.setItem('products', JSON.stringify(updated));
+      localStorage.setItem('indrani_products', JSON.stringify(updated));
       setProducts(updated);
     }
   };
@@ -96,6 +109,7 @@ const ProductCMS = () => {
     const duplicate = { ...product, id: `PROD_${Date.now()}`, name: `${product.name} (Copy)` };
     const updated = [duplicate, ...products];
     localStorage.setItem('products', JSON.stringify(updated));
+    localStorage.setItem('indrani_products', JSON.stringify(updated));
     setProducts(updated);
   };
 
@@ -112,17 +126,29 @@ const ProductCMS = () => {
     <div className="space-y-8 animate-fade-in">
       <div className="border-b border-gold/20 pb-4 flex justify-between items-end">
         <div>
-          <h2 className="text-3xl font-heading text-maroon">Product CMS</h2>
+          <h2 className="text-3xl font-heading text-maroon font-bold">Product CMS</h2>
           <p className="text-sm text-gray-500 font-light mt-1">Manage your entire inventory, pricing, and galleries.</p>
         </div>
         {!isFormOpen && (
-          <button 
-            onClick={() => { setFormData(emptyForm); setEditingProduct(null); setIsFormOpen(true); }}
-            className="bg-maroon hover:bg-gold text-white font-semibold py-2 px-6 rounded-full transition flex items-center space-x-2"
-          >
-            <FaPlus size={12} />
-            <span>Add New Product</span>
-          </button>
+          <div className="flex items-center space-x-3">
+            {products.length > 0 && (
+              <button 
+                onClick={handleClearAllProducts}
+                className="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-5 rounded-full transition flex items-center space-x-2 text-xs"
+                title="Remove all products from catalog"
+              >
+                <FaTrash size={12} />
+                <span>Remove All Products</span>
+              </button>
+            )}
+            <button 
+              onClick={() => { setFormData(emptyForm); setEditingProduct(null); setIsFormOpen(true); }}
+              className="bg-maroon hover:bg-gold text-white font-semibold py-2 px-6 rounded-full transition flex items-center space-x-2 text-xs"
+            >
+              <FaPlus size={12} />
+              <span>Add New Product</span>
+            </button>
+          </div>
         )}
       </div>
 
@@ -210,6 +236,19 @@ const ProductCMS = () => {
             <button type="submit" className="px-8 py-2 bg-maroon text-white rounded-full hover:bg-gold font-medium shadow-md transition">Save Product</button>
           </div>
         </form>
+      ) : products.length === 0 ? (
+        <div className="bg-white rounded-2xl p-12 text-center shadow-premium border border-gold/15 space-y-4 animate-fade-in">
+          <div className="w-16 h-16 bg-red-50 text-maroon rounded-full flex items-center justify-center mx-auto text-2xl font-bold shadow-inner">👗</div>
+          <h3 className="text-xl font-heading text-maroon font-bold">No Products Found in Catalog</h3>
+          <p className="text-sm text-gray-500 max-w-md mx-auto">All products have been completely removed from the Owner section. Click below to add your first product.</p>
+          <button 
+            onClick={() => { setFormData(emptyForm); setEditingProduct(null); setIsFormOpen(true); }}
+            className="bg-maroon hover:bg-gold text-white font-semibold py-2.5 px-6 rounded-full transition inline-flex items-center space-x-2 text-xs shadow-md"
+          >
+            <FaPlus size={12} />
+            <span>Add New Product</span>
+          </button>
+        </div>
       ) : (
         <div className="bg-white rounded-2xl shadow-premium border border-gold/10 overflow-hidden">
           <div className="overflow-x-auto">

@@ -10,10 +10,18 @@ class ProductService {
       if (stored) {
         resolve(JSON.parse(stored));
       } else {
-        localStorage.setItem(this.KEY, JSON.stringify(productsData));
-        resolve(productsData);
+        localStorage.setItem(this.KEY, JSON.stringify([]));
+        localStorage.setItem('products', JSON.stringify([]));
+        resolve([]);
       }
     });
+  }
+
+  static async clearAllProducts() {
+    localStorage.setItem(this.KEY, JSON.stringify([]));
+    localStorage.setItem('products', JSON.stringify([]));
+    ActivityLogger.log('All Products Cleared', 'Owner completely removed all products from catalog');
+    return [];
   }
 
   static async getProductById(id) {
@@ -36,6 +44,7 @@ class ProductService {
     }
 
     localStorage.setItem(this.KEY, JSON.stringify(updated));
+    localStorage.setItem('products', JSON.stringify(updated));
     return updated;
   }
 
@@ -44,6 +53,7 @@ class ProductService {
     const product = products.find(p => p.id === id);
     const updated = products.filter(p => p.id !== id);
     localStorage.setItem(this.KEY, JSON.stringify(updated));
+    localStorage.setItem('products', JSON.stringify(updated));
     if (product) {
        ActivityLogger.log('Product Deleted', `Deleted product: ${product.name}`);
     }

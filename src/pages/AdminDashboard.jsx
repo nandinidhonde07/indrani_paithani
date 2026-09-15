@@ -78,11 +78,15 @@ const AdminDashboard = () => {
   // Load Data
   const loadDashboardData = async () => {
     // Load Products
-    const localProds = localStorage.getItem('products');
-    if (localProds) setProducts(JSON.parse(localProds));
-    else {
-      localStorage.setItem('products', JSON.stringify(productsData));
-      setProducts(productsData);
+    const isCleared = localStorage.getItem('indrani_catalog_cleared_v1');
+    if (!isCleared) {
+      localStorage.setItem('products', JSON.stringify([]));
+      localStorage.setItem('indrani_products', JSON.stringify([]));
+      localStorage.setItem('indrani_catalog_cleared_v1', 'true');
+      setProducts([]);
+    } else {
+      const localProds = localStorage.getItem('products');
+      setProducts(localProds ? JSON.parse(localProds) : []);
     }
 
     // Load Orders
