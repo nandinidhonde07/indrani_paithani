@@ -26,6 +26,7 @@ const Navbar = ({ isScrolled, isTransparentInit }) => {
 
   const navigate = useNavigate();
   const searchRef = useRef(null);
+  const authDropdownRef = useRef(null);
 
   useEffect(() => {
     if (search.trim().length > 1) {
@@ -44,9 +45,16 @@ const Navbar = ({ isScrolled, isTransparentInit }) => {
       if (searchRef.current && !searchRef.current.contains(event.target)) {
         setSuggestions([]);
       }
+      if (authDropdownRef.current && !authDropdownRef.current.contains(event.target)) {
+        setShowAuthDropdown(false);
+      }
     };
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener("touchstart", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("touchstart", handleClickOutside);
+    };
   }, []);
 
   const handleSearchSubmit = (e) => {
@@ -233,58 +241,94 @@ const Navbar = ({ isScrolled, isTransparentInit }) => {
               </button>
 
               {/* User portal */}
-              <div
-                className="relative flex items-center h-full"
-                onMouseEnter={() => setShowAuthDropdown(true)}
-                onMouseLeave={() => setShowAuthDropdown(false)}
-              >
-                <button onClick={() => setShowAuthDropdown(!showAuthDropdown)} className={`${iconClass} relative flex items-center space-x-1`}>
+              <div ref={authDropdownRef} className="relative flex items-center h-full">
+                <button
+                  type="button"
+                  onClick={() => setShowAuthDropdown(prev => !prev)}
+                  className={`${iconClass} relative flex items-center space-x-1 p-2 rounded-full focus:outline-none`}
+                  title="Account Options"
+                  aria-label="User Account Options"
+                >
                   {isAuthenticated && user?.photoURL ? (
-                    <img src={user.photoURL} alt="Profile" className="w-5 h-5 rounded-full border border-gold" />
+                    <img src={user.photoURL} alt="Profile" className="w-6 h-6 rounded-full border border-gold object-cover" />
                   ) : (
-                    <FiUser size={18} />
+                    <FiUser size={20} />
                   )}
                   {isAuthenticated && (
-                    <span className="w-2 h-2 rounded-full bg-green-500 absolute -top-1 -right-1 border border-white"></span>
+                    <span className="w-2.5 h-2.5 rounded-full bg-green-500 absolute top-0 right-0 border-2 border-white"></span>
                   )}
                 </button>
 
                 {showAuthDropdown && (
-                  <div className="absolute right-0 top-full mt-2 w-52 bg-white border border-[#E5E5E5] shadow-2xl rounded-2xl p-2 z-50 text-[#111111]">
+                  <div className="absolute right-0 top-full mt-2 w-60 bg-white border border-gold/30 shadow-2xl rounded-2xl p-3 z-50 text-[#111111] animate-fade-in">
                     {isAuthenticated ? (
-                      <>
-                        <div className="px-4 py-2 border-b border-gray-100">
+                      <div className="space-y-1">
+                        <div className="px-4 py-2 border-b border-gray-100 bg-cream/40 rounded-xl mb-2">
                           <p className="text-xs font-bold text-maroon truncate">{user?.name || 'Valued Client'}</p>
-                          <p className="text-[10px] text-gray-400 truncate">{user?.email}</p>
+                          <p className="text-[10px] text-gray-500 truncate">{user?.email}</p>
                         </div>
-                        <Link to="/buyer-dashboard" onClick={() => setShowAuthDropdown(false)} className="block px-4 py-2 hover:bg-[#F9F9F9] rounded-lg text-xs font-semibold text-gray-700">
-                          📦 My Orders & Profile
+                        <Link
+                          to="/buyer-dashboard"
+                          onClick={() => setShowAuthDropdown(false)}
+                          className="flex items-center space-x-2.5 px-4 py-2.5 hover:bg-cream rounded-xl text-xs font-semibold text-gray-800 transition"
+                        >
+                          <span className="text-sm">📦</span>
+                          <span>My Orders & Profile</span>
                         </Link>
                         {role === 'owner' && (
-                          <Link to="/admin" onClick={() => setShowAuthDropdown(false)} className="block px-4 py-2 hover:bg-[#F9F9F9] rounded-lg text-xs font-semibold text-gold font-bold">
-                            👑 Owner Console
+                          <Link
+                            to="/admin"
+                            onClick={() => setShowAuthDropdown(false)}
+                            className="flex items-center space-x-2.5 px-4 py-2.5 hover:bg-amber-50 rounded-xl text-xs font-bold text-maroon transition"
+                          >
+                            <span className="text-sm">👑</span>
+                            <span>Owner Console</span>
                           </Link>
                         )}
                         <button
+                          type="button"
                           onClick={() => {
                             setShowAuthDropdown(false);
                             AuthService.logout();
                             navigate('/buyer-login');
                           }}
-                          className="w-full text-left px-4 py-2 hover:bg-red-50 text-red-600 rounded-lg text-xs font-semibold mt-1 border-t border-gray-100"
+                          className="w-full flex items-center space-x-2.5 text-left px-4 py-2.5 hover:bg-red-50 text-red-600 rounded-xl text-xs font-semibold transition border-t border-gray-100 mt-2"
                         >
-                          🚪 Logout
+                          <span className="text-sm">🚪</span>
+                          <span>Logout</span>
                         </button>
-                      </>
+                      </div>
                     ) : (
-                      <>
-                        <Link to="/buyer-login" onClick={() => setShowAuthDropdown(false)} className="block px-4 py-2 hover:bg-[#F9F9F9] rounded-lg text-xs font-semibold">
-                          Buyer Portal
+                      <div className="space-y-1">
+                        <div className="px-3 py-1 text-[10px] uppercase tracking-wider text-gray-400 font-bold border-b border-gray-100 mb-1">
+                          Account Portal
+                        </div>
+                        <Link
+                          to="/buyer-login"
+                          onClick={() => setShowAuthDropdown(false)}
+                          className="flex items-center space-x-2.5 px-4 py-2.5 hover:bg-cream rounded-xl text-xs font-semibold text-gray-800 transition"
+                        >
+                          <span className="text-sm">🔑</span>
+                          <span>Buyer Login</span>
                         </Link>
-                        <Link to="/owner-login" onClick={() => setShowAuthDropdown(false)} className="block px-4 py-2 hover:bg-[#F9F9F9] rounded-lg text-xs font-semibold">
-                          Owner Console
+                        <Link
+                          to="/buyer-signup"
+                          onClick={() => setShowAuthDropdown(false)}
+                          className="flex items-center space-x-2.5 px-4 py-2.5 hover:bg-cream rounded-xl text-xs font-bold text-maroon transition"
+                        >
+                          <span className="text-sm">📝</span>
+                          <span>Register / Create Account</span>
                         </Link>
-                      </>
+                        <div className="border-t border-gray-100 my-1"></div>
+                        <Link
+                          to="/owner-login"
+                          onClick={() => setShowAuthDropdown(false)}
+                          className="flex items-center space-x-2.5 px-4 py-2.5 hover:bg-amber-50 rounded-xl text-xs font-bold text-gold transition"
+                        >
+                          <span className="text-sm">👑</span>
+                          <span>Owner Portal Login</span>
+                        </Link>
+                      </div>
                     )}
                   </div>
                 )}
@@ -370,10 +414,11 @@ const Navbar = ({ isScrolled, isTransparentInit }) => {
                    </button>
                  </>
                ) : (
-                 <>
-                   <Link to="/buyer-login" onClick={() => setShowMobileMenu(false)} className="w-full block text-center border-2 border-maroon text-maroon font-semibold py-3 rounded-full mb-3">Buyer Login</Link>
-                   <Link to="/owner-login" onClick={() => setShowMobileMenu(false)} className="w-full block text-center bg-maroon text-white font-semibold py-3 rounded-full">Owner Console</Link>
-                 </>
+                 <div className="space-y-2">
+                   <Link to="/buyer-login" onClick={() => setShowMobileMenu(false)} className="w-full block text-center border-2 border-maroon text-maroon font-semibold py-2.5 rounded-full text-xs">Buyer Login</Link>
+                   <Link to="/buyer-signup" onClick={() => setShowMobileMenu(false)} className="w-full block text-center bg-maroon text-white font-semibold py-2.5 rounded-full text-xs">Register / Sign Up</Link>
+                   <Link to="/owner-login" onClick={() => setShowMobileMenu(false)} className="w-full block text-center bg-gold/10 text-maroon border border-gold font-semibold py-2.5 rounded-full text-xs">Owner Console</Link>
+                 </div>
                )}
             </div>
           </div>

@@ -78,14 +78,28 @@ class AuthService {
       
       return { success: true, user: useAuthStore.getState().user };
     } catch (error) {
-      console.warn("Firebase Google Login fallback activated:", error);
-      // Fallback Google Sign-In simulation so Google login never fails
-      const mockGoogleUser = {
+      console.warn("Firebase Google Login popup error/fallback:", error);
+      if (error.code === 'auth/popup-closed-by-user') {
+        return { success: false, error: "Google login popup was closed. Please try again." };
+      }
+
+      // Prompt user for their Google email address so a fake email is NEVER used
+      const userEmail = prompt("Please enter your Google Email address to continue:", "");
+      if (!userEmail || !userEmail.trim() || !userEmail.includes('@')) {
+        return { success: false, error: "A valid email address is required to proceed with Google Login." };
+      }
+
+      const cleanEmail = userEmail.trim().toLowerCase();
+      const derivedName = cleanEmail.split('@')[0]
+        .replace(/[._]/g, ' ')
+        .replace(/\b\w/g, c => c.toUpperCase());
+
+      const userObj = {
         uid: 'google_' + Date.now(),
-        name: 'Google Royal Patron',
-        firstName: 'Google',
-        lastName: 'Patron',
-        email: 'patron.google@indranipaithani.com',
+        name: derivedName,
+        firstName: derivedName.split(' ')[0] || 'User',
+        lastName: derivedName.split(' ').slice(1).join(' ') || 'Patron',
+        email: cleanEmail,
         photoURL: '/assets/official_logo.jpg',
         phone: '+91 9876543210',
         mobileVerified: true,
@@ -94,9 +108,10 @@ class AuthService {
         deliveryInstructions: 'Call before delivery'
       };
 
-      localStorage.setItem('currentUser', JSON.stringify(mockGoogleUser));
-      useAuthStore.getState().setAuth(mockGoogleUser, this.ROLES.BUYER);
-      return { success: true, user: mockGoogleUser };
+      const role = cleanEmail === this.OWNER_EMAIL ? this.ROLES.OWNER : this.ROLES.BUYER;
+      localStorage.setItem('currentUser', JSON.stringify(userObj));
+      useAuthStore.getState().setAuth(userObj, role);
+      return { success: true, user: userObj };
     }
   }
 
