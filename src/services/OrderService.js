@@ -11,9 +11,9 @@ const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 class OrderService {
   constructor() {
     this.storageKey = 'indrani_orders';
-    // Purge demo orders if legacy seed exists
-    const isDemoCleared = localStorage.getItem('indrani_orders_cleared_v1');
-    if (!isDemoCleared) {
+    // Ensure demo orders are removed so only real website orders exist
+    const isCleared = localStorage.getItem('indrani_orders_cleared_v1');
+    if (!isCleared) {
       localStorage.setItem(this.storageKey, JSON.stringify([]));
       localStorage.setItem('indrani_orders_cleared_v1', 'true');
     }

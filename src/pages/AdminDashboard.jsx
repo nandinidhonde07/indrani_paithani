@@ -171,54 +171,14 @@ const AdminDashboard = () => {
     }
   };
 
-  // Calculate Real Overview Stats (Strictly website data, 0 demo seeds)
-  const totalRevenue = orders.reduce((acc, o) => acc + (o.grandTotal || 0), 0);
-  const totalProductsInStock = products.reduce((acc, p) => acc + (parseInt(p.stock) || 0), 0);
+  // Calculate Overview Stats (REAL DATA ONLY - NO DEMO DATA)
+  const realOrders = orders;
+  const totalRevenue = realOrders.reduce((acc, o) => acc + (o.grandTotal || 0), 0);
+  const totalOrdersCount = realOrders.length;
+  const productsInStockCount = products.reduce((acc, p) => acc + (parseInt(p.stock) || 0), 0);
+  const registeredUsers = JSON.parse(localStorage.getItem('buyer_users') || '[]');
+  const activeCustomersCount = registeredUsers.length;
   const lowStockProducts = products.filter(p => p.stock <= 3);
-
-  // Real Customers strictly from website buyers and registered users (No demo data)
-  const getRealCustomers = () => {
-    const registeredUsers = JSON.parse(localStorage.getItem('buyer_users') || '[]');
-    const customerMap = new Map();
-
-    registeredUsers.forEach(u => {
-      const key = u.email ? u.email.toLowerCase() : u.phone;
-      if (key) {
-        customerMap.set(key, {
-          name: u.name || `${u.firstName || ''} ${u.lastName || ''}`.trim() || 'Valued Patron',
-          email: u.email || 'N/A',
-          phone: u.phone || 'N/A',
-          altPhone: u.altPhone || '',
-          gender: u.gender || 'Female',
-          dob: u.dob || '',
-          anniversaryDate: u.anniversaryDate || '',
-          address: u.address || (u.addresses && u.addresses[0] ? `${u.addresses[0].street}, ${u.addresses[0].city}` : 'No address saved'),
-          deliveryInstructions: u.deliveryInstructions || ''
-        });
-      }
-    });
-
-    orders.forEach(o => {
-      const key = o.buyerEmail ? o.buyerEmail.toLowerCase() : o.phone;
-      if (key && !customerMap.has(key)) {
-        customerMap.set(key, {
-          name: o.buyerName || 'Valued Patron',
-          email: o.buyerEmail || 'N/A',
-          phone: o.phone || 'N/A',
-          altPhone: o.altPhone || '',
-          gender: 'Female',
-          dob: '',
-          anniversaryDate: '',
-          address: o.shippingAddress || 'N/A',
-          deliveryInstructions: o.deliveryInstructions || ''
-        });
-      }
-    });
-
-    return Array.from(customerMap.values());
-  };
-
-  const realCustomers = getRealCustomers();
 
   return (
     <div className="min-h-screen bg-cream flex flex-col md:flex-row text-black items-start">
@@ -274,31 +234,31 @@ const AdminDashboard = () => {
                 <p className="text-xs text-gray-500 font-light mt-1">Real-time metrics, live order statuses, and low stock inventory alerts.</p>
               </div>
               <button onClick={() => setActiveTab('products')} className="bg-maroon hover:bg-gold text-white font-bold py-2.5 px-5 rounded-full text-xs shadow-md transition">
-                + Add New Saree
+                + Add New Product
               </button>
             </div>
 
-            {/* Quick Metrics Grid */}
+            {/* Quick Metrics Grid (PURE REAL WEBSITE DATA ONLY) */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               <div className="bg-white p-6 rounded-2xl shadow-premium border border-gold/15 space-y-1">
-                <span className="text-xs text-gray-500 font-bold uppercase tracking-wider">Total Sales Revenue</span>
+                <span className="text-xs text-gray-500 font-bold uppercase tracking-wider">Total Revenue</span>
                 <p className="text-3xl font-bold font-heading text-maroon">₹{totalRevenue.toLocaleString('en-IN')}</p>
-                <span className="text-[10px] text-green-600 font-bold block">✓ Real Website Revenue</span>
+                <span className="text-[10px] text-green-600 font-bold block">✓ {totalOrdersCount} Real Placed Orders</span>
               </div>
               <div className="bg-white p-6 rounded-2xl shadow-premium border border-gold/15 space-y-1">
-                <span className="text-xs text-gray-500 font-bold uppercase tracking-wider">Total Live Orders</span>
-                <p className="text-3xl font-bold font-heading text-maroon">{orders.length}</p>
-                <span className="text-[10px] text-blue-600 font-bold block">{orders.filter(o => o.status === 'Order Confirmed' || o.status === 'Preparing Your Paithani').length} Pending Dispatch</span>
+                <span className="text-xs text-gray-500 font-bold uppercase tracking-wider">Total Orders</span>
+                <p className="text-3xl font-bold font-heading text-maroon">{totalOrdersCount}</p>
+                <span className="text-[10px] text-blue-600 font-bold block">{realOrders.filter(o => o.status === 'Order Confirmed' || o.status === 'Preparing Your Paithani').length} Pending Dispatch</span>
               </div>
               <div className="bg-white p-6 rounded-2xl shadow-premium border border-gold/15 space-y-1">
                 <span className="text-xs text-gray-500 font-bold uppercase tracking-wider">Products In Stock</span>
-                <p className="text-3xl font-bold font-heading text-maroon">{totalProductsInStock}</p>
-                <span className="text-[10px] text-purple-600 font-bold block">{products.length} Catalog Items</span>
+                <p className="text-3xl font-bold font-heading text-maroon">{productsInStockCount}</p>
+                <span className="text-[10px] text-purple-600 font-bold block">{products.length} Products in Catalog</span>
               </div>
               <div className="bg-white p-6 rounded-2xl shadow-premium border border-gold/15 space-y-1">
                 <span className="text-xs text-gray-500 font-bold uppercase tracking-wider">Active Customers</span>
-                <p className="text-3xl font-bold font-heading text-maroon">{realCustomers.length}</p>
-                <span className="text-[10px] text-amber-600 font-bold block">Real Patrons & Buyers</span>
+                <p className="text-3xl font-bold font-heading text-maroon">{activeCustomersCount}</p>
+                <span className="text-[10px] text-green-600 font-bold block">{activeCustomersCount > 0 ? '✓ Registered Patrons' : 'No Registrations Yet'}</span>
               </div>
             </div>
 
@@ -498,17 +458,23 @@ const AdminDashboard = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {realCustomers.length === 0 ? (
-                    <tr>
-                      <td colSpan="5" className="py-8 text-center text-gray-500 text-xs font-medium">
-                        No active customer records found. Customer profiles will automatically populate here as patrons register or place real orders on your website.
-                      </td>
-                    </tr>
-                  ) : (
-                    realCustomers.map((cust, idx) => (
+                  {(() => {
+                    const registeredUsers = JSON.parse(localStorage.getItem('buyer_users') || '[]');
+
+                    if (registeredUsers.length === 0) {
+                      return (
+                        <tr>
+                          <td colSpan="5" className="py-10 text-center text-gray-500">
+                            No registered customers yet. New buyers will automatically appear here upon registration.
+                          </td>
+                        </tr>
+                      );
+                    }
+
+                    return registeredUsers.map((cust, idx) => (
                       <tr key={idx} className="border-b border-gray-100 last:border-0 hover:bg-cream/20 transition">
                         <td className="py-3 font-semibold text-maroon">
-                          <div className="font-bold text-sm text-black">{cust.name || 'Valued Patron'}</div>
+                          <div className="font-bold text-sm text-black">{cust.name || `${cust.firstName || ''} ${cust.lastName || ''}`.trim() || 'Valued Patron'}</div>
                           <div className="text-[11px] text-gray-500 font-normal">{cust.email}</div>
                         </td>
                         <td className="py-3">
@@ -520,7 +486,7 @@ const AdminDashboard = () => {
                           {cust.dob && <div className="text-[10px] text-gray-400">DOB: {cust.dob}</div>}
                         </td>
                         <td className="py-3 text-gray-600 max-w-xs truncate">
-                          {cust.address}
+                          {cust.address || (cust.addresses && cust.addresses[0] ? `${cust.addresses[0].street}, ${cust.addresses[0].city}` : 'No address saved')}
                         </td>
                         <td className="py-3 text-right">
                           <button
@@ -531,8 +497,8 @@ const AdminDashboard = () => {
                           </button>
                         </td>
                       </tr>
-                    ))
-                  )}
+                    ));
+                  })()}
                 </tbody>
               </table>
             </div>
