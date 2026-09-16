@@ -51,8 +51,9 @@ const BuyerDashboard = () => {
   const [showAvatarModal, setShowAvatarModal] = useState(false);
   const [customAvatarInput, setCustomAvatarInput] = useState('');
 
-  // Address Modal
+  // Address Modal (Add & Edit)
   const [showAddAddressModal, setShowAddAddressModal] = useState(false);
+  const [editingAddressId, setEditingAddressId] = useState(null);
   const [newAddressForm, setNewAddressForm] = useState({
     label: 'Home',
     street: '',
@@ -174,16 +175,68 @@ const BuyerDashboard = () => {
     });
   };
 
-  // Add Address Handler
+  // Open Edit Address Modal
+  const handleEditAddressClick = (addr) => {
+    setEditingAddressId(addr.id);
+    setNewAddressForm({
+      label: addr.label || 'Home',
+      street: addr.street || '',
+      landmark: addr.landmark || '',
+      pincode: addr.pincode || '',
+      city: addr.city || '',
+      state: addr.state || '',
+      country: addr.country || 'India',
+      isDefault: !!addr.isDefault
+    });
+    setShowAddAddressModal(true);
+  };
+
+  // Add / Edit Address Submit Handler
   const handleAddAddressSubmit = async (e) => {
     e.preventDefault();
     if (!newAddressForm.street || !newAddressForm.pincode) {
       alert("Please fill out street address and pincode.");
       return;
     }
-    const updatedUser = await UserService.addAddress(newAddressForm);
-    setUserProfile(updatedUser);
-    setShowAddAddressModal(false);
+
+    if (editingAddressId) {
+      // Update existing address
+      const currentAddresses = userProfile?.addresses || [];
+      const updatedAddresses = currentAddresses.map(a => {
+        if (a.id === editingAddressId) {
+          return {
+            ...a,
+            ...newAddressForm
+          };
+        }
+        return a;
+      });
+
+      if (newAddressForm.isDefault) {
+        updatedAddresses.forEach(a => a.isDefault = (a.id === editingAddressId));
+      }
+
+      const defaultAddr = updatedAddresses.find(a => a.isDefault) || updatedAddresses[0];
+      const primaryAddressStr = defaultAddr 
+        ? `${defaultAddr.street}, ${defaultAddr.city}, ${defaultAddr.state} - ${defaultAddr.pincode}`
+        : userProfile.address;
+
+      const updatedUser = await UserService.updateCurrentUser({
+        addresses: updatedAddresses,
+        address: primaryAddressStr
+      });
+      setUserProfile(updatedUser);
+      setShowAddAddressModal(false);
+      setEditingAddressId(null);
+      alert("✓ Delivery address updated successfully!");
+    } else {
+      // Add new address
+      const updatedUser = await UserService.addAddress(newAddressForm);
+      setUserProfile(updatedUser);
+      setShowAddAddressModal(false);
+      alert("✓ Saved address added successfully!");
+    }
+
     setNewAddressForm({
       label: 'Home',
       street: '',
@@ -194,7 +247,6 @@ const BuyerDashboard = () => {
       country: 'India',
       isDefault: false
     });
-    alert("✓ Saved address added successfully!");
   };
 
   // Set Default Address Handler
@@ -237,10 +289,10 @@ const BuyerDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-cream flex flex-col md:flex-row relative text-black font-sans">
+    <div className="min-h-screen bg-cream flex flex-col md:flex-row text-black font-sans pt-20 md:pt-24 pb-20 md:pb-12">
       
       {/* Sidebar Navigation */}
-      <aside className="w-full md:w-72 bg-maroon text-white p-6 flex flex-col justify-between shadow-xl">
+      <aside className="w-full md:w-72 bg-maroon text-white p-6 flex flex-col justify-between shadow-xl shrink-0 md:sticky md:top-24 md:h-[calc(100vh-120px)] overflow-y-auto z-30">
         <div className="space-y-6">
           
           {/* User Brief Card */}
@@ -296,11 +348,11 @@ const BuyerDashboard = () => {
       </aside>
 
       {/* Main Content Area */}
-      <main className="flex-grow p-6 md:p-12 overflow-y-auto relative">
+      <main className="flex-grow p-4 sm:p-6 md:p-10 overflow-y-auto relative z-10 min-h-[calc(100vh-120px)]">
 
         {/* 1. MY PROFILE TAB */}
         {activeTab === 'profile' && (
-          <div className="space-y-8 max-w-6xl mx-auto">
+          <div className="space-y-8 max-w-6xl mx-auto pb-8">
             
             {/* Profile Header */}
             <div className="relative bg-gradient-to-r from-maroon/90 via-maroon to-[#4A0E4E] rounded-3xl p-6 md:p-8 text-white shadow-xl overflow-hidden border border-gold/30">
@@ -330,7 +382,7 @@ const BuyerDashboard = () => {
             {/* Two Column Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
               
-              {/* LEFT COLUMN: Identity Card + Stats + Verification (lg:col-span-4) */}
+              {/* LEFT COLUMN: Identity Card + Stats + Verification */}
               <div className="lg:col-span-4 space-y-6">
                 
                 {/* Customer Identity Card */}
@@ -367,7 +419,7 @@ const BuyerDashboard = () => {
                     <p className="text-xs text-gray-500 font-mono mt-1 truncate">{userProfile?.email}</p>
                   </div>
 
-                  {/* Verification Badge (Only if emailVerified or mobileVerified) */}
+                  {/* Verification Badge */}
                   {(userProfile?.emailVerified || userProfile?.mobileVerified) ? (
                     <span className="inline-flex items-center space-x-1.5 bg-emerald-50 text-emerald-800 text-[11px] font-bold px-3.5 py-1 rounded-full uppercase tracking-wider border border-emerald-200 shadow-xs">
                       <FiCheckCircle className="text-emerald-600" />
@@ -390,7 +442,7 @@ const BuyerDashboard = () => {
                   </div>
                 </div>
 
-                {/* Account Statistics Cards (3 compact cards) */}
+                {/* Account Statistics Cards */}
                 <div className="grid grid-cols-3 gap-3">
                   <div 
                     onClick={() => setActiveTab('orders')}
@@ -464,7 +516,7 @@ const BuyerDashboard = () => {
 
               </div>
 
-              {/* RIGHT COLUMN: Personal Info + Address + Preferences + Quick Actions (lg:col-span-8) */}
+              {/* RIGHT COLUMN: Personal Info + Address + Preferences + Quick Actions */}
               <div className="lg:col-span-8 space-y-6">
                 
                 {/* Main Personal Information Card */}
@@ -572,8 +624,11 @@ const BuyerDashboard = () => {
                       <div className="flex justify-between items-center py-2">
                         <span className="text-gray-500 font-light italic">No shipping address added yet.</span>
                         <button
-                          onClick={() => setShowAddAddressModal(true)}
-                          className="bg-maroon text-white font-bold px-4 py-2 rounded-full text-xs hover:bg-gold transition shadow-xs"
+                          onClick={() => {
+                            setEditingAddressId(null);
+                            setShowAddAddressModal(true);
+                          }}
+                          className="bg-maroon text-white font-bold px-4 py-2 rounded-full text-xs hover:bg-gold transition shadow-xs uppercase tracking-wider"
                         >
                           + Add Address
                         </button>
@@ -683,8 +738,18 @@ const BuyerDashboard = () => {
 
         {/* 2. MY ORDERS TAB */}
         {activeTab === 'orders' && (
-          <div className="space-y-8 max-w-5xl">
-            <h1 className="text-3xl font-heading text-maroon font-bold">My Orders ({orders.length})</h1>
+          <div className="space-y-8 max-w-6xl mx-auto pb-12">
+            {/* Header Card */}
+            <div className="bg-white rounded-3xl p-6 md:p-8 shadow-premium border border-gold/15 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <div className="flex items-center space-x-2 text-gold text-xs font-semibold uppercase tracking-widest mb-1">
+                  <FiGift className="text-maroon" />
+                  <span>Order History</span>
+                </div>
+                <h1 className="text-2xl md:text-3xl font-heading text-maroon font-bold">My Orders ({orders.length})</h1>
+                <p className="text-xs text-gray-500 font-light mt-1">Track current shipments and download official GST tax invoices.</p>
+              </div>
+            </div>
             
             {orders.length === 0 ? (
               <div className="bg-white rounded-3xl p-12 text-center shadow-premium border border-gold/10 text-gray-500 space-y-3">
@@ -698,23 +763,27 @@ const BuyerDashboard = () => {
             ) : (
               <div className="space-y-6">
                 {orders.map(order => (
-                  <div key={order.orderId} className="bg-white rounded-2xl shadow-premium border border-gold/10 overflow-hidden flex flex-col md:flex-row relative">
-                    <div className="p-6 border-b md:border-b-0 md:border-r border-gray-100 flex-grow">
-                      <div className="flex justify-between items-start mb-4">
+                  <div key={order.orderId} className="bg-white rounded-3xl shadow-premium border border-gold/15 overflow-hidden flex flex-col md:flex-row relative">
+                    <div className="p-6 md:p-8 border-b md:border-b-0 md:border-r border-gray-100 flex-grow">
+                      <div className="flex flex-wrap justify-between items-start gap-4 mb-4 pb-4 border-b border-gray-100">
                         <div>
-                          <span className="text-xs text-gray-400 font-semibold uppercase tracking-wider block mb-1">Order Date</span>
-                          <span className="font-medium text-black">{new Date(order.orderDate).toLocaleDateString('en-IN')}</span>
+                          <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider block mb-1">Order Date</span>
+                          <span className="font-semibold text-black text-xs">{new Date(order.orderDate).toLocaleDateString('en-IN')}</span>
                         </div>
-                        <div className="text-right mr-28">
-                          <span className="text-xs text-gray-400 font-semibold uppercase tracking-wider block mb-1">Total Amount</span>
-                          <span className="font-bold text-maroon text-lg">₹{order.grandTotal.toLocaleString('en-IN')}</span>
+                        <div>
+                          <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider block mb-1">Order ID</span>
+                          <span className="font-bold text-maroon text-xs font-mono">{order.orderId}</span>
+                        </div>
+                        <div>
+                          <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider block mb-1">Total Amount</span>
+                          <span className="font-bold text-maroon text-base">₹{order.grandTotal.toLocaleString('en-IN')}</span>
                         </div>
                       </div>
 
                       <div className="space-y-3">
                         {order.items.map(item => (
                           <div key={item.id} className="flex items-center space-x-4">
-                            <img src={item.image} alt={item.name} className="w-14 h-16 object-cover rounded shadow-sm border border-gold/20" />
+                            <img src={item.image} alt={item.name} className="w-14 h-16 object-cover rounded-xl shadow-xs border border-gold/20" />
                             <div>
                               <h4 className="font-heading font-semibold text-maroon text-sm">{item.name}</h4>
                               <p className="text-xs text-gray-500">Qty: {item.quantity} &nbsp;|&nbsp; ₹{item.price.toLocaleString('en-IN')}</p>
@@ -724,10 +793,10 @@ const BuyerDashboard = () => {
                       </div>
                     </div>
 
-                    <div className="p-6 md:w-64 bg-gray-50 flex flex-col justify-center space-y-2.5">
+                    <div className="p-6 md:w-64 bg-cream/20 flex flex-col justify-center space-y-3 shrink-0">
                       <button
                         onClick={() => generateInvoice(order)}
-                        className="w-full bg-maroon text-white hover:bg-gold font-bold py-2 rounded-full text-xs transition"
+                        className="w-full bg-maroon text-white hover:bg-gold font-bold py-2.5 rounded-full text-xs transition uppercase tracking-wider shadow-xs"
                       >
                         Download PDF Invoice
                       </button>
@@ -741,46 +810,52 @@ const BuyerDashboard = () => {
 
         {/* 3. CART TAB */}
         {activeTab === 'cart' && (
-          <div className="space-y-8 max-w-5xl">
-            <h1 className="text-3xl font-heading text-maroon font-bold">Shopping Bag ({cart.length})</h1>
+          <div className="space-y-8 max-w-6xl mx-auto pb-12">
+            <div className="bg-white rounded-3xl p-6 md:p-8 shadow-premium border border-gold/15 flex justify-between items-center">
+              <div>
+                <h1 className="text-2xl md:text-3xl font-heading text-maroon font-bold">Shopping Bag ({cart.length})</h1>
+                <p className="text-xs text-gray-500 font-light mt-1">Review items in your bag before proceeding to checkout.</p>
+              </div>
+            </div>
+
             {cart.length > 0 ? (
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <div className="lg:col-span-2 space-y-4">
                   {cart.map(item => (
-                    <div key={item.id} className="bg-white p-4 rounded-2xl shadow-premium border border-gold/10 flex items-center space-x-4">
-                      <img src={item.image} alt={item.name} className="w-20 h-24 object-cover rounded-lg" />
+                    <div key={item.id} className="bg-white p-5 rounded-3xl shadow-premium border border-gold/15 flex items-center space-x-4">
+                      <img src={item.image} alt={item.name} className="w-20 h-24 object-cover rounded-2xl border border-gold/20" />
                       <div className="flex-grow">
-                        <h4 className="font-heading font-semibold text-maroon">{item.name}</h4>
+                        <h4 className="font-heading font-semibold text-maroon text-base">{item.name}</h4>
                         <span className="text-xs text-gray-400 block mb-2">{item.category}</span>
-                        <div className="flex items-center space-x-2">
-                          <button onClick={() => updateQuantity(item.id, item.quantity - 1)} className="border px-2 rounded">-</button>
-                          <span className="text-sm font-medium">{item.quantity}</span>
-                          <button onClick={() => updateQuantity(item.id, item.quantity + 1)} className="border px-2 rounded">+</button>
+                        <div className="flex items-center space-x-3">
+                          <button onClick={() => updateQuantity(item.id, item.quantity - 1)} className="w-7 h-7 border border-gray-300 rounded-full font-bold flex items-center justify-center hover:bg-gray-100 text-xs">-</button>
+                          <span className="text-xs font-bold">{item.quantity}</span>
+                          <button onClick={() => updateQuantity(item.id, item.quantity + 1)} className="w-7 h-7 border border-gray-300 rounded-full font-bold flex items-center justify-center hover:bg-gray-100 text-xs">+</button>
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="font-bold text-maroon">₹{(item.price * item.quantity).toLocaleString('en-IN')}</p>
-                        <button onClick={() => removeFromCart(item.id)} className="text-xs text-red-500 hover:underline mt-2">Remove</button>
+                        <p className="font-bold text-maroon text-sm">₹{(item.price * item.quantity).toLocaleString('en-IN')}</p>
+                        <button onClick={() => removeFromCart(item.id)} className="text-xs text-red-500 hover:underline mt-2 block ml-auto font-semibold">Remove</button>
                       </div>
                     </div>
                   ))}
                 </div>
 
-                <div className="bg-white p-6 rounded-2xl shadow-premium border border-gold/10 h-fit space-y-6">
-                  <h3 className="text-lg font-heading text-maroon border-b border-gold/20 pb-2">Order Summary</h3>
+                <div className="bg-white p-6 rounded-3xl shadow-premium border border-gold/15 h-fit space-y-6">
+                  <h3 className="text-lg font-heading text-maroon border-b border-gold/20 pb-2 font-bold">Order Summary</h3>
                   <div className="flex justify-between font-bold text-lg text-maroon">
                     <span>Total Amount:</span>
                     <span>₹{calculateTotal().toLocaleString('en-IN')}</span>
                   </div>
-                  <button onClick={() => navigate('/checkout')} className="w-full bg-maroon hover:bg-gold text-white font-semibold py-3 rounded-full transition shadow-md">
+                  <button onClick={() => navigate('/checkout')} className="w-full bg-maroon hover:bg-gold text-white font-bold py-3.5 rounded-full transition shadow-md uppercase tracking-wider text-xs">
                     Proceed to Checkout
                   </button>
                 </div>
               </div>
             ) : (
-              <div className="text-center py-20 bg-white rounded-3xl border border-gold/10 text-gray-500 space-y-3">
-                <p>Your cart is empty.</p>
-                <Link to="/shop" className="inline-block bg-maroon text-white text-xs font-bold px-6 py-2.5 rounded-full hover:bg-gold transition shadow-sm uppercase tracking-wider">Browse Shop</Link>
+              <div className="text-center py-16 bg-white rounded-3xl border border-gold/15 text-gray-500 space-y-4">
+                <p className="text-sm font-light">Your shopping bag is empty.</p>
+                <Link to="/shop" className="inline-block bg-maroon text-white text-xs font-bold px-6 py-3 rounded-full hover:bg-gold transition shadow-md uppercase tracking-wider">Browse Shop</Link>
               </div>
             )}
           </div>
@@ -788,26 +863,32 @@ const BuyerDashboard = () => {
 
         {/* 4. WISHLIST TAB */}
         {activeTab === 'wishlist' && (
-          <div className="space-y-8 max-w-5xl">
-            <h1 className="text-3xl font-heading text-maroon font-bold">Saved Wishlist ({wishlist.length})</h1>
+          <div className="space-y-8 max-w-6xl mx-auto pb-12">
+            <div className="bg-white rounded-3xl p-6 md:p-8 shadow-premium border border-gold/15 flex justify-between items-center">
+              <div>
+                <h1 className="text-2xl md:text-3xl font-heading text-maroon font-bold">Saved Wishlist ({wishlist.length})</h1>
+                <p className="text-xs text-gray-500 font-light mt-1">Your curated favorite handwoven sarees.</p>
+              </div>
+            </div>
+
             {wishlist.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                 {wishlist.map(item => (
-                  <div key={item.id} className="bg-white p-4 rounded-2xl shadow-premium border border-gold/10 flex flex-col justify-between">
-                    <img src={item.image} alt={item.name} className="w-full aspect-[3/4] object-cover rounded-xl" />
-                    <h4 className="font-heading font-semibold text-maroon mt-3">{item.name}</h4>
+                  <div key={item.id} className="bg-white p-4 rounded-3xl shadow-premium border border-gold/15 flex flex-col justify-between">
+                    <img src={item.image} alt={item.name} className="w-full aspect-[3/4] object-cover rounded-2xl" />
+                    <h4 className="font-heading font-semibold text-maroon mt-3 text-sm">{item.name}</h4>
                     <p className="font-bold text-maroon text-sm mt-1">₹{item.price.toLocaleString('en-IN')}</p>
-                    <div className="flex justify-between items-center mt-4">
-                      <button onClick={() => removeFromWishlist(item.id)} className="text-xs text-red-500 hover:underline">Remove</button>
-                      <Link to={`/product/${item.id}`} className="text-xs bg-gold text-maroon font-semibold py-1 px-3 rounded-full hover:bg-maroon hover:text-white transition">View Item</Link>
+                    <div className="flex justify-between items-center mt-4 pt-3 border-t border-gray-100">
+                      <button onClick={() => removeFromWishlist(item.id)} className="text-xs text-red-500 font-semibold hover:underline">Remove</button>
+                      <Link to={`/product/${item.id}`} className="text-xs bg-gold text-maroon font-bold py-1.5 px-4 rounded-full hover:bg-maroon hover:text-white transition uppercase tracking-wider">View Item</Link>
                     </div>
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="text-center py-20 bg-white rounded-3xl border border-gold/10 text-gray-500 space-y-3">
-                <p>Your wishlist is empty.</p>
-                <Link to="/shop" className="inline-block bg-maroon text-white text-xs font-bold px-6 py-2.5 rounded-full hover:bg-gold transition shadow-sm uppercase tracking-wider">Explore Shop</Link>
+              <div className="text-center py-16 bg-white rounded-3xl border border-gold/15 text-gray-500 space-y-4">
+                <p className="text-sm font-light">Your wishlist is empty.</p>
+                <Link to="/shop" className="inline-block bg-maroon text-white text-xs font-bold px-6 py-3 rounded-full hover:bg-gold transition shadow-md uppercase tracking-wider">Explore Shop</Link>
               </div>
             )}
           </div>
@@ -815,69 +896,117 @@ const BuyerDashboard = () => {
 
         {/* 5. SAVED ADDRESSES TAB */}
         {activeTab === 'address' && (
-          <div className="space-y-8 max-w-5xl">
-            <div className="flex justify-between items-center border-b border-gold/20 pb-4">
+          <div className="space-y-8 max-w-6xl mx-auto pb-12">
+            
+            {/* Page Header Bar */}
+            <div className="bg-white rounded-3xl p-6 md:p-8 shadow-premium border border-gold/15 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
-                <h1 className="text-3xl font-heading text-maroon font-bold">Saved Delivery Addresses</h1>
-                <p className="text-xs text-gray-500 mt-0.5">Manage multiple shipping destinations for fast checkout.</p>
+                <div className="flex items-center space-x-2 text-gold text-xs font-semibold uppercase tracking-widest mb-1">
+                  <FiMapPin className="text-maroon" />
+                  <span>Shipping Destinations</span>
+                </div>
+                <h1 className="text-2xl md:text-3xl font-heading font-bold text-maroon">My Addresses</h1>
+                <p className="text-xs text-gray-500 font-light mt-1">
+                  Manage multiple shipping destinations for fast and effortless checkout.
+                </p>
               </div>
+
               <button
-                onClick={() => setShowAddAddressModal(true)}
-                className="bg-maroon hover:bg-gold text-white font-bold text-xs px-5 py-2.5 rounded-full transition shadow flex items-center space-x-2 uppercase tracking-wider"
+                onClick={() => {
+                  setEditingAddressId(null);
+                  setNewAddressForm({
+                    label: 'Home',
+                    street: '',
+                    landmark: '',
+                    pincode: '',
+                    city: '',
+                    state: '',
+                    country: 'India',
+                    isDefault: false
+                  });
+                  setShowAddAddressModal(true);
+                }}
+                className="bg-maroon hover:bg-gold text-white font-bold text-xs px-6 py-3 rounded-full transition-all shadow-md flex items-center space-x-2 uppercase tracking-wider shrink-0 self-start sm:self-auto"
               >
-                <FiPlus />
+                <FiPlus className="text-base" />
                 <span>Add New Address</span>
               </button>
             </div>
 
-            {/* Addresses Grid */}
+            {/* Addresses Cards Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {(userProfile?.addresses && userProfile.addresses.length > 0) ? (
                 userProfile.addresses.map((addr) => (
                   <div
                     key={addr.id}
-                    className={`bg-white p-6 rounded-3xl border transition duration-300 relative flex flex-col justify-between ${
+                    className={`bg-white p-6 md:p-8 rounded-3xl border transition duration-300 relative flex flex-col justify-between space-y-4 ${
                       addr.isDefault 
                         ? 'border-maroon shadow-md ring-2 ring-gold/40' 
                         : 'border-gold/20 hover:border-gold shadow-sm'
                     }`}
                   >
-                    <div>
-                      <div className="flex justify-between items-center mb-3">
+                    <div className="space-y-3">
+                      {/* Badge & Type */}
+                      <div className="flex justify-between items-center">
                         <span className="bg-maroon/10 text-maroon text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider border border-gold/30">
                           {addr.label}
                         </span>
                         {addr.isDefault && (
-                          <span className="bg-green-100 text-green-800 text-[9px] font-bold px-2.5 py-0.5 rounded-full uppercase">
+                          <span className="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider border border-emerald-200">
                             Default Shipping Address
                           </span>
                         )}
                       </div>
 
-                      <p className="text-xs font-semibold text-black leading-relaxed">
-                        {addr.street}
-                      </p>
-                      {addr.landmark && <p className="text-xs text-gray-500 font-light mt-1">Landmark: {addr.landmark}</p>}
-                      <p className="text-xs text-gray-700 font-medium mt-1">
-                        {addr.city}, {addr.state} - <span className="font-mono">{addr.pincode}</span>
-                      </p>
+                      {/* Recipient Details */}
+                      <div className="text-xs space-y-1">
+                        <span className="font-bold text-maroon text-sm block font-heading">
+                          {userProfile?.name || userProfile?.fullName || 'Valued Patron'}
+                        </span>
+                        <span className="text-gray-500 font-mono block">
+                          Ph: {userProfile?.phone || 'Not added'}
+                        </span>
+                      </div>
+
+                      {/* Address Details */}
+                      <div className="text-xs space-y-1 pt-1 border-t border-gray-100">
+                        <p className="font-semibold text-gray-800 leading-relaxed">
+                          {addr.street}
+                        </p>
+                        {addr.landmark && (
+                          <p className="text-gray-500 font-light">Landmark: {addr.landmark}</p>
+                        )}
+                        <p className="text-gray-700 font-medium">
+                          {addr.city}, {addr.state} – <span className="font-mono font-bold text-maroon">{addr.pincode}</span>
+                        </p>
+                        <p className="text-gray-400 text-[11px] font-light">{addr.country || 'India'}</p>
+                      </div>
                     </div>
 
-                    <div className="flex justify-between items-center pt-4 mt-4 border-t border-gray-100 text-xs">
-                      {!addr.isDefault ? (
+                    {/* Actions Bar */}
+                    <div className="flex items-center justify-between pt-4 border-t border-gray-100 text-xs">
+                      <div className="flex items-center space-x-3">
                         <button
-                          onClick={() => handleSetDefaultAddress(addr.id)}
-                          className="text-maroon font-bold hover:text-gold transition text-[11px]"
+                          onClick={() => handleEditAddressClick(addr)}
+                          className="text-maroon font-bold hover:text-gold transition text-xs flex items-center space-x-1"
                         >
-                          Set as Default
+                          <FiEdit3 className="text-xs" />
+                          <span>Edit</span>
                         </button>
-                      ) : (
-                        <span className="text-gray-400 font-medium text-[11px]">Primary Choice</span>
-                      )}
+
+                        {!addr.isDefault && (
+                          <button
+                            onClick={() => handleSetDefaultAddress(addr.id)}
+                            className="text-gray-600 font-semibold hover:text-maroon transition text-[11px]"
+                          >
+                            Set as Default
+                          </button>
+                        )}
+                      </div>
 
                       <button
                         onClick={() => handleDeleteAddress(addr.id)}
-                        className="text-red-500 hover:text-red-700 transition flex items-center space-x-1"
+                        className="text-red-500 hover:text-red-700 transition flex items-center space-x-1 text-xs font-semibold"
                         title="Delete Address"
                       >
                         <FiTrash2 />
@@ -887,14 +1016,33 @@ const BuyerDashboard = () => {
                   </div>
                 ))
               ) : (
-                <div className="col-span-full bg-white p-12 rounded-3xl border border-dashed border-gray-300 text-center space-y-3">
-                  <FiMapPin className="mx-auto text-3xl text-gray-400" />
-                  <p className="text-xs text-gray-500 font-light">No saved addresses found. Add a delivery address for fast checkout.</p>
+                <div className="col-span-full bg-white p-12 rounded-3xl border border-dashed border-gray-300 text-center space-y-4 shadow-sm">
+                  <FiMapPin className="mx-auto text-4xl text-gold/60" />
+                  <div>
+                    <h3 className="text-lg font-heading font-bold text-maroon">No Shipping Address Saved Yet</h3>
+                    <p className="text-xs text-gray-500 font-light mt-1 max-w-md mx-auto">
+                      Save your primary delivery destination for quick and effortless checkout during your saree purchases.
+                    </p>
+                  </div>
                   <button
-                    onClick={() => setShowAddAddressModal(true)}
-                    className="inline-block bg-maroon text-white text-xs font-bold px-6 py-2.5 rounded-full hover:bg-gold transition shadow-sm uppercase tracking-wider"
+                    onClick={() => {
+                      setEditingAddressId(null);
+                      setNewAddressForm({
+                        label: 'Home',
+                        street: '',
+                        landmark: '',
+                        pincode: '',
+                        city: '',
+                        state: '',
+                        country: 'India',
+                        isDefault: true
+                      });
+                      setShowAddAddressModal(true);
+                    }}
+                    className="inline-flex items-center space-x-2 bg-maroon hover:bg-gold text-white font-bold text-xs px-6 py-3 rounded-full transition-all shadow-md uppercase tracking-wider"
                   >
-                    Add Your First Address
+                    <FiPlus />
+                    <span>Add Your First Address</span>
                   </button>
                 </div>
               )}
@@ -904,16 +1052,16 @@ const BuyerDashboard = () => {
 
         {/* 6. ACCOUNT SECURITY & PASSWORD TAB */}
         {activeTab === 'security' && (
-          <div className="space-y-8 max-w-4xl">
-            <div>
-              <h1 className="text-3xl font-heading text-maroon font-bold">Manage Password & Security</h1>
+          <div className="space-y-8 max-w-5xl mx-auto pb-12">
+            <div className="bg-white rounded-3xl p-6 md:p-8 shadow-premium border border-gold/15">
+              <h1 className="text-2xl md:text-3xl font-heading text-maroon font-bold">Manage Password & Security</h1>
               <p className="text-xs text-gray-500 font-light mt-1">Update your account credentials and review connected login methods.</p>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               
               {/* Connected Accounts Card */}
-              <div className="bg-white p-6 rounded-3xl border border-gold/15 shadow-premium space-y-4">
+              <div className="bg-white p-6 md:p-8 rounded-3xl border border-gold/15 shadow-premium space-y-4">
                 <h3 className="font-heading text-base text-maroon font-bold border-b border-gold/20 pb-2">
                   Connected Login Methods
                 </h3>
@@ -921,7 +1069,7 @@ const BuyerDashboard = () => {
                 <div className="space-y-3 text-xs">
                   <div className="flex items-center justify-between p-3 bg-cream/30 rounded-xl border border-gold/10">
                     <span className="font-semibold text-gray-800">Email & Password</span>
-                    <span className="text-green-600 font-bold">Active</span>
+                    <span className="text-emerald-700 font-bold">Active</span>
                   </div>
                   <div className="flex items-center justify-between p-3 bg-cream/30 rounded-xl border border-gold/10">
                     <span className="font-semibold text-gray-800">Google OAuth SSO</span>
@@ -936,14 +1084,14 @@ const BuyerDashboard = () => {
               </div>
 
               {/* Change Password Form */}
-              <div className="lg:col-span-2 bg-white p-8 rounded-3xl border border-gold/15 shadow-premium space-y-6">
+              <div className="lg:col-span-2 bg-white p-6 md:p-8 rounded-3xl border border-gold/15 shadow-premium space-y-6">
                 <h3 className="font-heading text-xl text-maroon font-bold border-b border-gold/20 pb-3">
                   Change Password
                 </h3>
 
                 {passwordMessage && (
                   <div className={`p-4 rounded-xl text-xs border ${
-                    passwordMessage.type === 'success' ? 'bg-green-50 border-green-200 text-green-800' : 'bg-red-50 border-red-200 text-red-700'
+                    passwordMessage.type === 'success' ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-red-50 border-red-200 text-red-700'
                   }`}>
                     {passwordMessage.text}
                   </div>
@@ -1001,9 +1149,9 @@ const BuyerDashboard = () => {
 
         {/* 7. HELP & SUPPORT TAB */}
         {activeTab === 'support' && (
-          <div className="space-y-8 max-w-4xl">
-            <div>
-              <h1 className="text-3xl font-heading text-maroon font-bold">Help & Support Concierge</h1>
+          <div className="space-y-8 max-w-5xl mx-auto pb-12">
+            <div className="bg-white rounded-3xl p-6 md:p-8 shadow-premium border border-gold/15">
+              <h1 className="text-2xl md:text-3xl font-heading text-maroon font-bold">Help & Support Concierge</h1>
               <p className="text-xs text-gray-500 font-light mt-1">Direct support for order status, custom weaving, or silk mark authentication.</p>
             </div>
 
@@ -1012,7 +1160,7 @@ const BuyerDashboard = () => {
                 href="https://wa.me/919876543210?text=Hello%20Indrani%20Paithani%20Support!%20I%20need%20help%20with%20my%20account."
                 target="_blank"
                 rel="noreferrer"
-                className="bg-[#25D366] text-white p-6 rounded-2xl shadow hover:opacity-90 transition block space-y-2"
+                className="bg-[#25D366] text-white p-6 md:p-8 rounded-3xl shadow hover:opacity-90 transition block space-y-2"
               >
                 <div className="text-3xl">💬</div>
                 <h4 className="font-bold text-base">WhatsApp Concierge</h4>
@@ -1021,7 +1169,7 @@ const BuyerDashboard = () => {
 
               <a 
                 href="tel:+919876543210"
-                className="bg-maroon text-gold p-6 rounded-2xl shadow hover:opacity-90 transition block space-y-2"
+                className="bg-maroon text-gold p-6 md:p-8 rounded-3xl shadow hover:opacity-90 transition block space-y-2 border border-gold/30"
               >
                 <div className="text-3xl">📞</div>
                 <h4 className="font-bold text-base">Call +91 9876543210</h4>
@@ -1035,11 +1183,11 @@ const BuyerDashboard = () => {
 
       {/* EDIT PROFILE MODAL */}
       {showEditProfileModal && (
-        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-xl w-full p-8 space-y-6 relative shadow-2xl border border-gold/30">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white rounded-3xl max-w-xl w-full p-6 md:p-8 space-y-6 relative shadow-2xl border border-gold/30 max-h-[90vh] overflow-y-auto my-auto">
             <button
               onClick={() => setShowEditProfileModal(false)}
-              className="absolute top-4 right-4 bg-maroon text-white w-8 h-8 rounded-full flex items-center justify-center font-bold hover:bg-gold transition"
+              className="absolute top-4 right-4 bg-maroon text-white w-8 h-8 rounded-full flex items-center justify-center font-bold hover:bg-gold transition shadow-md"
             >
               ✕
             </button>
@@ -1174,11 +1322,11 @@ const BuyerDashboard = () => {
 
       {/* AVATAR SELECTOR MODAL */}
       {showAvatarModal && (
-        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-md w-full p-6 space-y-6 relative shadow-2xl border border-gold/30">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 space-y-6 relative shadow-2xl border border-gold/30 max-h-[90vh] overflow-y-auto my-auto">
             <button
               onClick={() => setShowAvatarModal(false)}
-              className="absolute top-4 right-4 bg-maroon text-white w-8 h-8 rounded-full flex items-center justify-center font-bold hover:bg-gold transition"
+              className="absolute top-4 right-4 bg-maroon text-white w-8 h-8 rounded-full flex items-center justify-center font-bold hover:bg-gold transition shadow-md"
             >
               ✕
             </button>
@@ -1222,22 +1370,32 @@ const BuyerDashboard = () => {
         </div>
       )}
 
-      {/* ADD ADDRESS MODAL */}
+      {/* ADD / EDIT ADDRESS MODAL */}
       {showAddAddressModal && (
-        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-md w-full p-8 space-y-6 relative shadow-2xl border border-gold/30">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 md:p-8 space-y-6 relative shadow-2xl border border-gold/30 max-h-[90vh] overflow-y-auto my-auto">
             <button
-              onClick={() => setShowAddAddressModal(false)}
-              className="absolute top-4 right-4 bg-maroon text-white w-8 h-8 rounded-full flex items-center justify-center font-bold hover:bg-gold transition"
+              onClick={() => {
+                setShowAddAddressModal(false);
+                setEditingAddressId(null);
+              }}
+              className="absolute top-4 right-4 bg-maroon text-white w-8 h-8 rounded-full flex items-center justify-center font-bold hover:bg-gold transition shadow-md"
             >
               ✕
             </button>
 
-            <h3 className="font-heading text-xl text-maroon font-bold border-b border-gold/20 pb-2">Add Delivery Address</h3>
+            <div className="border-b border-gold/20 pb-3">
+              <h3 className="font-heading text-xl text-maroon font-bold">
+                {editingAddressId ? 'Edit Delivery Address' : 'Add Delivery Address'}
+              </h3>
+              <p className="text-xs text-gray-500 font-light mt-0.5">
+                {editingAddressId ? 'Update shipping destination details' : 'Save a new delivery location for fast checkout'}
+              </p>
+            </div>
 
             <form onSubmit={handleAddAddressSubmit} className="space-y-4 text-xs">
               <div>
-                <label className="block font-bold text-gray-600 uppercase mb-1">Address Type / Label</label>
+                <label className="block font-bold text-gray-600 uppercase mb-1">Address Label</label>
                 <div className="flex gap-2">
                   {['Home', 'Work', 'Other'].map((lbl) => (
                     <button
@@ -1255,13 +1413,13 @@ const BuyerDashboard = () => {
               </div>
 
               <div>
-                <label className="block font-bold text-gray-600 uppercase mb-1">Flat / Building / Street *</label>
+                <label className="block font-bold text-gray-600 uppercase mb-1">Flat / Building / Street Address *</label>
                 <textarea
                   rows={2}
                   required
                   value={newAddressForm.street}
                   onChange={(e) => setNewAddressForm({ ...newAddressForm, street: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-gold"
+                  className="w-full px-3 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-gold"
                   placeholder="e.g. Flat 402, Royal Palms Apartment, MG Road"
                 />
               </div>
@@ -1273,7 +1431,7 @@ const BuyerDashboard = () => {
                     type="text"
                     value={newAddressForm.landmark}
                     onChange={(e) => setNewAddressForm({ ...newAddressForm, landmark: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-gold"
+                    className="w-full px-3 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-gold"
                     placeholder="e.g. Near Library"
                   />
                 </div>
@@ -1285,7 +1443,7 @@ const BuyerDashboard = () => {
                     maxLength="6"
                     value={newAddressForm.pincode}
                     onChange={handleAddressPincodeChange}
-                    className="w-full px-3 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-gold font-bold"
+                    className="w-full px-3 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-gold font-bold"
                     placeholder="6-digit pincode"
                   />
                 </div>
@@ -1293,23 +1451,23 @@ const BuyerDashboard = () => {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block font-bold text-gray-600 uppercase mb-1">City</label>
+                  <label className="block font-bold text-gray-600 uppercase mb-1">City *</label>
                   <input
                     type="text"
                     required
                     value={newAddressForm.city}
                     onChange={(e) => setNewAddressForm({ ...newAddressForm, city: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-gold"
+                    className="w-full px-3 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-gold"
                   />
                 </div>
                 <div>
-                  <label className="block font-bold text-gray-600 uppercase mb-1">State</label>
+                  <label className="block font-bold text-gray-600 uppercase mb-1">State *</label>
                   <input
                     type="text"
                     required
                     value={newAddressForm.state}
                     onChange={(e) => setNewAddressForm({ ...newAddressForm, state: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-gold"
+                    className="w-full px-3 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-gold"
                   />
                 </div>
               </div>
@@ -1324,19 +1482,22 @@ const BuyerDashboard = () => {
                 <span className="text-xs font-semibold text-gray-700">Set as Primary Default Delivery Address</span>
               </label>
 
-              <div className="flex gap-4 pt-4 border-t">
+              <div className="flex gap-4 pt-4 border-t border-gray-100">
                 <button
                   type="button"
-                  onClick={() => setShowAddAddressModal(false)}
-                  className="flex-1 border border-gray-300 py-3 rounded-full hover:bg-gray-50 transition"
+                  onClick={() => {
+                    setShowAddAddressModal(false);
+                    setEditingAddressId(null);
+                  }}
+                  className="flex-1 border border-gray-300 py-3 rounded-full hover:bg-gray-50 transition text-gray-700 font-bold"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 bg-maroon hover:bg-gold text-white font-bold py-3 rounded-full transition shadow-md"
+                  className="flex-1 bg-maroon hover:bg-gold text-white font-bold py-3 rounded-full transition shadow-md uppercase tracking-wider text-[11px]"
                 >
-                  Save Address
+                  {editingAddressId ? 'Update Address' : 'Save Address'}
                 </button>
               </div>
             </form>
