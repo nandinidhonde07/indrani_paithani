@@ -124,18 +124,18 @@ const ProductCMS = () => {
   const imageLabels = ["Main Image", "Front View", "Back View", "Model Wearing", "Border Close-up", "Pallu Close-up"];
 
   return (
-    <div className="space-y-8 animate-fade-in">
+    <div className="space-y-8 animate-fade-in max-w-6xl mx-auto pb-8">
       <div className="border-b border-gold/20 pb-4 flex justify-between items-end">
         <div>
           <h2 className="text-3xl font-heading text-maroon font-bold">Product CMS</h2>
-          <p className="text-sm text-gray-500 font-light mt-1">Manage your entire inventory, pricing, and galleries.</p>
+          <p className="text-xs text-gray-500 font-light mt-1">Manage your entire inventory, pricing, and galleries.</p>
         </div>
         {!isFormOpen && (
           <div className="flex items-center space-x-3">
             {products.length > 0 && (
               <button 
                 onClick={handleClearAllProducts}
-                className="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-5 rounded-full transition flex items-center space-x-2 text-xs"
+                className="bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 px-5 rounded-full transition flex items-center space-x-2 text-xs shadow-md uppercase tracking-wider"
                 title="Remove all products from catalog"
               >
                 <FaTrash size={12} />
@@ -144,7 +144,7 @@ const ProductCMS = () => {
             )}
             <button 
               onClick={() => { setFormData(emptyForm); setEditingProduct(null); setIsFormOpen(true); }}
-              className="bg-maroon hover:bg-gold text-white font-semibold py-2 px-6 rounded-full transition flex items-center space-x-2 text-xs"
+              className="bg-maroon hover:bg-gold hover:text-maroon text-white font-bold py-2.5 px-6 rounded-full transition flex items-center space-x-2 text-xs shadow-md uppercase tracking-wider"
             >
               <FaPlus size={12} />
               <span>Add New Product</span>
@@ -154,7 +154,7 @@ const ProductCMS = () => {
       </div>
 
       {isFormOpen ? (
-        <form onSubmit={handleSave} className="bg-white p-8 rounded-2xl shadow-premium border border-gold/10 space-y-8 relative">
+        <form onSubmit={handleSave} className="bg-white p-6 md:p-8 rounded-3xl shadow-premium border border-gold/20 space-y-8 relative">
           <div className="flex justify-between items-center border-b pb-4">
             <h3 className="text-xl font-heading text-maroon font-semibold">
               {editingProduct ? 'Edit Product: ' + formData.name : 'Create New Product'}

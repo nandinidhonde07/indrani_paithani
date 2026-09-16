@@ -46,54 +46,58 @@ const OrderManagementCMS = () => {
   };
 
   const getStatusColor = (status) => {
-    if (status === 'Delivered') return 'bg-green-100 text-green-700';
-    if (status === 'Shipped' || status === 'Out For Delivery') return 'bg-blue-100 text-blue-700';
-    if (status === 'Cancelled') return 'bg-red-100 text-red-700';
-    return 'bg-yellow-100 text-yellow-700'; // Preparing, Confirmed, Quality Check, Packed
+    if (status === 'Delivered') return 'bg-green-100 text-green-800 border border-green-200';
+    if (status === 'Shipped' || status === 'Out For Delivery') return 'bg-blue-100 text-blue-800 border border-blue-200';
+    if (status === 'Cancelled') return 'bg-red-100 text-red-800 border border-red-200';
+    if (status === 'Preparing Your Paithani' || status === 'Quality Inspection') return 'bg-purple-100 text-purple-800 border border-purple-200';
+    return 'bg-gold/20 text-maroon border border-gold/30'; // Confirmed, Packed, etc.
   };
 
   return (
-    <div className="space-y-8">
-      <h2 className="text-3xl font-heading text-maroon">Order Management Dashboard</h2>
+    <div className="space-y-8 max-w-6xl mx-auto pb-8 animate-fade-in">
+      <div className="border-b border-gold/20 pb-4">
+        <h2 className="text-3xl font-heading text-maroon font-bold">Order Management CMS</h2>
+        <p className="text-xs text-gray-500 font-light mt-1">Track customer orders, manage status pipeline, and generate PDF invoices.</p>
+      </div>
       
-      <div className="bg-white rounded-2xl p-6 shadow-premium border border-gold/10 overflow-x-auto">
-        <table className="w-full text-left text-sm border-collapse">
+      <div className="bg-white rounded-3xl p-6 md:p-8 shadow-premium border border-gold/20 overflow-x-auto">
+        <table className="w-full text-left text-xs border-collapse">
           <thead>
-            <tr className="border-b border-gray-200 text-gray-500">
-              <th className="py-2">Order ID</th>
-              <th className="py-2">Date</th>
-              <th className="py-2">Customer</th>
-              <th className="py-2">Status</th>
-              <th className="py-2">Total Price</th>
-              <th className="py-2 text-right">Actions</th>
+            <tr className="border-b border-gold/20 text-maroon font-heading font-bold uppercase tracking-wider">
+              <th className="py-3 px-3">Order ID</th>
+              <th className="py-3 px-3">Date</th>
+              <th className="py-3 px-3">Customer</th>
+              <th className="py-3 px-3">Status</th>
+              <th className="py-3 px-3">Total Price</th>
+              <th className="py-3 px-3 text-right">Actions</th>
             </tr>
           </thead>
           <tbody>
             {orders.length === 0 ? (
               <tr>
-                <td colSpan="6" className="py-8 text-center text-gray-500">No orders received yet.</td>
+                <td colSpan="6" className="py-10 text-center text-gray-500">No customer orders received yet.</td>
               </tr>
             ) : orders.map(ord => (
-              <tr key={ord.orderId} className="border-b border-gray-100 last:border-0 hover:bg-cream/20 transition">
-                <td className="py-3 font-semibold text-maroon">{ord.orderId}</td>
-                <td className="py-3">{new Date(ord.orderDate).toLocaleDateString()}</td>
-                <td className="py-3">{ord.buyerName}</td>
-                <td className="py-3">
+              <tr key={ord.orderId} className="border-b border-gold/10 last:border-0 hover:bg-cream/20 transition">
+                <td className="py-3.5 px-3 font-bold text-maroon font-mono">{ord.orderId}</td>
+                <td className="py-3.5 px-3 text-gray-500">{new Date(ord.orderDate).toLocaleDateString()}</td>
+                <td className="py-3.5 px-3 font-semibold text-black">{ord.buyerName}</td>
+                <td className="py-3.5 px-3">
                   <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${getStatusColor(ord.status)}`}>
                     {ord.status}
                   </span>
                 </td>
-                <td className="py-3 font-medium">₹{ord.grandTotal.toLocaleString('en-IN')}</td>
-                <td className="py-3 text-right space-x-2">
+                <td className="py-3.5 px-3 font-bold text-black text-sm">₹{ord.grandTotal.toLocaleString('en-IN')}</td>
+                <td className="py-3.5 px-3 text-right space-x-2">
                   <button 
                     onClick={() => setSelectedOrder(ord)}
-                    className="text-xs bg-gold hover:bg-maroon hover:text-white text-maroon font-semibold py-1 px-3 rounded transition"
+                    className="text-xs bg-gold hover:bg-maroon hover:text-white text-maroon font-bold py-1.5 px-4 rounded-full transition shadow-xs"
                   >
                     Manage
                   </button>
                   <button 
                     onClick={() => generateInvoice(ord)}
-                    className="text-xs border border-maroon hover:bg-maroon hover:text-white text-maroon font-semibold py-1 px-3 rounded transition"
+                    className="text-xs border border-maroon hover:bg-maroon hover:text-white text-maroon font-bold py-1.5 px-4 rounded-full transition"
                   >
                     PDF
                   </button>

@@ -7,6 +7,7 @@ export default {
     extend: {
       colors: {
         maroon: "#800000",
+        royalPurple: "#4B123F",
         gold: "#D4AF37",
         cream: "#FFFDD0",
         black: "#000000",
