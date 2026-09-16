@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import productsData from '../../data/products.json';
 import MediaInput from '../../components/admin/MediaInput';
 import { FaEdit, FaTrash, FaPlus, FaCopy } from 'react-icons/fa';
+import { FiPackage } from 'react-icons/fi';
 
 const ProductCMS = () => {
   const [products, setProducts] = useState([]);
@@ -43,7 +44,7 @@ const ProductCMS = () => {
   }, []);
 
   const handleClearAllProducts = () => {
-    if (window.confirm('⚠️ Are you sure you want to remove ALL products completely from your store catalog?')) {
+    if (window.confirm('Are you sure you want to remove ALL products completely from your store catalog?')) {
       localStorage.setItem('products', JSON.stringify([]));
       localStorage.setItem('indrani_products', JSON.stringify([]));
       setProducts([]);
@@ -238,7 +239,9 @@ const ProductCMS = () => {
         </form>
       ) : products.length === 0 ? (
         <div className="bg-white rounded-2xl p-12 text-center shadow-premium border border-gold/15 space-y-4 animate-fade-in">
-          <div className="w-16 h-16 bg-red-50 text-maroon rounded-full flex items-center justify-center mx-auto text-2xl font-bold shadow-inner">👗</div>
+          <div className="w-16 h-16 bg-[#4A0E17]/10 text-[#4A0E17] rounded-full flex items-center justify-center mx-auto shadow-inner">
+            <FiPackage className="w-8 h-8" />
+          </div>
           <h3 className="text-xl font-heading text-maroon font-bold">No Products Found in Catalog</h3>
           <p className="text-sm text-gray-500 max-w-md mx-auto">All products have been completely removed from the Owner section. Click below to add your first product.</p>
           <button 

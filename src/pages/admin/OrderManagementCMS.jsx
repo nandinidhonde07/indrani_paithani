@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import OrderService from '../../services/OrderService.js';
 import { generateInvoice } from '../../utils/InvoiceGenerator.js';
+import { FiX } from 'react-icons/fi';
 
 const OrderManagementCMS = () => {
   const [orders, setOrders] = useState([]);
@@ -112,7 +113,9 @@ const OrderManagementCMS = () => {
                 <h3 className="font-heading text-2xl tracking-wide text-gold">Manage Order</h3>
                 <p className="text-sm opacity-90">{selectedOrder.orderId} | {new Date(selectedOrder.orderDate).toLocaleString()}</p>
               </div>
-              <button onClick={() => setSelectedOrder(null)} className="text-white/70 hover:text-white transition font-bold text-xl mr-2">✕</button>
+              <button onClick={() => setSelectedOrder(null)} className="text-white/70 hover:text-white transition font-bold p-1 rounded-full hover:bg-white/10" aria-label="Close Modal">
+                <FiX className="w-6 h-6" />
+              </button>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 flex-grow overflow-hidden">
