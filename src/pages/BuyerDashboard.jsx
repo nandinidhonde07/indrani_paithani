@@ -6,7 +6,11 @@ import useCartStore from '../store/useCartStore.js';
 import AuthService from '../services/AuthService.js';
 import useAuthStore from '../store/useAuthStore.js';
 import { generateInvoice } from '../utils/InvoiceGenerator.js';
-import { FiCheckCircle, FiEdit3, FiUser, FiMapPin, FiLock, FiShield, FiPlus, FiTrash2, FiStar, FiPhoneCall, FiGift, FiX, FiCheck } from 'react-icons/fi';
+import { 
+  FiCheckCircle, FiEdit3, FiUser, FiMapPin, FiLock, FiShield, 
+  FiPlus, FiTrash2, FiStar, FiPhoneCall, FiGift, FiX, FiCheck,
+  FiCamera, FiPhone, FiHeart, FiUserCheck, FiArrowRight
+} from 'react-icons/fi';
 
 const AVATAR_PRESETS = [
   { id: 'logo', name: 'Royal Monogram', url: '/assets/official_logo.jpg' },
@@ -39,7 +43,7 @@ const BuyerDashboard = () => {
     gender: 'Female',
     dob: '',
     anniversaryDate: '',
-    emergencyContact: ''
+    deliveryInstructions: ''
   });
   const [isSavingProfile, setIsSavingProfile] = useState(false);
 
@@ -70,14 +74,6 @@ const BuyerDashboard = () => {
 
   // Orders State
   const [orders, setOrders] = useState([]);
-  const [trackingOrder, setTrackingOrder] = useState(null);
-  const [viewingOrderDetails, setViewingOrderDetails] = useState(null);
-  const [notifications, setNotifications] = useState([]);
-
-  // Help & Support State
-  const [supportMessage, setSupportMessage] = useState('');
-  const [supportCategory, setSupportCategory] = useState('Order Tracking');
-  const [supportSubmitted, setSupportSubmitted] = useState(false);
 
   const fetchUserData = async () => {
     const user = await UserService.getCurrentUser();
@@ -92,7 +88,7 @@ const BuyerDashboard = () => {
         gender: user.gender || 'Female',
         dob: user.dob || '',
         anniversaryDate: user.anniversaryDate || '',
-        emergencyContact: user.emergencyContact || ''
+        deliveryInstructions: user.deliveryInstructions || ''
       });
     }
   };
@@ -136,7 +132,10 @@ const BuyerDashboard = () => {
   const handleSaveProfile = async (e) => {
     e.preventDefault();
     setIsSavingProfile(true);
-    const updated = await UserService.updateCurrentUser(editProfileForm);
+    const updated = await UserService.updateCurrentUser({
+      ...editProfileForm,
+      name: `${editProfileForm.firstName.trim()} ${editProfileForm.lastName.trim()}`.trim()
+    });
     setUserProfile(updated);
     setIsSavingProfile(false);
     setShowEditProfileModal(false);
@@ -238,7 +237,7 @@ const BuyerDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-cream flex flex-col md:flex-row relative text-black">
+    <div className="min-h-screen bg-cream flex flex-col md:flex-row relative text-black font-sans">
       
       {/* Sidebar Navigation */}
       <aside className="w-full md:w-72 bg-maroon text-white p-6 flex flex-col justify-between shadow-xl">
@@ -246,7 +245,7 @@ const BuyerDashboard = () => {
           
           {/* User Brief Card */}
           <div className="border-b border-gold/30 pb-4 flex items-center space-x-3">
-            <div className="relative cursor-pointer group" onClick={() => setShowAvatarModal(true)}>
+            <div className="relative cursor-pointer group shrink-0" onClick={() => setShowAvatarModal(true)}>
               <img 
                 src={userProfile?.avatarUrl || '/assets/official_logo.jpg'} 
                 alt="Avatar" 
@@ -277,7 +276,7 @@ const BuyerDashboard = () => {
                 onClick={() => setActiveTab(tab.id)}
                 className={`w-full flex items-center space-x-3 py-3 px-4 rounded-xl text-xs font-semibold transition ${
                   activeTab === tab.id 
-                    ? 'bg-gold text-maroon shadow-md' 
+                    ? 'bg-gold text-maroon shadow-md font-bold' 
                     : 'text-white/80 hover:bg-gold/15 hover:text-white'
                 }`}
               >
@@ -301,180 +300,384 @@ const BuyerDashboard = () => {
 
         {/* 1. MY PROFILE TAB */}
         {activeTab === 'profile' && (
-          <div className="space-y-8 max-w-5xl">
-            <div className="flex justify-between items-center border-b border-gold/20 pb-4">
-              <div>
-                <h1 className="text-3xl font-heading text-maroon font-bold">Personal Profile Dashboard</h1>
-                <p className="text-xs text-gray-500 font-light mt-1">Manage your verified customer details and preferences.</p>
-              </div>
-              <button
-                onClick={() => setShowEditProfileModal(true)}
-                className="bg-maroon hover:bg-gold text-white font-bold text-xs px-5 py-2.5 rounded-full transition shadow flex items-center space-x-2"
-              >
-                <FiEdit3 />
-                <span>Edit Profile</span>
-              </button>
-            </div>
-
-            {/* Personal Details Card */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="space-y-8 max-w-6xl mx-auto">
+            
+            {/* Profile Header */}
+            <div className="relative bg-gradient-to-r from-maroon/90 via-maroon to-[#4A0E4E] rounded-3xl p-6 md:p-8 text-white shadow-xl overflow-hidden border border-gold/30">
+              <div className="absolute inset-0 opacity-[0.07] bg-[radial-gradient(#D4AF37_1px,transparent_1px)] [background-size:16px_16px] pointer-events-none"></div>
               
-              {/* Identity & Verified Badges */}
-              <div className="bg-white p-8 rounded-3xl shadow-premium border border-gold/15 space-y-6 flex flex-col justify-between">
+              <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                  <div className="flex justify-between items-start mb-4">
-                    <div className="relative cursor-pointer group" onClick={() => setShowAvatarModal(true)}>
+                  <div className="flex items-center space-x-2 text-gold text-xs font-semibold uppercase tracking-widest mb-1">
+                    <span>⚜ Royal Paithani Patron</span>
+                  </div>
+                  <h1 className="text-3xl md:text-4xl font-heading font-bold text-white tracking-wide">My Profile</h1>
+                  <p className="text-xs md:text-sm text-cream/80 font-light mt-1 max-w-xl">
+                    Manage your personal information, contact details and delivery preferences.
+                  </p>
+                </div>
+
+                <button
+                  onClick={() => setShowEditProfileModal(true)}
+                  className="bg-gold text-maroon font-bold text-xs px-6 py-3 rounded-full hover:bg-white hover:text-maroon transition-all shadow-md flex items-center space-x-2 shrink-0 self-start md:self-auto uppercase tracking-wider"
+                >
+                  <FiEdit3 className="text-sm" />
+                  <span>Edit Profile</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Two Column Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+              
+              {/* LEFT COLUMN: Identity Card + Stats + Verification (lg:col-span-4) */}
+              <div className="lg:col-span-4 space-y-6">
+                
+                {/* Customer Identity Card */}
+                <div className="bg-white rounded-3xl p-6 md:p-8 shadow-premium border border-gold/20 text-center space-y-5 relative overflow-hidden">
+                  <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-maroon via-gold to-maroon"></div>
+
+                  {/* Avatar with Camera Icon */}
+                  <div className="relative inline-block mx-auto group">
+                    {userProfile?.avatarUrl ? (
                       <img
-                        src={userProfile?.avatarUrl || '/assets/official_logo.jpg'}
-                        alt="Avatar"
-                        className="w-20 h-20 rounded-full object-cover border-2 border-gold shadow-md"
+                        src={userProfile.avatarUrl}
+                        alt="Profile Avatar"
+                        className="w-24 h-24 rounded-full object-cover border-4 border-gold shadow-lg"
                       />
-                      <span className="absolute bottom-0 right-0 bg-maroon text-gold p-1.5 rounded-full text-xs shadow-md">📷</span>
+                    ) : (
+                      <div className="w-24 h-24 rounded-full bg-maroon text-gold font-heading text-3xl font-bold flex items-center justify-center border-4 border-gold shadow-lg">
+                        {(userProfile?.name || 'U').split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
+                      </div>
+                    )}
+                    <button
+                      onClick={() => setShowAvatarModal(true)}
+                      className="absolute bottom-0 right-0 bg-maroon hover:bg-gold text-gold hover:text-maroon p-2 rounded-full shadow-md transition border border-gold"
+                      title="Change Profile Picture"
+                    >
+                      <FiCamera className="text-sm" />
+                    </button>
+                  </div>
+
+                  {/* User Name & Email */}
+                  <div>
+                    <h2 className="text-xl md:text-2xl font-heading text-maroon font-bold">
+                      {userProfile?.name || userProfile?.fullName || 'Valued Patron'}
+                    </h2>
+                    <p className="text-xs text-gray-500 font-mono mt-1 truncate">{userProfile?.email}</p>
+                  </div>
+
+                  {/* Verification Badge (Only if emailVerified or mobileVerified) */}
+                  {(userProfile?.emailVerified || userProfile?.mobileVerified) ? (
+                    <span className="inline-flex items-center space-x-1.5 bg-emerald-50 text-emerald-800 text-[11px] font-bold px-3.5 py-1 rounded-full uppercase tracking-wider border border-emerald-200 shadow-xs">
+                      <FiCheckCircle className="text-emerald-600" />
+                      <span>Verified Customer</span>
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center space-x-1.5 bg-amber-50 text-amber-800 text-[11px] font-medium px-3.5 py-1 rounded-full uppercase tracking-wider border border-amber-200">
+                      <span>Registered Patron</span>
+                    </span>
+                  )}
+
+                  {/* Customer Since */}
+                  <div className="pt-4 border-t border-gray-100 text-xs">
+                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-1">Customer Since</span>
+                    <span className="font-semibold text-gray-800 font-heading text-sm">
+                      {userProfile?.createdAt 
+                        ? new Date(userProfile.createdAt).toLocaleDateString('en-IN', { month: 'long', year: 'numeric' })
+                        : 'September 2026'}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Account Statistics Cards (3 compact cards) */}
+                <div className="grid grid-cols-3 gap-3">
+                  <div 
+                    onClick={() => setActiveTab('orders')}
+                    className="bg-white p-4 rounded-2xl shadow-xs border border-gold/15 text-center cursor-pointer hover:border-gold hover:shadow-md transition"
+                  >
+                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">Orders</span>
+                    <span className="text-2xl font-heading font-bold text-maroon mt-1 block">{orders.length}</span>
+                  </div>
+
+                  <div 
+                    onClick={() => setActiveTab('wishlist')}
+                    className="bg-white p-4 rounded-2xl shadow-xs border border-gold/15 text-center cursor-pointer hover:border-gold hover:shadow-md transition"
+                  >
+                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">Wishlist</span>
+                    <span className="text-2xl font-heading font-bold text-maroon mt-1 block">{wishlist.length}</span>
+                  </div>
+
+                  <div 
+                    onClick={() => setActiveTab('address')}
+                    className="bg-white p-4 rounded-2xl shadow-xs border border-gold/15 text-center cursor-pointer hover:border-gold hover:shadow-md transition"
+                  >
+                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">Addresses</span>
+                    <span className="text-2xl font-heading font-bold text-maroon mt-1 block">{(userProfile?.addresses || []).length}</span>
+                  </div>
+                </div>
+
+                {/* Account Verification Section */}
+                <div className="bg-white rounded-3xl p-6 shadow-premium border border-gold/15 space-y-4">
+                  <h3 className="text-xs font-bold text-maroon uppercase tracking-widest border-b border-gold/20 pb-2">
+                    Account Verification
+                  </h3>
+
+                  <div className="space-y-3 text-xs">
+                    {/* Email Verification */}
+                    <div className="flex items-center justify-between p-3 rounded-2xl bg-cream/30 border border-gold/10">
+                      <div className="overflow-hidden mr-2">
+                        <span className="text-[10px] font-bold text-gray-400 uppercase block">Email</span>
+                        <span className="font-semibold text-gray-800 truncate block text-[11px]">{userProfile?.email}</span>
+                      </div>
+                      {userProfile?.emailVerified ? (
+                        <span className="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2.5 py-1 rounded-full shrink-0 flex items-center space-x-1">
+                          <FiCheck className="text-xs" />
+                          <span>Verified</span>
+                        </span>
+                      ) : (
+                        <span className="bg-amber-100 text-amber-800 text-[10px] font-bold px-2.5 py-1 rounded-full shrink-0">
+                          ! Not Verified
+                        </span>
+                      )}
                     </div>
-                    <span className="bg-green-100 text-green-700 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider border border-green-200 flex items-center space-x-1">
-                      <FiCheckCircle />
-                      <span>Verified Client</span>
-                    </span>
-                  </div>
 
-                  <h3 className="text-2xl font-heading text-maroon font-bold">{userProfile?.name || 'Valued Client'}</h3>
-                  <p className="text-xs text-gray-500 font-mono mt-0.5">{userProfile?.email}</p>
-                </div>
-
-                <div className="space-y-3 pt-4 border-t border-gray-100 text-xs">
-                  <div className="flex justify-between items-center bg-green-50/60 p-3 rounded-xl border border-green-200">
-                    <span className="font-bold text-green-900">Verified Mobile</span>
-                    <span className="font-semibold text-black flex items-center space-x-1">
-                      <span>{userProfile?.phone || 'Not verified'}</span>
-                      <span className="text-[9px] bg-green-600 text-white font-bold px-1.5 py-0.5 rounded-full">✓ Verified</span>
-                    </span>
-                  </div>
-
-                  <div className="flex justify-between items-center bg-blue-50/60 p-3 rounded-xl border border-blue-200">
-                    <span className="font-bold text-blue-900">Verified Email</span>
-                    <span className="font-semibold text-black flex items-center space-x-1">
-                      <span>{userProfile?.email}</span>
-                      <span className="text-[9px] bg-blue-600 text-white font-bold px-1.5 py-0.5 rounded-full">✓ Verified</span>
-                    </span>
+                    {/* Mobile Verification */}
+                    <div className="flex items-center justify-between p-3 rounded-2xl bg-cream/30 border border-gold/10">
+                      <div className="overflow-hidden mr-2">
+                        <span className="text-[10px] font-bold text-gray-400 uppercase block">Mobile</span>
+                        <span className="font-semibold text-gray-800 truncate block text-[11px]">{userProfile?.phone || 'Not added'}</span>
+                      </div>
+                      {userProfile?.mobileVerified ? (
+                        <span className="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2.5 py-1 rounded-full shrink-0 flex items-center space-x-1">
+                          <FiCheck className="text-xs" />
+                          <span>Verified</span>
+                        </span>
+                      ) : (
+                        <span className="bg-amber-100 text-amber-800 text-[10px] font-bold px-2.5 py-1 rounded-full shrink-0">
+                          ! Not Verified
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
+
               </div>
 
-              {/* Comprehensive Details Card */}
-              <div className="lg:col-span-2 bg-white p-8 rounded-3xl shadow-premium border border-gold/15 space-y-6">
-                <h3 className="text-xl font-heading text-maroon font-bold border-b border-gold/20 pb-3">Personal & Contact Info</h3>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs">
-                  <div className="bg-cream/20 p-4 rounded-2xl border border-gold/10 space-y-1">
-                    <span className="font-bold text-gray-400 block text-[10px] uppercase">Full Name</span>
-                    <span className="font-bold text-maroon text-sm">{userProfile?.name || 'N/A'}</span>
+              {/* RIGHT COLUMN: Personal Info + Address + Preferences + Quick Actions (lg:col-span-8) */}
+              <div className="lg:col-span-8 space-y-6">
+                
+                {/* Main Personal Information Card */}
+                <div className="bg-white rounded-3xl p-6 md:p-8 shadow-premium border border-gold/15 space-y-6">
+                  <div>
+                    <h3 className="text-xl font-heading text-maroon font-bold">Personal Information</h3>
+                    <div className="h-[1px] bg-gradient-to-r from-gold/40 via-gold/20 to-transparent mt-2"></div>
                   </div>
 
-                  <div className="bg-cream/20 p-4 rounded-2xl border border-gold/10 space-y-1">
-                    <span className="font-bold text-gray-400 block text-[10px] uppercase">Primary Mobile Number</span>
-                    <span className="font-bold text-black text-sm">{userProfile?.phone || 'N/A'}</span>
-                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5 text-xs">
+                    {/* Full Name */}
+                    <div className="bg-cream/25 p-4 rounded-2xl border border-gold/15 space-y-1 hover:border-gold/30 transition">
+                      <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider flex items-center space-x-1.5">
+                        <FiUser className="text-maroon text-xs" />
+                        <span>Full Name</span>
+                      </span>
+                      <p className="font-bold text-maroon text-sm pt-0.5">
+                        {userProfile?.name || userProfile?.fullName || <span className="text-gray-400 font-normal italic">Not provided</span>}
+                      </p>
+                    </div>
 
-                  <div className="bg-cream/20 p-4 rounded-2xl border border-gold/10 space-y-1">
-                    <span className="font-bold text-gray-400 block text-[10px] uppercase">Alternate Contact Number</span>
-                    <span className="font-semibold text-gray-700 text-xs">{userProfile?.altPhone || 'Not provided'}</span>
-                  </div>
+                    {/* Primary Mobile */}
+                    <div className="bg-cream/25 p-4 rounded-2xl border border-gold/15 space-y-1 hover:border-gold/30 transition">
+                      <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider flex items-center space-x-1.5">
+                        <FiPhone className="text-maroon text-xs" />
+                        <span>Primary Mobile Number</span>
+                      </span>
+                      <p className="font-bold text-black text-sm pt-0.5 font-mono">
+                        {userProfile?.phone || <span className="text-gray-400 font-normal italic">Not provided</span>}
+                      </p>
+                    </div>
 
-                  <div className="bg-cream/20 p-4 rounded-2xl border border-gold/10 space-y-1">
-                    <span className="font-bold text-gray-400 block text-[10px] uppercase">Gender / Pronoun</span>
-                    <span className="font-semibold text-gray-700 text-xs">{userProfile?.gender || 'Female'}</span>
-                  </div>
+                    {/* Alternate Phone */}
+                    <div className="bg-cream/25 p-4 rounded-2xl border border-gold/15 space-y-1 hover:border-gold/30 transition">
+                      <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider flex items-center space-x-1.5">
+                        <FiPhoneCall className="text-maroon text-xs" />
+                        <span>Alternate Contact Number</span>
+                      </span>
+                      <p className="font-semibold text-gray-800 text-xs pt-0.5">
+                        {userProfile?.altPhone || <span className="text-gray-400 font-normal italic">Not provided</span>}
+                      </p>
+                    </div>
 
-                  <div className="bg-cream/20 p-4 rounded-2xl border border-gold/10 space-y-1">
-                    <span className="font-bold text-gray-400 block text-[10px] uppercase">Date of Birth</span>
-                    <span className="font-semibold text-gray-700 text-xs">{userProfile?.dob ? new Date(userProfile.dob).toLocaleDateString() : 'Not provided'}</span>
-                  </div>
+                    {/* Gender / Pronoun */}
+                    <div className="bg-cream/25 p-4 rounded-2xl border border-gold/15 space-y-1 hover:border-gold/30 transition">
+                      <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider flex items-center space-x-1.5">
+                        <FiUserCheck className="text-maroon text-xs" />
+                        <span>Gender / Pronoun</span>
+                      </span>
+                      <p className="font-semibold text-gray-800 text-xs pt-0.5">
+                        {userProfile?.gender || <span className="text-gray-400 font-normal italic">Not provided</span>}
+                      </p>
+                    </div>
 
-                  <div className="bg-cream/20 p-4 rounded-2xl border border-gold/10 space-y-1">
-                    <span className="font-bold text-gray-400 block text-[10px] uppercase">Anniversary Date</span>
-                    <span className="font-semibold text-gray-700 text-xs">{userProfile?.anniversaryDate ? new Date(userProfile.anniversaryDate).toLocaleDateString() : 'Not provided'}</span>
+                    {/* Date of Birth */}
+                    <div className="bg-cream/25 p-4 rounded-2xl border border-gold/15 space-y-1 hover:border-gold/30 transition">
+                      <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider flex items-center space-x-1.5">
+                        <FiGift className="text-gold text-xs" />
+                        <span>Date of Birth</span>
+                      </span>
+                      <p className="font-semibold text-gray-800 text-xs pt-0.5">
+                        {userProfile?.dob ? new Date(userProfile.dob).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' }) : <span className="text-gray-400 font-normal italic">Not provided</span>}
+                      </p>
+                    </div>
+
+                    {/* Anniversary Date */}
+                    <div className="bg-cream/25 p-4 rounded-2xl border border-gold/15 space-y-1 hover:border-gold/30 transition">
+                      <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider flex items-center space-x-1.5">
+                        <FiHeart className="text-gold text-xs" />
+                        <span>Anniversary Date</span>
+                      </span>
+                      <p className="font-semibold text-gray-800 text-xs pt-0.5">
+                        {userProfile?.anniversaryDate ? new Date(userProfile.anniversaryDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' }) : <span className="text-gray-400 font-normal italic">Not provided</span>}
+                      </p>
+                    </div>
                   </div>
                 </div>
 
-                <div className="bg-gray-50 p-4 rounded-2xl border border-gray-200 text-xs space-y-1">
-                  <span className="font-bold text-gray-500 block text-[10px] uppercase">Primary Shipping Address</span>
-                  <p className="text-gray-800 font-medium leading-relaxed">
-                    {userProfile?.address || 'No primary delivery address saved.'}
-                  </p>
+                {/* Primary Shipping Address Card */}
+                <div className="bg-white rounded-3xl p-6 md:p-8 shadow-premium border border-gold/15 space-y-4">
+                  <div className="flex justify-between items-center border-b border-gold/20 pb-3">
+                    <h3 className="text-lg font-heading text-maroon font-bold flex items-center space-x-2">
+                      <FiMapPin className="text-gold" />
+                      <span>Primary Shipping Address</span>
+                    </h3>
+                    <button
+                      onClick={() => setActiveTab('address')}
+                      className="text-xs font-bold text-maroon hover:text-gold transition uppercase tracking-wider"
+                    >
+                      Manage Addresses →
+                    </button>
+                  </div>
+
+                  <div className="bg-cream/20 p-5 rounded-2xl border border-gold/15 text-xs">
+                    {userProfile?.address && userProfile.address !== 'No primary delivery address saved.' && userProfile.address !== 'No saved address' ? (
+                      <div className="flex items-start space-x-3">
+                        <span className="text-base text-maroon shrink-0 mt-0.5">📍</span>
+                        <div>
+                          <p className="font-semibold text-gray-800 leading-relaxed text-xs">
+                            {userProfile.address}
+                          </p>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex justify-between items-center py-2">
+                        <span className="text-gray-500 font-light italic">No shipping address added yet.</span>
+                        <button
+                          onClick={() => setShowAddAddressModal(true)}
+                          className="bg-maroon text-white font-bold px-4 py-2 rounded-full text-xs hover:bg-gold transition shadow-xs"
+                        >
+                          + Add Address
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </div>
 
-                <div className="bg-cream/40 p-4 rounded-2xl border border-gold/20 text-xs space-y-1">
-                  <span className="font-bold text-maroon block text-[10px] uppercase">Default Delivery Instructions</span>
-                  <p className="text-gray-800 italic font-medium leading-relaxed">
-                    {userProfile?.deliveryInstructions || 'Standard Courier Delivery (No special instructions)'}
-                  </p>
+                {/* Delivery Preferences Card */}
+                <div className="bg-white rounded-3xl p-6 md:p-8 shadow-premium border border-gold/15 space-y-4">
+                  <div className="flex justify-between items-center border-b border-gold/20 pb-3">
+                    <h3 className="text-lg font-heading text-maroon font-bold flex items-center space-x-2">
+                      <FiShield className="text-gold" />
+                      <span>Delivery Preferences</span>
+                    </h3>
+                    <button
+                      onClick={() => setShowEditProfileModal(true)}
+                      className="text-xs font-bold text-maroon hover:text-gold transition uppercase tracking-wider"
+                    >
+                      Edit Preferences
+                    </button>
+                  </div>
+
+                  <div className="bg-cream/20 p-5 rounded-2xl border border-gold/15 text-xs space-y-1">
+                    <span className="text-[10px] font-bold text-maroon uppercase tracking-wider block">Default Delivery Instructions</span>
+                    <p className="text-gray-800 italic font-medium leading-relaxed pt-1">
+                      {userProfile?.deliveryInstructions || 'No special delivery instructions'}
+                    </p>
+                  </div>
                 </div>
+
+                {/* Quick Account Actions Grid */}
+                <div className="bg-white rounded-3xl p-6 md:p-8 shadow-premium border border-gold/15 space-y-6">
+                  <h3 className="text-lg font-heading text-maroon font-bold border-b border-gold/20 pb-3">
+                    Account & Preferences
+                  </h3>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {/* Card 1: My Orders */}
+                    <div 
+                      onClick={() => setActiveTab('orders')}
+                      className="p-5 rounded-2xl bg-cream/20 border border-gold/15 hover:border-gold hover:shadow-md transition cursor-pointer flex justify-between items-center group"
+                    >
+                      <div className="space-y-1">
+                        <div className="flex items-center space-x-2 text-maroon font-heading font-bold text-sm">
+                          <FiGift className="text-gold text-base" />
+                          <span>My Orders</span>
+                        </div>
+                        <p className="text-[11px] text-gray-500 font-light">View your previous and current orders.</p>
+                      </div>
+                      <FiArrowRight className="text-maroon text-lg group-hover:translate-x-1 transition shrink-0 ml-2" />
+                    </div>
+
+                    {/* Card 2: Wishlist */}
+                    <div 
+                      onClick={() => setActiveTab('wishlist')}
+                      className="p-5 rounded-2xl bg-cream/20 border border-gold/15 hover:border-gold hover:shadow-md transition cursor-pointer flex justify-between items-center group"
+                    >
+                      <div className="space-y-1">
+                        <div className="flex items-center space-x-2 text-maroon font-heading font-bold text-sm">
+                          <FiStar className="text-gold text-base" />
+                          <span>Wishlist</span>
+                        </div>
+                        <p className="text-[11px] text-gray-500 font-light">View your saved Paithani sarees.</p>
+                      </div>
+                      <FiArrowRight className="text-maroon text-lg group-hover:translate-x-1 transition shrink-0 ml-2" />
+                    </div>
+
+                    {/* Card 3: Saved Addresses */}
+                    <div 
+                      onClick={() => setActiveTab('address')}
+                      className="p-5 rounded-2xl bg-cream/20 border border-gold/15 hover:border-gold hover:shadow-md transition cursor-pointer flex justify-between items-center group"
+                    >
+                      <div className="space-y-1">
+                        <div className="flex items-center space-x-2 text-maroon font-heading font-bold text-sm">
+                          <FiMapPin className="text-gold text-base" />
+                          <span>Saved Addresses</span>
+                        </div>
+                        <p className="text-[11px] text-gray-500 font-light">Manage your delivery addresses.</p>
+                      </div>
+                      <FiArrowRight className="text-maroon text-lg group-hover:translate-x-1 transition shrink-0 ml-2" />
+                    </div>
+
+                    {/* Card 4: Security */}
+                    <div 
+                      onClick={() => setActiveTab('security')}
+                      className="p-5 rounded-2xl bg-cream/20 border border-gold/15 hover:border-gold hover:shadow-md transition cursor-pointer flex justify-between items-center group"
+                    >
+                      <div className="space-y-1">
+                        <div className="flex items-center space-x-2 text-maroon font-heading font-bold text-sm">
+                          <FiLock className="text-gold text-base" />
+                          <span>Security</span>
+                        </div>
+                        <p className="text-[11px] text-gray-500 font-light">Manage password and account security.</p>
+                      </div>
+                      <FiArrowRight className="text-maroon text-lg group-hover:translate-x-1 transition shrink-0 ml-2" />
+                    </div>
+                  </div>
+                </div>
+
               </div>
+
             </div>
 
-
-            {/* PREVIOUS ORDERS BREAKDOWN */}
-            <div className="bg-white p-8 rounded-3xl shadow-premium border border-gold/15 space-y-6">
-              <div className="flex justify-between items-center border-b border-gold/20 pb-4">
-                <div>
-                  <h3 className="text-xl font-heading text-maroon font-bold">Previous Orders Breakdown</h3>
-                  <p className="text-xs text-gray-500 mt-0.5">Comprehensive history of past saree purchases and status logs.</p>
-                </div>
-                <span className="text-xs font-bold text-maroon bg-cream px-3 py-1 rounded-full border border-gold/30">
-                  Total Orders: {orders.length}
-                </span>
-              </div>
-
-              {orders.length === 0 ? (
-                <div className="text-center py-8 text-gray-500 text-xs">
-                  No orders placed yet. <Link to="/shop" className="text-maroon font-bold underline">Explore Saree Boutique</Link>
-                </div>
-              ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left text-xs border-collapse">
-                    <thead>
-                      <tr className="border-b border-gray-200 text-gray-500 uppercase font-bold tracking-wider">
-                        <th className="py-3 px-2">Order ID</th>
-                        <th className="py-3 px-2">Order Date</th>
-                        <th className="py-3 px-2">Est. Delivery</th>
-                        <th className="py-3 px-2">Payment Method</th>
-                        <th className="py-3 px-2">Grand Total</th>
-                        <th className="py-3 px-2">Status</th>
-                        <th className="py-3 px-2 text-right">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {orders.map(ord => (
-                        <tr key={ord.orderId} className="border-b border-gray-100 hover:bg-cream/20 transition">
-                          <td className="py-3 px-2 font-mono font-bold text-maroon">{ord.orderId}</td>
-                          <td className="py-3 px-2 font-medium">{new Date(ord.orderDate).toLocaleDateString('en-IN')}</td>
-                          <td className="py-3 px-2 text-gray-700 font-semibold">{new Date(ord.estimatedDelivery).toLocaleDateString('en-IN')}</td>
-                          <td className="py-3 px-2 font-semibold text-purple-900">{ord.paymentMethod}</td>
-                          <td className="py-3 px-2 font-bold text-maroon">₹{ord.grandTotal.toLocaleString('en-IN')}</td>
-                          <td className="py-3 px-2">
-                            <span className={`px-2.5 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider ${
-                              ord.status === 'Delivered' ? 'bg-green-100 text-green-700' :
-                              ord.status === 'Cancelled' ? 'bg-red-100 text-red-700' :
-                              'bg-cream text-maroon border border-gold/30'
-                            }`}>
-                              {ord.status}
-                            </span>
-                          </td>
-                          <td className="py-3 px-2 text-right space-x-2">
-                            <button
-                              onClick={() => generateInvoice(ord)}
-                              className="text-[10px] border border-maroon text-maroon hover:bg-maroon hover:text-white font-bold py-1 px-3 rounded-full transition"
-                            >
-                              PDF Invoice
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </div>
           </div>
         )}
 
@@ -484,8 +687,13 @@ const BuyerDashboard = () => {
             <h1 className="text-3xl font-heading text-maroon font-bold">My Orders ({orders.length})</h1>
             
             {orders.length === 0 ? (
-              <div className="bg-white rounded-3xl p-12 text-center shadow-premium border border-gold/10 text-gray-500">
-                You haven't placed any orders yet. <Link to="/shop" className="text-maroon font-semibold underline">Explore our saree collections</Link>.
+              <div className="bg-white rounded-3xl p-12 text-center shadow-premium border border-gold/10 text-gray-500 space-y-3">
+                <FiGift className="mx-auto text-4xl text-gold/60" />
+                <h3 className="font-heading text-lg font-bold text-maroon">No Orders Yet</h3>
+                <p className="text-xs font-light max-w-sm mx-auto">Your Paithani journey begins here. Explore our handwoven saree collections.</p>
+                <Link to="/shop" className="inline-block bg-maroon text-white text-xs font-bold px-6 py-2.5 rounded-full hover:bg-gold transition shadow-sm uppercase tracking-wider">
+                  Explore Collection
+                </Link>
               </div>
             ) : (
               <div className="space-y-6">
@@ -534,7 +742,7 @@ const BuyerDashboard = () => {
         {/* 3. CART TAB */}
         {activeTab === 'cart' && (
           <div className="space-y-8 max-w-5xl">
-            <h1 className="text-3xl font-heading text-maroon font-bold">Shopping Cart ({cart.length})</h1>
+            <h1 className="text-3xl font-heading text-maroon font-bold">Shopping Bag ({cart.length})</h1>
             {cart.length > 0 ? (
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <div className="lg:col-span-2 space-y-4">
@@ -570,8 +778,9 @@ const BuyerDashboard = () => {
                 </div>
               </div>
             ) : (
-              <div className="text-center py-20 bg-white rounded-3xl border border-gold/10 text-gray-500">
-                Your cart is empty. <Link to="/shop" className="text-maroon font-semibold underline">Browse Shop</Link>.
+              <div className="text-center py-20 bg-white rounded-3xl border border-gold/10 text-gray-500 space-y-3">
+                <p>Your cart is empty.</p>
+                <Link to="/shop" className="inline-block bg-maroon text-white text-xs font-bold px-6 py-2.5 rounded-full hover:bg-gold transition shadow-sm uppercase tracking-wider">Browse Shop</Link>
               </div>
             )}
           </div>
@@ -596,8 +805,9 @@ const BuyerDashboard = () => {
                 ))}
               </div>
             ) : (
-              <div className="text-center py-20 bg-white rounded-3xl border border-gold/10 text-gray-500">
-                Your wishlist is empty. Explore items in our <Link to="/shop" className="text-maroon font-semibold underline">Shop</Link>.
+              <div className="text-center py-20 bg-white rounded-3xl border border-gold/10 text-gray-500 space-y-3">
+                <p>Your wishlist is empty.</p>
+                <Link to="/shop" className="inline-block bg-maroon text-white text-xs font-bold px-6 py-2.5 rounded-full hover:bg-gold transition shadow-sm uppercase tracking-wider">Explore Shop</Link>
               </div>
             )}
           </div>
@@ -613,7 +823,7 @@ const BuyerDashboard = () => {
               </div>
               <button
                 onClick={() => setShowAddAddressModal(true)}
-                className="bg-maroon hover:bg-gold text-white font-bold text-xs px-5 py-2.5 rounded-full transition shadow flex items-center space-x-2"
+                className="bg-maroon hover:bg-gold text-white font-bold text-xs px-5 py-2.5 rounded-full transition shadow flex items-center space-x-2 uppercase tracking-wider"
               >
                 <FiPlus />
                 <span>Add New Address</span>
@@ -682,7 +892,7 @@ const BuyerDashboard = () => {
                   <p className="text-xs text-gray-500 font-light">No saved addresses found. Add a delivery address for fast checkout.</p>
                   <button
                     onClick={() => setShowAddAddressModal(true)}
-                    className="inline-block bg-maroon text-white text-xs font-bold px-6 py-2.5 rounded-full hover:bg-gold transition shadow-sm"
+                    className="inline-block bg-maroon text-white text-xs font-bold px-6 py-2.5 rounded-full hover:bg-gold transition shadow-sm uppercase tracking-wider"
                   >
                     Add Your First Address
                   </button>
@@ -721,7 +931,7 @@ const BuyerDashboard = () => {
 
                 <div className="bg-purple-50 p-3 rounded-xl border border-purple-100 text-[11px] text-purple-900 space-y-1">
                   <p className="font-bold">🔒 Multi-Factor Protected</p>
-                  <p className="text-gray-600">Your account is secured with SMS OTP mobile verification.</p>
+                  <p className="text-gray-600">Your account is secured with UID persistence and verified session tokens.</p>
                 </div>
               </div>
 
@@ -826,7 +1036,7 @@ const BuyerDashboard = () => {
       {/* EDIT PROFILE MODAL */}
       {showEditProfileModal && (
         <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-xl w-full p-8 space-y-6 relative shadow-2xl">
+          <div className="bg-white rounded-3xl max-w-xl w-full p-8 space-y-6 relative shadow-2xl border border-gold/30">
             <button
               onClick={() => setShowEditProfileModal(false)}
               className="absolute top-4 right-4 bg-maroon text-white w-8 h-8 rounded-full flex items-center justify-center font-bold hover:bg-gold transition"
@@ -834,12 +1044,15 @@ const BuyerDashboard = () => {
               ✕
             </button>
 
-            <h3 className="font-heading text-2xl text-maroon font-bold border-b border-gold/20 pb-3">Edit Profile Details</h3>
+            <div className="border-b border-gold/20 pb-3">
+              <h3 className="font-heading text-2xl text-maroon font-bold">Edit Profile Details</h3>
+              <p className="text-xs text-gray-500 font-light mt-0.5">Update your personal preferences and contact information.</p>
+            </div>
 
             <form onSubmit={handleSaveProfile} className="space-y-4 text-xs">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block font-bold text-gray-600 uppercase mb-1">First Name</label>
+                  <label className="block font-bold text-gray-600 uppercase mb-1">First Name *</label>
                   <input
                     type="text"
                     required
@@ -849,7 +1062,7 @@ const BuyerDashboard = () => {
                   />
                 </div>
                 <div>
-                  <label className="block font-bold text-gray-600 uppercase mb-1">Last Name</label>
+                  <label className="block font-bold text-gray-600 uppercase mb-1">Last Name *</label>
                   <input
                     type="text"
                     required
@@ -860,9 +1073,21 @@ const BuyerDashboard = () => {
                 </div>
               </div>
 
+              <div>
+                <label className="block font-bold text-gray-400 uppercase mb-1">Email Address (Read Only)</label>
+                <input
+                  type="email"
+                  readOnly
+                  disabled
+                  value={editProfileForm.email}
+                  className="w-full px-4 py-2 border border-gray-200 rounded-xl bg-gray-50 text-gray-500 font-mono cursor-not-allowed"
+                />
+                <span className="text-[10px] text-gray-400 italic mt-1 block">Email is managed through your authentication account.</span>
+              </div>
+
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block font-bold text-gray-600 uppercase mb-1">Mobile Phone (+91)</label>
+                  <label className="block font-bold text-gray-600 uppercase mb-1">Primary Phone (+91)</label>
                   <input
                     type="text"
                     value={editProfileForm.phone}
@@ -915,18 +1140,29 @@ const BuyerDashboard = () => {
                 </div>
               </div>
 
-              <div className="flex gap-4 pt-4 border-t">
+              <div>
+                <label className="block font-bold text-gray-600 uppercase mb-1">Default Delivery Instructions</label>
+                <input
+                  type="text"
+                  value={editProfileForm.deliveryInstructions}
+                  onChange={(e) => setEditProfileForm({ ...editProfileForm, deliveryInstructions: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-gold"
+                  placeholder="e.g. Call before delivery"
+                />
+              </div>
+
+              <div className="flex gap-4 pt-4 border-t border-gray-100">
                 <button
                   type="button"
                   onClick={() => setShowEditProfileModal(false)}
-                  className="flex-1 border border-gray-300 py-3 rounded-full hover:bg-gray-50 transition"
+                  className="flex-1 border border-gray-300 py-3 rounded-full hover:bg-gray-50 transition text-gray-700 font-bold"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSavingProfile}
-                  className="flex-1 bg-maroon hover:bg-gold text-white font-bold py-3 rounded-full transition shadow-md"
+                  className="flex-1 bg-maroon hover:bg-gold text-white font-bold py-3 rounded-full transition shadow-md uppercase tracking-wider text-[11px]"
                 >
                   {isSavingProfile ? 'Saving...' : 'Save Profile Changes'}
                 </button>
@@ -939,7 +1175,7 @@ const BuyerDashboard = () => {
       {/* AVATAR SELECTOR MODAL */}
       {showAvatarModal && (
         <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-md w-full p-6 space-y-6 relative shadow-2xl">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 space-y-6 relative shadow-2xl border border-gold/30">
             <button
               onClick={() => setShowAvatarModal(false)}
               className="absolute top-4 right-4 bg-maroon text-white w-8 h-8 rounded-full flex items-center justify-center font-bold hover:bg-gold transition"
@@ -989,7 +1225,7 @@ const BuyerDashboard = () => {
       {/* ADD ADDRESS MODAL */}
       {showAddAddressModal && (
         <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-md w-full p-8 space-y-6 relative shadow-2xl">
+          <div className="bg-white rounded-3xl max-w-md w-full p-8 space-y-6 relative shadow-2xl border border-gold/30">
             <button
               onClick={() => setShowAddAddressModal(false)}
               className="absolute top-4 right-4 bg-maroon text-white w-8 h-8 rounded-full flex items-center justify-center font-bold hover:bg-gold transition"
