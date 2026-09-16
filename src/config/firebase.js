@@ -1,8 +1,16 @@
 import { initializeApp, getApps } from "firebase/app";
 import { getAuth, GoogleAuthProvider } from "firebase/auth";
 
+const rawApiKey = import.meta.env.VITE_FIREBASE_API_KEY || "";
+const isFirebaseConfigured = Boolean(
+  rawApiKey && 
+  rawApiKey !== "AIzaSyDemoKeyForIndraniPaithaniStore2026" && 
+  !rawApiKey.toLowerCase().includes("demo") &&
+  !rawApiKey.toLowerCase().includes("placeholder")
+);
+
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "AIzaSyDemoKeyForIndraniPaithaniStore2026",
+  apiKey: rawApiKey || "AIzaSyDemoKeyForIndraniPaithaniStore2026",
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "indrani-paithani.firebaseapp.com",
   projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "indrani-paithani",
   storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "indrani-paithani.appspot.com",
@@ -35,4 +43,4 @@ try {
   googleProvider = {};
 }
 
-export { auth, googleProvider };
+export { auth, googleProvider, isFirebaseConfigured };
